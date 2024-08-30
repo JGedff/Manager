@@ -1,0 +1,8 @@
+WINDOW_WIDTH = 1440
+WINDOW_HEIGTH = 720
+
+STORES = []
+SHELVES = []
+
+CATEGORY_NAMES = ['Empty', 'Unreachable']
+CATEGORY_COLORS = ['white', 'red']
