@@ -6,12 +6,12 @@ from components.space import Space
 from components.shelf import Shelf
 from components.store import Store
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGTH, SHELVES, STORES
+from constants import WINDOW_WIDTH, WINDOW_HEIGTH, WINDOW_TITLE, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Manager")
+        self.setWindowTitle(WINDOW_TITLE)
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGTH)
 
         self.scroll = QScrollArea()
@@ -19,29 +19,13 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
         self.scroll.setWidget(self.widget)
 
-        SHELVES.append(Shelf("Shelf " + str(SHELVES.__len__() + 1), 400, 130, self, self.widget))
+        SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, self, self.widget))
 
         self.initUI(self.widget)
         self.initEvents()
         
         self.setCentralWidget(self.scroll)
         self.resizeScroll()
-
-    def resizeScroll(self):
-        if SHELVES.__len__() > 0 and SHELVES[SHELVES.__len__() - 1].pos().y() + 250 > WINDOW_HEIGTH:
-            self.widget.resize(WINDOW_WIDTH - 20, SHELVES[SHELVES.__len__() - 1].pos().y() + 250)
-        else:
-            self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
-
-        self.createShelfButton.setGeometry(SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + 150, self.createShelfButton.width(), self.createShelfButton.height())
-        self.createShelfButton.raise_()
-
-        self.createStoreButton.setGeometry(SHELVES[SHELVES.__len__() - 1].pos().x() + 400, SHELVES[SHELVES.__len__() - 1].pos().y() + 150, self.createStoreButton.width(), self.createStoreButton.height())
-        self.createStoreButton.raise_()
-
-        for index, obj in enumerate(SHELVES):
-            if isinstance(obj, Shelf):
-                obj.setGeometry(obj.pos().x(), (150 * (index + 1)), obj.width(), obj.height())
 
     def initUI(self, parent):
         # Create main buttons
@@ -54,7 +38,7 @@ class MainWindow(QMainWindow):
         self.newStoreLabel.setStyleSheet("background-color: #dddddd;")
         self.newStoreLabel.hide()
 
-        # Config
+        # Config new store
         self.newStoreNameLabel = QLabel("Name of the store:", parent)
         self.newStoreNameLabel.setGeometry(400, 100, 100, 35)
         self.newStoreNameLabel.hide()
@@ -64,47 +48,118 @@ class MainWindow(QMainWindow):
         self.newStoreNameEdit.setPlaceholderText("Store 1")
         self.newStoreNameEdit.hide()
 
-        self.createStoreButton = QPushButton("+ Create store", parent)
-        self.createStoreButton.setGeometry(830, 390, 100, 35)
-        self.createStoreButton.hide()
-
-        self.goBackHomeButton = QPushButton("← Go back", parent)
-        self.goBackHomeButton.setGeometry(1300, 15, 100, 50)
-        self.goBackHomeButton.hide()
-
+        # Add new shelf
         self.createShelfButton = QPushButton("+ Add shelf", parent)
         self.createShelfButton.setGeometry(830, 340, 100, 35)
         self.createShelfButton.hide()
 
-        self.editCategories = Space(0, 0, 0, Shelf("",0,0,self,parent), Store("", "", 0, 0, self, parent), self, parent, False, True)
-        self.editCategories.STORE.hideStore()
-        self.editCategories.STORE.hideIcon()
-        self.editCategories.hideSpace()
+        # Create store
+        self.createStoreButton = QPushButton("+ Create store", parent)
+        self.createStoreButton.setGeometry(830, 390, 100, 35)
+        self.createStoreButton.hide()
+
+        # Go home        
+        self.goBackHomeButton = QPushButton("← Go back", parent)
+        self.goBackHomeButton.setGeometry(1300, 15, 100, 50)
+        self.goBackHomeButton.hide()
+
+        # Show edit categories button
+        self.categorySpace = Space(0, 0, 0, 0, Store("", "", 0, 0, self, parent), parent, False, True)
+        self.categorySpace.STORE.hideStore()
+        self.categorySpace.STORE.hideIcon()
+        self.categorySpace.hideSpace()
+
+        self.editCategories = QPushButton("Edit categories ⚙️", parent)
+        self.editCategories.setGeometry(1316, 610, 100, 30)
 
         if STORES.__len__() > 0:
-            self.editCategories.home()
+            self.editCategories.show()
+        else:
+            self.editCategories.hide()
 
         for i in STORES:
             if isinstance(i, Store):
                 i.showIcon()
 
-    def createShelf(self):
-        SHELVES.append(Shelf("Shelf " + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + 150, self, self.widget))
+    def resizeScroll(self):
+        if SHELVES.__len__() > 0 and SHELVES[SHELVES.__len__() - 1].pos().y() + 250 > WINDOW_HEIGTH:
+            self.widget.resize(WINDOW_WIDTH - 20, SHELVES[SHELVES.__len__() - 1].pos().y() + 250)
+        else:
+            self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
 
-        self.resizeScroll()
+        self.createShelfButton.setGeometry(SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self.createShelfButton.width(), self.createShelfButton.height())
+        self.createShelfButton.raise_()
 
-        if STORES.__len__() > 0:
-            self.editCategories.hideHome()
+        self.createStoreButton.setGeometry(SHELVES[SHELVES.__len__() - 1].pos().x() + DEFAULT_SHELF_WIDTH, SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self.createStoreButton.width(), self.createStoreButton.height())
+        self.createStoreButton.raise_()
 
-        for i in SHELVES:
-            if isinstance(i, Shelf):
-                i.showForm()
-    
+        for index, obj in enumerate(SHELVES):
+            if isinstance(obj, Shelf):
+                obj.setGeometry(obj.pos().x(), (DEFAULT_SHELF_MARGIN * (index + 1)), obj.width(), obj.height())
+
     def initEvents(self):
         self.addStoreButton.clicked.connect(self.addStore)
         self.goBackHomeButton.clicked.connect(self.reOpenHome)
         self.createShelfButton.clicked.connect(self.createShelf)
         self.createStoreButton.clicked.connect(self.createStore)
+        self.editCategories.clicked.connect(self.configCategories)
+
+    def addStore(self):
+        self.newStoreLabel.show()
+        self.newStoreNameEdit.show()
+        self.newStoreNameLabel.show()
+        self.createStoreButton.show()
+        self.createShelfButton.show()
+        
+        for i in SHELVES:
+            if isinstance(i, Shelf):
+                i.showForm()
+
+        for i in STORES:
+            if isinstance(i, Store):
+                i.hideIcon()
+
+        # It only hides and shows the same items as when it opens a store, but here it does not open a store
+        self.openStore()
+
+        self.resizeScroll()
+
+    def reOpenHome(self):
+        self.newStoreLabel.hide()
+        self.newStoreNameEdit.hide()
+        self.goBackHomeButton.hide()
+        self.newStoreNameLabel.hide()
+        self.createStoreButton.hide()
+        self.createShelfButton.hide()
+        self.addStoreButton.show()
+
+        if STORES.__len__() > 0:
+            self.editCategories.show()
+        else:
+            self.editCategories.hide()
+
+        for i in STORES:
+            if isinstance(i, Store):
+                i.hideStore()
+                i.showIcon()
+
+        for i in SHELVES:
+            if isinstance(i, Shelf):
+                i.hideForm()
+
+        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
+
+        # This case is for when you open category configuration from main
+        self.categorySpace.category.hideUI()
+
+    def createShelf(self):
+        SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self, self.widget))
+
+        self.resizeScroll()
+
+        for i in SHELVES:
+            if isinstance(i, Shelf):
+                i.showForm()
 
     def createStore(self):
         val = self.newStoreNameEdit.text()
@@ -132,59 +187,19 @@ class MainWindow(QMainWindow):
         
         self.reOpenHome()
     
-    def addStore(self):
-        self.addStoreButton.hide()
-        self.newStoreLabel.show()
-        self.goBackHomeButton.show()
-        self.newStoreNameEdit.show()
-        self.newStoreNameLabel.show()
-        self.createStoreButton.show()
-        self.createShelfButton.show()
-        
-        for i in SHELVES:
-            if isinstance(i, Shelf):
-                i.showForm()
-
+    def configCategories(self):
         for i in STORES:
             if isinstance(i, Store):
                 i.hideIcon()
 
-        self.resizeScroll()
+        self.openStore()
+        self.categorySpace.configSpace()
+        self.categorySpace.openSpaceConfig.hide()
 
     def openStore(self):
         self.addStoreButton.hide()
         self.goBackHomeButton.show()
-
-        if STORES.__len__() > 0:
-            self.editCategories.hideHome()
-
-    def reOpenHome(self):
-        self.newStoreLabel.hide()
-        self.newStoreNameEdit.hide()
-        self.goBackHomeButton.hide()
-        self.newStoreNameLabel.hide()
-        self.createStoreButton.hide()
-        self.createShelfButton.hide()
-        self.addStoreButton.show()
-
-        if STORES.__len__() > 0:
-            self.editCategories.home()
-
-        for i in STORES:
-            if isinstance(i, Store):
-                i.hideStore()
-                i.showIcon()
-
-        for i in SHELVES:
-            if isinstance(i, Shelf):
-                i.hideForm()
-
-        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
-
-    def configSpace(self):
-        self.goBackHomeButton.hide()
-
-        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
+        self.editCategories.hide()
 
 class main():
     app = QApplication(sys.argv)
