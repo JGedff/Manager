@@ -6,23 +6,29 @@ class InputNumber(QLabel):
 
         self.defaultNumber = defaultNumber
 
+        self.initUI()
+        self.initEvents()
+    
+    def initUI(self):
         layout = QHBoxLayout(self)
         self.inputNum = QLineEdit(self)
-        self.inputNum.setText(str(defaultNumber))
+        self.inputNum.setText(str(self.defaultNumber))
         self.inputNum.setReadOnly(True)
 
-        addNumber = QPushButton("↑", self)
-        addNumber.clicked.connect(self.addNum)
+        self.addNumber = QPushButton("↑", self)
 
-        restNumber = QPushButton("↓", self)
-        restNumber.clicked.connect(self.restNum)
+        self.restNumber = QPushButton("↓", self)
 
-        layout.addWidget(addNumber)
+        layout.addWidget(self.addNumber)
         layout.addWidget(self.inputNum)
-        layout.addWidget(restNumber)
+        layout.addWidget(self.restNumber)
 
         layout.setSpacing(0)
     
+    def initEvents(self):
+        self.addNumber.clicked.connect(self.addNum)
+        self.restNumber.clicked.connect(self.restNum)
+
     def addNum(self):
         actualNum = self.inputNum.text()
         self.inputNum.setText(str(int(actualNum) + 1))
@@ -32,3 +38,6 @@ class InputNumber(QLabel):
     
         if int(actualNum) > self.defaultNumber:
             self.inputNum.setText(str(int(actualNum) - 1))
+
+    def getNum(self):
+        return int(self.inputNum.text())

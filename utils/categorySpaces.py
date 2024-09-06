@@ -3,14 +3,7 @@ from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QColorDialog
 from constants import CATEGORY_NAMES, CATEGORY_COLORS, STORES
 
 class Category():
-    def changeCategoryName(index, name):
-        CATEGORY_NAMES[index] = name
-
     def changeCategoryColor(index, color):
-        CATEGORY_COLORS[index] = color
-
-    def changeCategory(index, name, color):
-        CATEGORY_NAMES[index] = name
         CATEGORY_COLORS[index] = color
 
     def addCategory(name, color):
@@ -21,29 +14,11 @@ class Category():
         CATEGORY_NAMES.pop(index)
         CATEGORY_COLORS.pop(index)
 
-    def getCategoryByIndex(index):
-        return CATEGORY_NAMES[index], CATEGORY_COLORS[index]
-    
-    def getCategoryByName(name):
-        for index, cat in enumerate(CATEGORY_NAMES):
-            if cat.lower() == name.lower():
-                return cat, CATEGORY_COLORS[index]
-
     def getIndexByName(name):
         for index, cat in enumerate(CATEGORY_NAMES):
             if cat.lower() == name.lower():
                 return index
 
-    def getCategoryByColor(color):
-        for index, cat in enumerate(CATEGORY_COLORS):
-            if cat.lower() == color.lower():
-                return CATEGORY_NAMES[index], cat
-        
-    def getNameByColor(color):
-        for index, cat in enumerate(CATEGORY_COLORS):
-            if cat.lower() == color.lower():
-                return CATEGORY_NAMES[index]
-            
     def getColorByName(name):
         for index, cat in enumerate(CATEGORY_NAMES):
             if cat.lower() == name.lower():
@@ -51,24 +26,23 @@ class Category():
 
 class SpaceCategory():
     def __init__(self, space, parent):
-        self.SPACE = space
-        self.nameCategory = ''
-        self.name = ''
-        self.color = ''
-        self.product = None
-        self.amount = 0
-        self.buttons = []
-        
+        self.initVariables(space)
         self.initUI(parent)
         self.initEvents()
-        self.hideUI()
 
         self.setEmptyCategory()
+        self.hideUI()
+
+    def initVariables(self, space):
+        self.name = ''
+        self.color = ''
+        self.amount = 0
+        self.buttons = []
+        self.SPACE = space
+        self.product = None
+        self.nameModifiedCategory = ''
 
     def initUI(self, parent):
-        posx = 25
-        posy = 25
-
         self.showSpace = QPushButton("← Go back", parent)
         self.showSpace.setGeometry(1300, 15, 100, 50)
         self.showSpace.hide()
@@ -89,11 +63,13 @@ class SpaceCategory():
         self.categoryColor.setGeometry(175, 75, 125, 25)
         self.categoryColor.hide()
 
+        posx = 25
+        posy = 25
+
         for category in CATEGORY_NAMES:
             newButton = QPushButton(category.capitalize(), parent)
             newButton.setGeometry(posx, posy, 200, 25)
-            newButton.clicked.connect(self.editCategory)
-
+            
             posy += 50
 
             self.buttons.append(newButton)
@@ -102,24 +78,12 @@ class SpaceCategory():
         self.showSpace.clicked.connect(self.stopEditCategory)
         self.categoryColor.clicked.connect(self.selectColor)
 
-    def selectColor(self):
-        color = QColorDialog.getColor()
-        
-        if color.isValid():
-            self.categoryColor.setStyleSheet("background-color: " + color.name())
-            index = Category.getIndexByName(self.nameCategory)
-            Category.changeCategoryColor(index, color.name())
-    
-    def reloadColorCategories(self):
-        for store in STORES:
-            for shelf in store.shelves:
-                for space in shelf.spaces:
-                    if space.category.name == self.nameCategory:
-                        space.category.color = CATEGORY_COLORS[Category.getIndexByName(self.nameCategory)]
-                        space.category.name = CATEGORY_COLORS[Category.getIndexByName(self.name)]
+        for button in self.buttons:
+            button.clicked.connect(self.editCategory)
 
     def stopEditCategory(self):
         self.reloadColorCategories()
+        self.SPACE.updateSpaceColor()
 
         self.showUI()
         self.SPACE.openSpaceConfig.show()
@@ -129,13 +93,33 @@ class SpaceCategory():
         self.categoryColor.hide()
         self.categoryName.hide()
 
+    def reloadColorCategories(self):
+        for store in STORES:
+            for shelf in store.shelves:
+                for space in shelf.spaces:
+                    if space.category.name == self.nameModifiedCategory:
+                        space.category.color = CATEGORY_COLORS[Category.getIndexByName(self.nameModifiedCategory)]
+
+    def showUI(self):
+        for button in self.buttons:
+            button.show()
+
+    def selectColor(self):
+        color = QColorDialog.getColor()
+        
+        if color.isValid():
+            self.categoryColor.setStyleSheet("background-color: " + color.name())
+            index = Category.getIndexByName(self.nameModifiedCategory)
+            Category.changeCategoryColor(index, color.name())
+    
     def editCategory(self):
         self.hideUI()
         self.SPACE.openSpaceConfig.hide()
         self.showSpace.show()
 
-        color = Category.getColorByName(self.buttons[0].sender().text())
-        self.nameCategory = self.buttons[0].sender().text()
+        # self.buttons[0].sender() will be used as a receptor of events
+        self.nameModifiedCategory = self.buttons[0].sender().text()
+        color = Category.getColorByName(self.nameModifiedCategory)
 
         self.categoryColor.setStyleSheet("background-color: " + color)
 
@@ -143,31 +127,19 @@ class SpaceCategory():
         self.categoryColorLabel.show()
         self.categoryColor.show()
         self.categoryName.show()
-    
-    def setEmptyCategory(self):
-        self.name = CATEGORY_NAMES[0]
-        self.color = CATEGORY_COLORS[0]
-        self.nameCategory = CATEGORY_NAMES[0]
-
-    def setUnreachableCategory(self):
-        self.name = CATEGORY_NAMES[1]
-        self.color = CATEGORY_COLORS[1]
-        self.nameCategory = CATEGORY_NAMES[1]
-    
-    def setCategoryByName(self, name):
-        self.name = name
-        self.color = Category.getColorByName(name)
-        self.nameCategory = name
-
-    def setCategoryByColor(self, color):
-        self.color = color
-        self.name = Category.getNameByColor(color)
-        self.nameCategory = self.name
 
     def hideUI(self):
         for button in self.buttons:
             button.hide()
+    
+    def setEmptyCategory(self):
+        self.name = CATEGORY_NAMES[0]
+        self.color = CATEGORY_COLORS[0]
 
-    def showUI(self):
-        for button in self.buttons:
-            button.show()
+    def setUnreachableCategory(self):
+        self.name = CATEGORY_NAMES[1]
+        self.color = CATEGORY_COLORS[1]
+    
+    def setCategoryByName(self, name):
+        self.name = name
+        self.color = Category.getColorByName(name)

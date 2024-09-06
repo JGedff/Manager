@@ -6,10 +6,13 @@ class ImageButton(QPushButton):
     def __init__(self, text, icon_path, parent = None):
         super().__init__(parent)
 
+        self.initUI(text, icon_path)
+
+    def initUI(self, text, icon_path):
         # Create a layout for the button to hold icon and text
         layout = QVBoxLayout(self)
 
-        # Create and set the icon
+        # Create and set the icon image
         icon_label = QLabel(self)
         pixmap = QPixmap(icon_path)
         icon_label.setPixmap(pixmap)

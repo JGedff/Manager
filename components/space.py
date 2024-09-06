@@ -26,7 +26,6 @@ class Space(QLabel):
 
     def initUI(self, parent):
         self.box = QPushButton(parent)
-        self.box.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
 
         if self.long:
             self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 151)
@@ -38,7 +37,6 @@ class Space(QLabel):
         
         self.configBox = QPushButton(parent)
         self.configBox.setGeometry(26, 26, 76, 76)
-        self.configBox.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
 
         self.labelCategory = QLabel("Category:", parent)
         self.labelCategory.setGeometry(150, 26, 50, 25)
@@ -53,6 +51,12 @@ class Space(QLabel):
 
         self.editCategories = QPushButton("⚙️", parent)
         self.editCategories.setGeometry(300, 26, 26, 26)
+
+        self.updateSpaceColor()
+
+    def updateSpaceColor(self):
+        self.box.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
+        self.configBox.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
 
     def initEvents(self):
         self.box.clicked.connect(self.configSpace)
@@ -92,11 +96,12 @@ class Space(QLabel):
             self.STORE.configSpace()
             self.configBox.show()
             self.labelCategory.show()
+            self.editCategories.show()
             self.configCategory.show()
     
     def changeCategory(self):
         self.category.setCategoryByName(self.configCategory.currentText())
-        self.configBox.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
+        self.updateSpaceColor()
 
     def showFloor(self, number):
         if number != self.actualFloor:
@@ -114,8 +119,7 @@ class Space(QLabel):
         self.category.hideUI()
 
     def showSpace(self):
-        self.box.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
-        self.configBox.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
+        self.updateSpaceColor()
         self.box.show()
         self.configBox.hide()
 

@@ -46,7 +46,7 @@ class Shelf(QLabel):
         self.sidesNewShelf = QLabel("Can you put products in both sides of the shelf?:", self)
         self.sidesNewShelf.setGeometry(0, 65, 300, 35)
 
-        self.sidesNewShelfInput = InputBool("Yes", "No", self.setShelfTwoSides, self.setShelfOneSide, self)
+        self.sidesNewShelfInput = InputBool("Yes", "No", self)
         self.sidesNewShelfInput.setGeometry(390, 60, 175, 50)
 
         self.configFloorsShelfLabel = QLabel("How many floors does the shelf have?:", self)
@@ -54,18 +54,6 @@ class Shelf(QLabel):
 
         self.configFloorsShelfInput = InputNumber(1, self)
         self.configFloorsShelfInput.setGeometry(390, 95, 175, 50)
-
-    def setShelfTwoSides(self):
-        self.double_shelf = True
-        
-        self.sidesNewShelfInput.trueButton.setStyleSheet("background-color: #4fd9ff")
-        self.sidesNewShelfInput.falseButton.setStyleSheet("background-color: #ebebeb")
-
-    def setShelfOneSide(self):
-        self.double_shelf = False
-
-        self.sidesNewShelfInput.trueButton.setStyleSheet("background-color: #ebebeb")
-        self.sidesNewShelfInput.falseButton.setStyleSheet("background-color: #4fd9ff")
 
     def hideForm(self):
         self.hide()
@@ -80,13 +68,9 @@ class Shelf(QLabel):
         self.show()
 
     def saveInfo(self):
-        self.spaces = int(self.configNewShelveInput.inputNum.text())
-        self.floors = int(self.configFloorsShelfInput.inputNum.text())
-
-        if self.sidesNewShelfInput.trueButton.styleSheet() == 'background-color: #4fd9ff':
-            self.double_shelf = True
-        else:
-            self.double_shelf = False
+        self.spaces = self.configNewShelveInput.getNum()
+        self.floors = self.configFloorsShelfInput.getNum()
+        self.double_shelf = self.sidesNewShelfInput.getValue()
 
 class ShelfInfo():
     def __init__(self, posx, posy, shelf, store, parent = None):
