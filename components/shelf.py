@@ -4,12 +4,12 @@ from utils.inputBool import InputBool
 from utils.inputNumber import InputNumber
 from components.space import Space
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGTH, SHELVES, DEFAULT_SPACE_MARGIN
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SPACE_MARGIN
 
 class Shelf(QLabel):
     def __init__(self, name, posx, posy, mainWindow, parent = None):
         super().__init__(parent)
-        self.setGeometry(posx, posy, WINDOW_WIDTH, WINDOW_HEIGTH)
+        self.setGeometry(posx, posy, WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.initVariables(mainWindow)
         self.initUI(name)

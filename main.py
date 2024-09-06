@@ -6,17 +6,17 @@ from components.space import Space
 from components.shelf import Shelf
 from components.store import Store
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGTH, WINDOW_TITLE, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, DEFAULT_SPACE_MARGIN, STORES
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(WINDOW_TITLE)
-        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGTH)
+        self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.scroll = QScrollArea()
         self.widget = QWidget()
-        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
+        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
         SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, self, self.widget))
@@ -30,37 +30,42 @@ class MainWindow(QMainWindow):
     def initUI(self, parent):
         # Create main buttons
         self.addStoreButton = QPushButton("+ Add store", parent)
-        self.addStoreButton.setGeometry(WINDOW_WIDTH - 125, WINDOW_HEIGTH - 75, 100, 50)
+        self.addStoreButton.setGeometry(WINDOW_WIDTH - 125, WINDOW_HEIGHT - 75, 100, 50)
 
         # New store form
-        self.newStoreLabel = QLabel("New store", parent)
+        self.newStoreLabel = QLabel("", parent)
         self.newStoreLabel.setGeometry(0, 0, WINDOW_WIDTH, 75)
         self.newStoreLabel.setStyleSheet("background-color: #dddddd;")
         self.newStoreLabel.hide()
 
         # Config new store
         self.newStoreNameLabel = QLabel("Name of the store:", parent)
-        self.newStoreNameLabel.setGeometry(400, 100, 100, 35)
+        self.newStoreNameLabel.setGeometry(400, 20, 100, 35)
         self.newStoreNameLabel.hide()
         
         self.newStoreNameEdit = QLineEdit(parent)
-        self.newStoreNameEdit.setGeometry(800, 100, 300, 35)
+        self.newStoreNameEdit.setGeometry(800, 20, 300, 35)
         self.newStoreNameEdit.setPlaceholderText("Store 1")
         self.newStoreNameEdit.hide()
 
         # Add new shelf
+        self.createButtonsBackground = QLabel("", parent)
+        self.createButtonsBackground.setGeometry(0, WINDOW_HEIGHT - 75, WINDOW_WIDTH, 75)
+        self.createButtonsBackground.setStyleSheet("background-color: #dddddd;")
+        self.createButtonsBackground.hide()
+
         self.createShelfButton = QPushButton("+ Add shelf", parent)
-        self.createShelfButton.setGeometry(830, 340, 100, 35)
+        self.createShelfButton.setGeometry(830, WINDOW_HEIGHT - 62, 100, 50)
         self.createShelfButton.hide()
 
         # Create store
         self.createStoreButton = QPushButton("+ Create store", parent)
-        self.createStoreButton.setGeometry(830, 390, 100, 35)
+        self.createStoreButton.setGeometry(1000, WINDOW_HEIGHT - 62, 100, 50)
         self.createStoreButton.hide()
 
         # Go home        
         self.goBackHomeButton = QPushButton("← Go back", parent)
-        self.goBackHomeButton.setGeometry(1300, 15, 100, 50)
+        self.goBackHomeButton.setGeometry(1300, 10, 100, 50)
         self.goBackHomeButton.hide()
 
         # Show edit categories button
@@ -81,21 +86,28 @@ class MainWindow(QMainWindow):
             if isinstance(i, Store):
                 i.showIcon()
 
-    def resizeScroll(self):
-        if SHELVES.__len__() > 0 and SHELVES[SHELVES.__len__() - 1].pos().y() + 250 > WINDOW_HEIGTH:
-            self.widget.resize(WINDOW_WIDTH - 20, SHELVES[SHELVES.__len__() - 1].pos().y() + 250)
+    def resizeScroll(self, height = 0):
+        if height == 0:
+            if SHELVES.__len__() > 0 and SHELVES[SHELVES.__len__() - 1].pos().y() + 250 > WINDOW_HEIGHT:
+                self.widget.resize(WINDOW_WIDTH - 20, SHELVES[SHELVES.__len__() - 1].pos().y() + 250)
+            else:
+                self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
+
+            self.createButtonsBackground.raise_()
+            self.createShelfButton.raise_()
+            self.createStoreButton.raise_()
+
+            for index, obj in enumerate(SHELVES):
+                if isinstance(obj, Shelf):
+                    obj.setGeometry(obj.pos().x(), (DEFAULT_SHELF_MARGIN * (index + 1)), obj.width(), obj.height())
         else:
-            self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
+            width = WINDOW_WIDTH - 5
+            aux = height + 175
 
-        self.createShelfButton.setGeometry(SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self.createShelfButton.width(), self.createShelfButton.height())
-        self.createShelfButton.raise_()
+            if aux > WINDOW_HEIGHT - 5:
+                width -= 15
 
-        self.createStoreButton.setGeometry(SHELVES[SHELVES.__len__() - 1].pos().x() + DEFAULT_SHELF_WIDTH, SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self.createStoreButton.width(), self.createStoreButton.height())
-        self.createStoreButton.raise_()
-
-        for index, obj in enumerate(SHELVES):
-            if isinstance(obj, Shelf):
-                obj.setGeometry(obj.pos().x(), (DEFAULT_SHELF_MARGIN * (index + 1)), obj.width(), obj.height())
+            self.widget.resize(width, aux)
 
     def initEvents(self):
         self.addStoreButton.clicked.connect(self.addStore)
@@ -104,8 +116,32 @@ class MainWindow(QMainWindow):
         self.createStoreButton.clicked.connect(self.createStore)
         self.editCategories.clicked.connect(self.configCategories)
 
+        self.scroll.verticalScrollBar().valueChanged.connect(self.updateHeaderPosition)
+    
+    def updateHeaderPosition(self, value):
+        self.newStoreLabel.move(self.newStoreLabel.pos().x(), value)
+        self.editCategories.move(self.editCategories.pos().x(), value + 610)
+        self.goBackHomeButton.move(self.goBackHomeButton.pos().x(), value + 10)
+        self.newStoreNameEdit.move(self.newStoreNameEdit.pos().x(), value + 20)
+        self.newStoreNameLabel.move(self.newStoreNameLabel.pos().x(), value + 20)
+        self.addStoreButton.move(self.addStoreButton.pos().x(), value + (WINDOW_HEIGHT - 75))
+        self.createStoreButton.move(self.createStoreButton.pos().x(), value + (WINDOW_HEIGHT - 62))
+        self.createShelfButton.move(self.createShelfButton.pos().x(), value + (WINDOW_HEIGHT - 62))
+        self.createButtonsBackground.move(self.createButtonsBackground.pos().x(), value + (WINDOW_HEIGHT - 75))
+
+        self.newStoreLabel.raise_()
+        self.createButtonsBackground.raise_()
+        self.addStoreButton.raise_()
+        self.editCategories.raise_()
+        self.goBackHomeButton.raise_()
+        self.newStoreNameEdit.raise_()
+        self.createShelfButton.raise_()
+        self.createStoreButton.raise_()
+        self.newStoreNameLabel.raise_()
+
     def addStore(self):
         self.newStoreLabel.show()
+        self.createButtonsBackground.show()
         self.newStoreNameEdit.show()
         self.newStoreNameLabel.show()
         self.createStoreButton.show()
@@ -126,6 +162,7 @@ class MainWindow(QMainWindow):
 
     def reOpenHome(self):
         self.newStoreLabel.hide()
+        self.createButtonsBackground.hide()
         self.newStoreNameEdit.hide()
         self.goBackHomeButton.hide()
         self.newStoreNameLabel.hide()
@@ -147,7 +184,7 @@ class MainWindow(QMainWindow):
             if isinstance(i, Shelf):
                 i.hideForm()
 
-        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGTH - 5)
+        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
         # This case is for when you open category configuration from main
         self.categorySpace.category.hideUI()
