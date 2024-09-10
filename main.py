@@ -1,3 +1,5 @@
+# CONNECT FIRST SPACE WITH THE OTHER STORES
+
 import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea
@@ -69,7 +71,12 @@ class MainWindow(QMainWindow):
         self.goBackHomeButton.hide()
 
         # Show edit categories button
-        self.categorySpace = Space(0, 0, 0, 0, Store("", "", 0, 0, self, parent), parent, False, True)
+        store = Store("", "", 0, 0, self, parent)
+        store.hideIcon()
+        
+        STORES.append(store)
+
+        self.categorySpace = Space(0, 0, 0, 0, store, parent, False, True)
         self.categorySpace.STORE.hideStore()
         self.categorySpace.STORE.hideIcon()
         self.categorySpace.hideSpace()
@@ -77,14 +84,15 @@ class MainWindow(QMainWindow):
         self.editCategories = QPushButton("Edit categories ⚙️", parent)
         self.editCategories.setGeometry(1316, 610, 100, 30)
 
-        if STORES.__len__() > 0:
+        if STORES.__len__() > 1:
             self.editCategories.show()
         else:
             self.editCategories.hide()
 
-        for i in STORES:
-            if isinstance(i, Store):
-                i.showIcon()
+        for i, instance in enumerate(STORES):
+            if i != 0:
+                if isinstance(instance, Store):
+                    instance.showIcon()
 
     def resizeScroll(self, height = 0):
         if height == 0:
@@ -161,6 +169,7 @@ class MainWindow(QMainWindow):
         self.resizeScroll()
 
     def reOpenHome(self):
+        self.categorySpace.category.cancelAddCategory()
         self.newStoreLabel.hide()
         self.createButtonsBackground.hide()
         self.newStoreNameEdit.hide()
@@ -170,15 +179,16 @@ class MainWindow(QMainWindow):
         self.createShelfButton.hide()
         self.addStoreButton.show()
 
-        if STORES.__len__() > 0:
+        if STORES.__len__() > 1:
             self.editCategories.show()
         else:
             self.editCategories.hide()
 
-        for i in STORES:
-            if isinstance(i, Store):
-                i.hideStore()
-                i.showIcon()
+        for i, instance in enumerate(STORES):
+            if i != 0:
+                if isinstance(instance, Store):
+                    instance.hideStore()
+                    instance.showIcon()
 
         for i in SHELVES:
             if isinstance(i, Shelf):
@@ -201,7 +211,7 @@ class MainWindow(QMainWindow):
     def createStore(self):
         val = self.newStoreNameEdit.text()
         self.newStoreNameEdit.setText("")
-        self.newStoreNameEdit.setPlaceholderText("Store " + str(STORES.__len__() + 2))
+        self.newStoreNameEdit.setPlaceholderText("Store " + str(STORES.__len__()))
 
         for shelf in SHELVES:
             if isinstance(shelf, Shelf):
@@ -210,12 +220,13 @@ class MainWindow(QMainWindow):
         posx = 25
         posy = 25
         
-        for _ in STORES:
-            posx += 170
+        for index, _ in enumerate(STORES):
+            if index != 0:
+                posx += 170
 
-            if posx + 170 >= WINDOW_WIDTH:
-                posx = 25
-                posy += 170
+                if posx + 170 >= WINDOW_WIDTH:
+                    posx = 25
+                    posy += 170
 
         if val == "":
             STORES.append(Store("Store " + str(STORES.__len__() + 1), "img/magazine.png", posx, posy, self, self.widget))

@@ -95,6 +95,7 @@ class Space(QLabel):
             self.openSpaceConfig.hide()
             self.STORE.WINDOW.reOpenHome()
         else:
+            self.category.cancelAddCategory()
             self.STORE.configSpace()
             self.configBox.show()
             self.labelCategory.show()
