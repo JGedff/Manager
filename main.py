@@ -211,7 +211,7 @@ class MainWindow(QMainWindow):
     def createStore(self):
         val = self.newStoreNameEdit.text()
         self.newStoreNameEdit.setText("")
-        self.newStoreNameEdit.setPlaceholderText("Store " + str(STORES.__len__()))
+        self.newStoreNameEdit.setPlaceholderText("Store " + str(STORES.__len__() - 1))
 
         for shelf in SHELVES:
             if isinstance(shelf, Shelf):
@@ -229,7 +229,7 @@ class MainWindow(QMainWindow):
                     posy += 170
 
         if val == "":
-            STORES.append(Store("Store " + str(STORES.__len__() + 1), "img/magazine.png", posx, posy, self, self.widget))
+            STORES.append(Store("Store " + str(STORES.__len__()), "img/magazine.png", posx, posy, self, self.widget))
         else:
             STORES.append(Store(val, "img/magazine.png", posx, posy, self, self.widget))
         

@@ -139,7 +139,6 @@ class SpaceCategory():
         self.categoryName.hide()
 
     def showUI(self):
-        print(self.buttons)
         for button in self.buttons:
             button.show()
         
@@ -280,6 +279,7 @@ class SpaceCategory():
 
         self.buttons.append(newSelfButton)
         self.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        self.SPACE.configCategory.addItem(self.newCategoryName.capitalize())
 
         for store in STORES:
             for shelf in store.shelves:
@@ -291,6 +291,7 @@ class SpaceCategory():
 
                         space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
                         space.category.buttons.append(newButton)
+                        space.configCategory.addItem(self.newCategoryName.capitalize())
         
         self.showUI()
         self.creatingCategory = False
