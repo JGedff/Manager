@@ -32,6 +32,9 @@ class Category():
             if cat.lower() == color.lower():
                 return index
 
+    def getNameByIndex(index):
+        return CATEGORY_NAMES[index]
+
 class SpaceCategory():
     def __init__(self, space, parent):
         self.initVariables(space, parent)
@@ -49,6 +52,7 @@ class SpaceCategory():
         self.newColor = ''
         self.SPACE = space
         self.product = None
+        self.deleteButtons = []
         self.mainParent = parent
         self.newCategoryName = ""
         self.newCategoryColor = ""
@@ -88,9 +92,13 @@ class SpaceCategory():
             newButton = QPushButton(category.capitalize(), parent)
             newButton.setGeometry(posx, posy, 200, 25)
 
+            deleteButton = QPushButton("🗑️", parent)
+            deleteButton.setGeometry(posx + 225, posy, 200, 25)
+
             posy += 50
 
             self.buttons.append(newButton)
+            self.deleteButtons.append(deleteButton)
 
         self.addCategory = QPushButton("+ Add category", parent)
         self.addCategory.setGeometry(posx, posy, 200, 50)
@@ -126,6 +134,9 @@ class SpaceCategory():
         for button in self.buttons:
             button.clicked.connect(self.editCategory)
 
+        for button in self.deleteButtons:
+            button.clicked.connect(self.deleteCategory)
+
     def stopEditCategory(self):
         self.SPACE.updateSpaceColor()
 
@@ -140,6 +151,9 @@ class SpaceCategory():
 
     def showUI(self):
         for button in self.buttons:
+            button.show()
+
+        for button in self.deleteButtons:
             button.show()
         
         self.addCategory.show()
@@ -173,6 +187,9 @@ class SpaceCategory():
 
     def hideUI(self):
         for button in self.buttons:
+            button.hide()
+
+        for button in self.deleteButtons:
             button.hide()
         
         self.addCategory.hide()
@@ -273,29 +290,61 @@ class SpaceCategory():
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
-        newSelfButton = QPushButton(self.newCategoryName.capitalize(), self.mainParent)
-        newSelfButton.setGeometry(25, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
-        newSelfButton.clicked.connect(self.editCategory)
-
-        self.buttons.append(newSelfButton)
-        self.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
-        self.SPACE.configCategory.addItem(self.newCategoryName.capitalize())
+        self.createCategoryIn(STORES[0].WINDOW.categorySpace)
 
         for store in STORES:
             for shelf in store.shelves:
                 for space in shelf.spaces:
-                    if space.category.buttons.__len__() < CATEGORY_NAMES.__len__():
-                        newButton = QPushButton(self.newCategoryName.capitalize(), self.mainParent)
-                        newButton.setGeometry(25, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
-                        newButton.clicked.connect(space.category.editCategory)
-
-                        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
-                        space.category.buttons.append(newButton)
-                        space.configCategory.addItem(self.newCategoryName.capitalize())
+                    self.createCategoryIn(space)
         
         self.showUI()
         self.creatingCategory = False
         self.cancelAddCategory()
+    
+    def createCategoryIn(self,space):
+        newButton = QPushButton(self.newCategoryName.capitalize(), self.mainParent)
+        newButton.setGeometry(25, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
+        newButton.clicked.connect(space.category.editCategory)
+
+        newDeleteButton = QPushButton("🗑️", self.mainParent)
+        newDeleteButton.setGeometry(250, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
+        newDeleteButton.clicked.connect(space.category.deleteCategory)
+
+        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        space.category.buttons.append(newButton)
+        space.category.deleteButtons.append(newDeleteButton)
+        space.configCategory.addItem(self.newCategoryName.capitalize())
+
+    def deleteCategory(self):
+        indexButtonPressed = int((self.buttons[0].sender().pos().y() - 25) / 50)
+        categoryName = Category.getNameByIndex(indexButtonPressed)
+        Category.delCategory(indexButtonPressed)
+
+        self.deleteCategoryFrom(STORES[0].WINDOW.categorySpace, indexButtonPressed, categoryName.capitalize())
+
+        for store in STORES:
+            for shelf in store.shelves:
+                for space in shelf.spaces:
+                    if space.category.buttons.__len__() > CATEGORY_NAMES.__len__():
+                        self.deleteCategoryFrom(space, indexButtonPressed, categoryName)
+
+    def deleteCategoryFrom(self, space, indexButtonPressed, categoryName):
+        items = []
+
+        for index in range(space.configCategory.count()):
+            items.append(space.configCategory.itemText(index))
+
+        for index, item in enumerate(items):
+            if item == categoryName:
+                space.configCategory.removeItem(index)
+
+
+        space.category.buttons[indexButtonPressed].hide()
+        space.category.deleteButtons[indexButtonPressed].hide()
+        
+        space.category.buttons.pop(indexButtonPressed)
+        space.category.deleteButtons.pop(indexButtonPressed)
+        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
 
     def setEmptyCategory(self):
         self.name = CATEGORY_NAMES[0]

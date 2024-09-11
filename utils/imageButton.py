@@ -20,11 +20,14 @@ class ImageButton(QPushButton):
         icon_label.setAlignment(Qt.AlignCenter)
 
         # Create and set the text label
-        text_label = QLabel(text, self)
-        text_label.setAlignment(Qt.AlignCenter)
+        self.text_label = QLabel(text, self)
+        self.text_label.setAlignment(Qt.AlignCenter)
 
         # Add the icon and text to the layout
         layout.addWidget(icon_label)
-        layout.addWidget(text_label)
+        layout.addWidget(self.text_label)
 
         layout.setSpacing(5)
+
+    def text(self):
+        return self.text_label.text()
