@@ -2,7 +2,8 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QComboBox
 
 from constants import CATEGORY_NAMES, WINDOW_WIDTH, WINDOW_HEIGHT
 
-from utils.categorySpaces import SpaceCategory
+from components.spaceCategory import SpaceCategory
+from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName
 
 class Space(QLabel):
     def __init__(self, posx, posy, actualFloor, floors, store, parent, long = False, buttonFromMain = False):
@@ -23,7 +24,7 @@ class Space(QLabel):
         self.category = SpaceCategory(self, parent)
 
         if actualFloor > floors:
-            self.category.setUnreachableCategory()
+            setUnreachableCategory(self.category)
 
     def initUI(self, parent):
         self.box = QPushButton(parent)
@@ -103,7 +104,7 @@ class Space(QLabel):
             self.configCategory.show()
     
     def changeCategory(self):
-        self.category.setCategoryByName(self.configCategory.currentText())
+        setCategoryByName(self.category, self.configCategory.currentText())
         self.updateSpaceColor()
 
     def showFloor(self, number):

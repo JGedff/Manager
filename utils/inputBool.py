@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
 
+from utils.functions.globalFunctions import useLessFunction
+
 class InputBool(QLabel):
     def __init__(self, trueString, falseString, parent = None, actionTrue = None, actionFalse = None):
         super().__init__(parent)
@@ -15,10 +17,10 @@ class InputBool(QLabel):
         self.actionFalse = actionFalse
 
         if actionTrue == None:
-            self.actionTrue = self.useLessFunction
+            self.actionTrue = useLessFunction
 
         if actionFalse == None:
-            self.actionFalse = self.useLessFunction
+            self.actionFalse = useLessFunction
 
     def initUI(self, trueString, falseString):
         layout = QHBoxLayout(self)
@@ -53,6 +55,3 @@ class InputBool(QLabel):
 
     def getValue(self):
         return self.value
-
-    def useLessFunction(self):
-        pass

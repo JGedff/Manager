@@ -1,39 +1,11 @@
 from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QColorDialog
 
-from constants import CATEGORY_NAMES, CATEGORY_COLORS, STORES
+from utils.category import Category
+from utils.doubleButton import DoubleButton
+from utils.functions.globalFunctions import updateNameCategory
+from utils.functions.spaceCategoryFunctions import createCategoryIn, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
 
-class Category():
-    def changeCategoryColor(index, color):
-        CATEGORY_COLORS[index] = color
-
-    def changeCategoryName(index, name):
-        CATEGORY_NAMES[index] = name
-
-    def addCategory(name, color):
-        CATEGORY_NAMES.append(name)
-        CATEGORY_COLORS.append(color)
-
-    def delCategory(index):
-        CATEGORY_NAMES.pop(index)
-        CATEGORY_COLORS.pop(index)
-
-    def getIndexByName(name):
-        for index, cat in enumerate(CATEGORY_NAMES):
-            if cat.lower() == name.lower():
-                return index
-
-    def getColorByName(name):
-        for index, cat in enumerate(CATEGORY_NAMES):
-            if cat.lower() == name.lower():
-                return CATEGORY_COLORS[index]
-
-    def getIndexByColor(color):
-        for index, cat in enumerate(CATEGORY_COLORS):
-            if cat.lower() == color.lower():
-                return index
-
-    def getNameByIndex(index):
-        return CATEGORY_NAMES[index]
+from constants import CATEGORY_NAMES, STORES
 
 class SpaceCategory():
     def __init__(self, space, parent):
@@ -41,18 +13,17 @@ class SpaceCategory():
         self.initUI(parent)
         self.initEvents()
 
-        self.setEmptyCategory()
+        setEmptyCategory(self)
         self.hideUI()
 
     def initVariables(self, space, parent):
         self.name = ''
         self.color = ''
         self.amount = 0
-        self.buttons = []
         self.newColor = ''
         self.SPACE = space
         self.product = None
-        self.deleteButtons = []
+        self.doubleButtons = []
         self.mainParent = parent
         self.newCategoryName = ""
         self.newCategoryColor = ""
@@ -89,16 +60,11 @@ class SpaceCategory():
         posy = 25
 
         for category in CATEGORY_NAMES:
-            newButton = QPushButton(category.capitalize(), parent)
-            newButton.setGeometry(posx, posy, 200, 25)
-
-            deleteButton = QPushButton("🗑️", parent)
-            deleteButton.setGeometry(posx + 225, posy, 200, 25)
+            newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
 
             posy += 50
 
-            self.buttons.append(newButton)
-            self.deleteButtons.append(deleteButton)
+            self.doubleButtons.append(newDoubleButton)
 
         self.addCategory = QPushButton("+ Add category", parent)
         self.addCategory.setGeometry(posx, posy, 200, 50)
@@ -131,12 +97,6 @@ class SpaceCategory():
         self.newCategoryColorButton.clicked.connect(self.selectColorNewCategory)
         self.addCategoryName.textChanged.connect(self.changeNewCategoryName)
 
-        for button in self.buttons:
-            button.clicked.connect(self.editCategory)
-
-        for button in self.deleteButtons:
-            button.clicked.connect(self.deleteCategory)
-
     def stopEditCategory(self):
         self.SPACE.updateSpaceColor()
 
@@ -150,10 +110,7 @@ class SpaceCategory():
         self.categoryName.hide()
 
     def showUI(self):
-        for button in self.buttons:
-            button.show()
-
-        for button in self.deleteButtons:
+        for button in self.doubleButtons:
             button.show()
         
         self.addCategory.show()
@@ -171,8 +128,8 @@ class SpaceCategory():
         self.showSpace.show()
         self.newColor = ''
             
-        # self.buttons[0].sender() will be used as a receptor of events
-        self.nameModifiedCategory = self.buttons[0].sender().text()
+        # self.doubleButtons[0].button1.sender() will be used as the receptor of events
+        self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
 
@@ -186,20 +143,17 @@ class SpaceCategory():
         self.SPACE.STORE.WINDOW.goBackHomeButton.hide()
 
     def hideUI(self):
-        for button in self.buttons:
-            button.hide()
-
-        for button in self.deleteButtons:
+        for button in self.doubleButtons:
             button.hide()
         
         self.addCategory.hide()
     
     def saveInfo(self):
         newName = self.categoryName.text()
-        
+
         if newName != "":
             self.reloadNameCategories(newName)
-    
+
         if self.newColor != "" and newName != "":
             self.reloadColorCategories(newName)
         elif self.newColor != "":
@@ -209,22 +163,12 @@ class SpaceCategory():
         index = Category.getIndexByName(self.nameModifiedCategory)
         Category.changeCategoryName(index, newName)
 
+        updateNameCategory(STORES[0].WINDOW.categorySpace, self.colorModifiedCategory, self.nameModifiedCategory, newName, index)
+
         for store in STORES:
             for shelf in store.shelves:
                 for space in shelf.spaces:
-                    if space.category.color == self.colorModifiedCategory:
-                        for button in space.category.buttons:
-                            if button.text() == self.nameModifiedCategory:
-                                button.setText(newName)
-
-                        space.configCategory.setItemText(0, newName)
-                        space.category.name = newName
-                    else:
-                        for button in space.category.buttons:
-                            if button.text() == self.nameModifiedCategory:
-                                button.setText(newName)
-
-                        space.configCategory.setItemText(index, newName)
+                    updateNameCategory(space, self.colorModifiedCategory, self.nameModifiedCategory, newName, index)
 
     def reloadColorCategories(self, newName):
         index = Category.getIndexByName(newName)
@@ -252,8 +196,8 @@ class SpaceCategory():
         self.createCategoryButton.show()
         self.cancelButtonAddCategory.show()
 
-        for button in self.deleteButtons:
-            button.setDisabled(True)
+        for button in self.doubleButtons:
+            button.setDisabledButton2(True)
 
     def cancelAddCategory(self):
         self.addCategoryName.hide()
@@ -272,8 +216,9 @@ class SpaceCategory():
         if self.creatingCategory:
             self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
 
-        for button in self.deleteButtons:
-            button.setDisabled(False)
+        if self.doubleButtons.__len__() > 1:
+            for button in self.doubleButtons:
+                button.setDisabledButton2(False)
 
         self.creatingCategory = False
 
@@ -296,87 +241,28 @@ class SpaceCategory():
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
-        self.createCategoryIn(STORES[0].WINDOW.categorySpace)
+        createCategoryIn(STORES[0].WINDOW.categorySpace, self.newCategoryName.capitalize(), self.mainParent)
 
         for store in STORES:
             for shelf in store.shelves:
                 for space in shelf.spaces:
-                    self.createCategoryIn(space)
+                    createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
         
         self.showUI()
         self.creatingCategory = False
         self.cancelAddCategory()
     
-    def createCategoryIn(self, space):
-        newButton = QPushButton(self.newCategoryName.capitalize(), self.mainParent)
-        newButton.setGeometry(25, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
-        newButton.clicked.connect(space.category.editCategory)
-
-        newDeleteButton = QPushButton("🗑️", self.mainParent)
-        newDeleteButton.setGeometry(250, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
-        newDeleteButton.clicked.connect(space.category.deleteCategory)
-
-        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
-        space.category.buttons.append(newButton)
-        space.category.deleteButtons.append(newDeleteButton)
-        space.configCategory.addItem(self.newCategoryName.capitalize())
-
-        if space.category.buttons.__len__() > 1:
-            space.category.deleteButtons[0].setDisabled(False)
-
     def deleteCategory(self):
-        indexButtonPressed = int((self.buttons[0].sender().pos().y() - 25) / 50)
+        indexButtonPressed = int((self.doubleButtons[0].button1.sender().pos().y() - 25) / 50)
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
-        self.deleteCategoryFrom(STORES[0].WINDOW.categorySpace, indexButtonPressed, categoryName.capitalize())
+        deleteCategoryFrom(STORES[0].WINDOW.categorySpace, indexButtonPressed, categoryName.capitalize())
+        updateButtonsPosition(STORES[0].WINDOW.categorySpace)
 
         for store in STORES:
             for shelf in store.shelves:
                 for space in shelf.spaces:
-                    if space.category.buttons.__len__() > CATEGORY_NAMES.__len__():
-                        self.deleteCategoryFrom(space, indexButtonPressed, categoryName)
-
-    def deleteCategoryFrom(self, space, indexButtonPressed, categoryName):
-        items = []
-
-        for index in range(space.configCategory.count()):
-            items.append(space.configCategory.itemText(index))
-
-        for index, item in enumerate(items):
-            if item == categoryName:
-                space.configCategory.removeItem(index)
-
-        space.category.buttons[indexButtonPressed].hide()
-        space.category.deleteButtons[indexButtonPressed].hide()
-        
-        space.category.buttons.pop(indexButtonPressed)
-        space.category.deleteButtons.pop(indexButtonPressed)
-        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
-
-        if space.category.buttons.__len__() == 1:
-            space.category.deleteButtons[0].setDisabled(True)
-        
-        self.updateButtonsPosition(space)
-
-    def updateButtonsPosition(self, space):
-        posx = 25
-        posy = 25
-
-        for index, _ in enumerate(CATEGORY_NAMES):
-            space.category.buttons[index].setGeometry(posx, posy, 200, 25)
-            space.category.deleteButtons[index].setGeometry(posx + 225, posy, 200, 25)
-
-            posy += 50
-
-    def setEmptyCategory(self):
-        self.name = CATEGORY_NAMES[0]
-        self.color = CATEGORY_COLORS[0]
-
-    def setUnreachableCategory(self):
-        self.name = CATEGORY_NAMES[1]
-        self.color = CATEGORY_COLORS[1]
-    
-    def setCategoryByName(self, name):
-        self.name = name
-        self.color = Category.getColorByName(name)
+                    if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
+                        deleteCategoryFrom(space, indexButtonPressed, categoryName)
+                        updateButtonsPosition(space)

@@ -1,5 +1,3 @@
-# CONNECT FIRST SPACE WITH THE OTHER STORES
-
 import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea
@@ -8,7 +6,7 @@ from components.space import Space
 from components.shelf import Shelf
 from components.store import Store
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, DEFAULT_SPACE_MARGIN, STORES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES
 
 class MainWindow(QMainWindow):
     def __init__(self):
