@@ -252,6 +252,9 @@ class SpaceCategory():
         self.createCategoryButton.show()
         self.cancelButtonAddCategory.show()
 
+        for button in self.deleteButtons:
+            button.setDisabled(True)
+
     def cancelAddCategory(self):
         self.addCategoryName.hide()
         self.createCategoryButton.hide()
@@ -268,6 +271,9 @@ class SpaceCategory():
 
         if self.creatingCategory:
             self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
+
+        for button in self.deleteButtons:
+            button.setDisabled(False)
 
         self.creatingCategory = False
 
@@ -301,7 +307,7 @@ class SpaceCategory():
         self.creatingCategory = False
         self.cancelAddCategory()
     
-    def createCategoryIn(self,space):
+    def createCategoryIn(self, space):
         newButton = QPushButton(self.newCategoryName.capitalize(), self.mainParent)
         newButton.setGeometry(25, 50 * CATEGORY_NAMES.__len__() - 25, 200, 25)
         newButton.clicked.connect(space.category.editCategory)
@@ -314,6 +320,9 @@ class SpaceCategory():
         space.category.buttons.append(newButton)
         space.category.deleteButtons.append(newDeleteButton)
         space.configCategory.addItem(self.newCategoryName.capitalize())
+
+        if space.category.buttons.__len__() > 1:
+            space.category.deleteButtons[0].setDisabled(False)
 
     def deleteCategory(self):
         indexButtonPressed = int((self.buttons[0].sender().pos().y() - 25) / 50)
@@ -338,13 +347,27 @@ class SpaceCategory():
             if item == categoryName:
                 space.configCategory.removeItem(index)
 
-
         space.category.buttons[indexButtonPressed].hide()
         space.category.deleteButtons[indexButtonPressed].hide()
         
         space.category.buttons.pop(indexButtonPressed)
         space.category.deleteButtons.pop(indexButtonPressed)
         space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+
+        if space.category.buttons.__len__() == 1:
+            space.category.deleteButtons[0].setDisabled(True)
+        
+        self.updateButtonsPosition(space)
+
+    def updateButtonsPosition(self, space):
+        posx = 25
+        posy = 25
+
+        for index, _ in enumerate(CATEGORY_NAMES):
+            space.category.buttons[index].setGeometry(posx, posy, 200, 25)
+            space.category.deleteButtons[index].setGeometry(posx + 225, posy, 200, 25)
+
+            posy += 50
 
     def setEmptyCategory(self):
         self.name = CATEGORY_NAMES[0]
