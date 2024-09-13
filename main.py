@@ -2,16 +2,19 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea
 
+from utils.language import Language
+
 from components.space import Space
 from components.shelf import Shelf
 from components.store import Store
+from components.languageChanger import LanguageChanger
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(WINDOW_TITLE)
+        self.setWindowTitle(Language.get("window_title"))
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.scroll = QScrollArea()
@@ -28,9 +31,12 @@ class MainWindow(QMainWindow):
         self.resizeScroll()
 
     def initUI(self, parent):
+        # Language changer
+        self.languageChanger = LanguageChanger(self, parent)
+
         # Create main buttons
-        self.addStoreButton = QPushButton("+ Add store", parent)
-        self.addStoreButton.setGeometry(WINDOW_WIDTH - 125, WINDOW_HEIGHT - 75, 100, 50)
+        self.addStoreButton = QPushButton(Language.get("add_store"), parent)
+        self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
 
         # New store form
         self.newStoreLabel = QLabel("", parent)
