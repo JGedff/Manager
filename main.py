@@ -9,7 +9,7 @@ from components.shelf import Shelf
 from components.store import Store
 from components.languageChanger import LanguageChanger
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES, DEFAULT_IMAGE
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -45,13 +45,13 @@ class MainWindow(QMainWindow):
         self.newStoreLabel.hide()
 
         # Config new store
-        self.newStoreNameLabel = QLabel("Name of the store:", parent)
+        self.newStoreNameLabel = QLabel(Language.get("name_store"), parent)
         self.newStoreNameLabel.setGeometry(400, 20, 100, 35)
         self.newStoreNameLabel.hide()
         
         self.newStoreNameEdit = QLineEdit(parent)
         self.newStoreNameEdit.setGeometry(800, 20, 300, 35)
-        self.newStoreNameEdit.setPlaceholderText("Store 1")
+        self.newStoreNameEdit.setPlaceholderText(Language.get("store") + str(1))
         self.newStoreNameEdit.hide()
 
         # Add new shelf
@@ -60,17 +60,17 @@ class MainWindow(QMainWindow):
         self.createButtonsBackground.setStyleSheet("background-color: #dddddd;")
         self.createButtonsBackground.hide()
 
-        self.createShelfButton = QPushButton("+ Add shelf", parent)
+        self.createShelfButton = QPushButton(Language.get("add_shelf"), parent)
         self.createShelfButton.setGeometry(830, WINDOW_HEIGHT - 62, 100, 50)
         self.createShelfButton.hide()
 
         # Create store
-        self.createStoreButton = QPushButton("+ Create store", parent)
+        self.createStoreButton = QPushButton(Language.get("create_store"), parent)
         self.createStoreButton.setGeometry(1000, WINDOW_HEIGHT - 62, 100, 50)
         self.createStoreButton.hide()
 
         # Go home        
-        self.goBackHomeButton = QPushButton("← Go back", parent)
+        self.goBackHomeButton = QPushButton(Language.get("go_back"), parent)
         self.goBackHomeButton.setGeometry(1300, 10, 100, 50)
         self.goBackHomeButton.hide()
 
@@ -85,7 +85,7 @@ class MainWindow(QMainWindow):
         self.categorySpace.STORE.hideIcon()
         self.categorySpace.hideSpace()
 
-        self.editCategories = QPushButton("Edit categories ⚙️", parent)
+        self.editCategories = QPushButton(Language.get("edit_categories"), parent)
         self.editCategories.setGeometry(1316, 610, 100, 30)
 
         if STORES.__len__() > 1:
@@ -215,7 +215,7 @@ class MainWindow(QMainWindow):
     def createStore(self):
         val = self.newStoreNameEdit.text()
         self.newStoreNameEdit.setText("")
-        self.newStoreNameEdit.setPlaceholderText("Store " + str(STORES.__len__() - 1))
+        self.newStoreNameEdit.setPlaceholderText(Language.get("store") + str(STORES.__len__() - 1))
 
         for shelf in SHELVES:
             if isinstance(shelf, Shelf):
@@ -233,9 +233,9 @@ class MainWindow(QMainWindow):
                     posy += 170
 
         if val == "":
-            STORES.append(Store("Store " + str(STORES.__len__()), "img/magazine.png", posx, posy, self, self.widget))
+            STORES.append(Store(Language.get("store") + str(STORES.__len__()), DEFAULT_IMAGE, posx, posy, self, self.widget))
         else:
-            STORES.append(Store(val, "img/magazine.png", posx, posy, self, self.widget))
+            STORES.append(Store(val, DEFAULT_IMAGE, posx, posy, self, self.widget))
         
         self.reOpenHome()
     

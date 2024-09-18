@@ -1,4 +1,24 @@
 {
     "window_title": "Gestor",
-    "add_store": "+ Afegir magatzem"
+    "add_store": "+ Afegir magatzem",
+    "name_store": "Nom del magatzem",
+    "store": "Magatzem ",
+    "add_shelf": "+ Afegir prestatgeries",
+    "create_store": "Crear magatzem",
+    "go_back": "← Tornar enrere",
+    "edit_categories": "Editar categories ⚙️",
+    "shelf_question_1": "Quants espais té la prestatgeria?:",
+    "shelf_question_2": "Es poden posar productes als dos costats de la prestatgeria?",
+    "shelf_question_4": "Quants pisos té la prestatgeria?",
+    "yes": "Sí",
+    "no": "No",
+    "category": "Categoria",
+    "category_name": "Nom de la categoria:",
+    "category_color": "Color de la categoria:",
+    "save": "Guardar",
+    "select_color": "Elegeix un color",
+    "add_category": "+ Afegir categoria",
+    "cancel": "Cancel·la",
+    "create": "Crear",
+    "floor": "Pis: "
 }

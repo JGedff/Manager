@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QComboBox
 from constants import CATEGORY_NAMES, WINDOW_WIDTH, WINDOW_HEIGHT
 
 from components.spaceCategory import SpaceCategory
+
+from utils.language import Language
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName
 
 class Space(QLabel):
@@ -34,13 +36,13 @@ class Space(QLabel):
         else:
             self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 76)
 
-        self.openSpaceConfig = QPushButton("← Go back", parent)
+        self.openSpaceConfig = QPushButton(Language.get("go_back"), parent)
         self.openSpaceConfig.setGeometry(1300, 15, 100, 50)
         
         self.configBox = QPushButton(parent)
         self.configBox.setGeometry(26, 26, 76, 76)
 
-        self.labelCategory = QLabel("Category:", parent)
+        self.labelCategory = QLabel(Language.get("category"), parent)
         self.labelCategory.setGeometry(150, 26, 50, 25)
 
         self.configCategory = QComboBox(parent)

@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QColorDialog
 
+from utils.language import Language
 from utils.category import Category
 from utils.doubleButton import DoubleButton
 from utils.functions.globalFunctions import updateNameCategory
@@ -32,11 +33,11 @@ class SpaceCategory():
         self.colorModifiedCategory = ""
 
     def initUI(self, parent):
-        self.showSpace = QPushButton("← Go back", parent)
+        self.showSpace = QPushButton(Language.get("go_back"), parent)
         self.showSpace.setGeometry(1300, 15, 100, 50)
         self.showSpace.hide()
 
-        self.categoryNameLabel = QLabel("Category name:", parent)
+        self.categoryNameLabel = QLabel(Language.get("category_name"), parent)
         self.categoryNameLabel.setGeometry(25, 25, 125, 25)
         self.categoryNameLabel.hide()
 
@@ -44,15 +45,15 @@ class SpaceCategory():
         self.categoryName.setGeometry(175, 25, 125, 25)
         self.categoryName.hide()
         
-        self.categoryColorLabel = QLabel("Category color:", parent)
+        self.categoryColorLabel = QLabel(Language.get("category_color"), parent)
         self.categoryColorLabel.setGeometry(25, 75, 125, 25)
         self.categoryColorLabel.hide()
 
-        self.saveCategory = QPushButton("Save", parent)
+        self.saveCategory = QPushButton(Language.get("save"), parent)
         self.saveCategory.setGeometry(175, 125, 125, 25)
         self.saveCategory.hide()
 
-        self.categoryColor = QPushButton("Select color", parent)
+        self.categoryColor = QPushButton(Language.get("select_color"), parent)
         self.categoryColor.setGeometry(175, 75, 125, 25)
         self.categoryColor.hide()
 
@@ -66,7 +67,7 @@ class SpaceCategory():
 
             self.doubleButtons.append(newDoubleButton)
 
-        self.addCategory = QPushButton("+ Add category", parent)
+        self.addCategory = QPushButton(Language.get("add_category"), parent)
         self.addCategory.setGeometry(posx, posy, 200, 50)
         self.addCategory.hide()
 
@@ -74,15 +75,15 @@ class SpaceCategory():
         self.addCategoryName.setGeometry(posx, posy, 200, 25)
         self.addCategoryName.hide()
 
-        self.newCategoryColorButton = QPushButton("Select color", parent)
+        self.newCategoryColorButton = QPushButton(Language.get("select_color"), parent)
         self.newCategoryColorButton.setGeometry(posx + 225, posy, 125, 25)
         self.newCategoryColorButton.hide()
 
-        self.cancelButtonAddCategory = QPushButton("Cancel", parent)
+        self.cancelButtonAddCategory = QPushButton(Language.get("cancel"), parent)
         self.cancelButtonAddCategory.setGeometry(posx, posy + 50, 100, 25)
         self.cancelButtonAddCategory.hide()
 
-        self.createCategoryButton = QPushButton("Create", parent)
+        self.createCategoryButton = QPushButton(Language.get("create"), parent)
         self.createCategoryButton.setGeometry(posx + 125, posy + 50, 100, 25)
         self.createCategoryButton.setDisabled(True)
         self.createCategoryButton.hide()

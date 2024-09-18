@@ -18,8 +18,8 @@ class LanguageChanger(QLabel):
     def initUI(self,parent):
         self.changer = QComboBox(parent)
         self.changer.addItem("English")
-        self.changer.addItem("Spanish")
-        self.changer.addItem("Catalan")
+        self.changer.addItem("Español")
+        self.changer.addItem("Català")
         self.changer.setGeometry(15, WINDOW_HEIGHT - 50, 100, 25)
     
     def initEvents(self):

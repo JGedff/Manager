@@ -10,9 +10,9 @@ class JsonManager():
             case "English":
                 with open("lang/en.json", 'r', encoding="utf-8") as file:
                     return json.load(file)
-            case "Spanish":
+            case "Español":
                 with open("lang/es.json", 'r', encoding="utf-8") as file:
                     return json.load(file)
-            case "Catalan":
+            case "Català":
                 with open("lang/ca.json", 'r', encoding="utf-8") as file:
                     return json.load(file)

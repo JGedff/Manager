@@ -1,6 +1,8 @@
 from PyQt5.QtWidgets import QLabel, QComboBox, QPushButton
 
+from utils.language import Language
 from utils.imageButton import ImageButton
+
 from components.shelf import Shelf, ShelfInfo
 
 from constants import SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, STORES
@@ -42,7 +44,7 @@ class Store(QLabel):
         self.WINDOW.resizeScroll()
 
     def initUI(self, name, image, posx, posy, parent):
-        self.goBackStore = QPushButton("← Go back", parent)
+        self.goBackStore = QPushButton(Language.get("go_back"), parent)
         self.goBackStore.setGeometry(1300, 15, 100, 50)
         self.goBackStore.hide()
 
@@ -53,7 +55,7 @@ class Store(QLabel):
         self.changeFloorButton.setGeometry(25, 15, 125, 25)
 
         for index in range(self.floor):
-            self.changeFloorButton.addItem("Floor: " + str(index + 1))
+            self.changeFloorButton.addItem(Language.get("floor") + str(index + 1))
 
     def initEvents(self):
         self.storeIcon.clicked.connect(self.openStore)

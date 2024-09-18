@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QLabel, QPushButton
 
+from utils.language import Language
 from utils.inputBool import InputBool
 from utils.inputNumber import InputNumber
 from components.space import Space
@@ -37,19 +38,19 @@ class Shelf(QLabel):
             self.separator.setStyleSheet("background-color: black;")
 
         # Config shelf
-        self.configNewShelveLabel = QLabel("How many spaces does the shelf have?:", self)
+        self.configNewShelveLabel = QLabel(Language.get("shelf_question_1"), self)
         self.configNewShelveLabel.setGeometry(0, 35, 200, 35)
 
         self.configNewShelveInput = InputNumber(1, self)
         self.configNewShelveInput.setGeometry(390, 25, 175, 50)
 
-        self.sidesNewShelf = QLabel("Can you put products in both sides of the shelf?:", self)
+        self.sidesNewShelf = QLabel(Language.get("shelf_question_2"), self)
         self.sidesNewShelf.setGeometry(0, 65, 300, 35)
 
-        self.sidesNewShelfInput = InputBool("Yes", "No", self)
+        self.sidesNewShelfInput = InputBool(Language.get("yes"), Language.get("no"), self)
         self.sidesNewShelfInput.setGeometry(390, 60, 175, 50)
 
-        self.configFloorsShelfLabel = QLabel("How many floors does the shelf have?:", self)
+        self.configFloorsShelfLabel = QLabel(Language.get("shelf_question_4"), self)
         self.configFloorsShelfLabel.setGeometry(0, 95, 200, 35)
 
         self.configFloorsShelfInput = InputNumber(1, self)
