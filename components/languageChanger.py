@@ -35,3 +35,15 @@ class LanguageChanger(QLabel):
 
         # Window button names
         self.WINDOW.addStoreButton.setText(Language.get("add_store"))
+    
+    def hide(self):
+        self.changer.hide()
+
+    def show(self):
+        self.changer.show()
+
+    def raise_(self):
+        self.changer.raise_()
+
+    def move(self, x, y):
+        self.changer.move(x, y)

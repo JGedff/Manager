@@ -41,7 +41,8 @@ class Store(QLabel):
         return maxFloor
 
     def updateWindow(self):
-        self.WINDOW.resizeScroll()
+        self.WINDOW.resizeHeightScroll()
+        self.WINDOW.resizeWidthScroll()
 
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
@@ -75,13 +76,18 @@ class Store(QLabel):
         self.changeFloor()
 
         maxPosY = 0
+        maxPosX = 0
 
         for shelf in self.shelves:
             if isinstance(shelf, ShelfInfo):
                 if shelf.spaces[shelf.spaces.__len__() - 1].pos().y() > maxPosY:
                     maxPosY = shelf.spaces[shelf.spaces.__len__() - 1].pos().y()
 
-        self.WINDOW.resizeScroll(maxPosY)
+                if shelf.spaces[shelf.spaces.__len__() - 1].pos().x() > maxPosX:
+                    maxPosX = shelf.spaces[shelf.spaces.__len__() - 1].pos().x()
+    
+        self.WINDOW.resizeHeightScroll(maxPosY)
+        self.WINDOW.resizeWidthScroll(maxPosX)
 
     def changeFloor(self):
         for shelf in self.shelves:
