@@ -1,19 +1,24 @@
+import re
+
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 
 class InputNumber(QLabel):
-    def __init__(self, defaultNumber = 0, parent = None):
+    def __init__(self, defaultNumber = 0, writeNumber = False, parent = None):
         super().__init__(parent)
 
-        self.defaultNumber = defaultNumber
-
-        self.initUI()
+        self.initVariables(defaultNumber)
+        self.initUI(not writeNumber)
         self.initEvents()
     
-    def initUI(self):
+    def initVariables(self, defaultNumber):
+        self.defaultNumber = defaultNumber
+        self.lastNumber = defaultNumber
+
+    def initUI(self, writeNumber):
         layout = QHBoxLayout(self)
         self.inputNum = QLineEdit(self)
         self.inputNum.setText(str(self.defaultNumber))
-        self.inputNum.setReadOnly(True)
+        self.inputNum.setReadOnly(writeNumber)
 
         self.addNumber = QPushButton("↑", self)
 
@@ -28,6 +33,7 @@ class InputNumber(QLabel):
     def initEvents(self):
         self.addNumber.clicked.connect(self.addNum)
         self.restNumber.clicked.connect(self.restNum)
+        self.inputNum.textChanged.connect(self.checkNumber)
 
     def addNum(self):
         actualNum = self.inputNum.text()
@@ -38,6 +44,21 @@ class InputNumber(QLabel):
     
         if int(actualNum) > self.defaultNumber:
             self.inputNum.setText(str(int(actualNum) - 1))
+
+    def checkNumber(self):
+        textToCheck = self.inputNum.text()
+        isNumber = False
+
+        try:
+            int(textToCheck)
+            isNumber = True
+        except ValueError:
+            isNumber = False
+
+        if textToCheck == "" or not isNumber or int(textToCheck) < self.defaultNumber:
+            self.inputNum.setText(str(self.lastNumber))
+        else:
+            self.lastNumber = textToCheck
 
     def getNum(self):
         return int(self.inputNum.text())

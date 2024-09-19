@@ -62,7 +62,8 @@ class Store(QLabel):
         self.storeIcon.clicked.connect(self.openStore)
         self.goBackStore.clicked.connect(self.openStore)
         self.changeFloorButton.currentTextChanged.connect(self.changeFloor)
-        self.WINDOW.scroll.verticalScrollBar().valueChanged.connect(self.updateHeaderPosition)
+        self.WINDOW.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
+        self.WINDOW.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalHeaderPosition)
 
     def openStore(self):
         self.WINDOW.openStore()
@@ -93,8 +94,15 @@ class Store(QLabel):
         for shelf in self.shelves:
             shelf.changeFloor(int(self.changeFloorButton.currentText().split(' ')[1]))
 
-    def updateHeaderPosition(self, value):
+    def updateVerticalHeaderPosition(self, value):
         self.changeFloorButton.move(self.changeFloorButton.pos().x(), value + 15)
+
+        self.changeFloorButton.raise_()
+
+    def updateHorizontalHeaderPosition(self, value):
+        self.changeFloorButton.move(value + 15, self.changeFloorButton.pos().y())
+
+        self.changeFloorButton.raise_()
 
     def hideStore(self):
         self.changeFloorButton.hide()

@@ -41,7 +41,7 @@ class Shelf(QLabel):
         self.configNewShelveLabel = QLabel(Language.get("shelf_question_1"), self)
         self.configNewShelveLabel.setGeometry(0, 35, 200, 35)
 
-        self.configNewShelveInput = InputNumber(1, self)
+        self.configNewShelveInput = InputNumber(1, True, self)
         self.configNewShelveInput.setGeometry(390, 25, 175, 50)
 
         self.sidesNewShelf = QLabel(Language.get("shelf_question_2"), self)
@@ -53,7 +53,7 @@ class Shelf(QLabel):
         self.configFloorsShelfLabel = QLabel(Language.get("shelf_question_4"), self)
         self.configFloorsShelfLabel.setGeometry(0, 95, 200, 35)
 
-        self.configFloorsShelfInput = InputNumber(1, self)
+        self.configFloorsShelfInput = InputNumber(1, True, self)
         self.configFloorsShelfInput.setGeometry(390, 95, 175, 50)
 
     def hideForm(self):

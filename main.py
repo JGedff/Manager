@@ -134,9 +134,10 @@ class MainWindow(QMainWindow):
         self.createStoreButton.clicked.connect(self.createStore)
         self.editCategories.clicked.connect(self.configCategories)
 
-        self.scroll.verticalScrollBar().valueChanged.connect(self.updateHeaderPosition)
+        self.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
+        self.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalHeaderPosition)
     
-    def updateHeaderPosition(self, value):
+    def updateVerticalHeaderPosition(self, value):
         self.newStoreLabel.move(self.newStoreLabel.pos().x(), value)
         self.editCategories.move(self.editCategories.pos().x(), value + 610)
         self.goBackHomeButton.move(self.goBackHomeButton.pos().x(), value + 10)
@@ -158,6 +159,11 @@ class MainWindow(QMainWindow):
         self.createShelfButton.raise_()
         self.createStoreButton.raise_()
         self.newStoreNameLabel.raise_()
+
+    def updateHorizontalHeaderPosition(self, value):
+        self.goBackHomeButton.move(value + 1300, self.goBackHomeButton.pos().y())
+
+        self.goBackHomeButton.raise_()
 
     def addStore(self):
         self.newStoreLabel.show()
@@ -223,7 +229,6 @@ class MainWindow(QMainWindow):
         SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self, self.widget))
 
         self.resizeHeightScroll()
-        self.resizeWidthScroll()
 
         for i in SHELVES:
             if isinstance(i, Shelf):
@@ -255,6 +260,7 @@ class MainWindow(QMainWindow):
             STORES.append(Store(val, DEFAULT_IMAGE, posx, posy, self, self.widget))
         
         self.reOpenHome()
+        self.goBackHomeButton.raise_()
     
     def configCategories(self):
         for i in STORES:
