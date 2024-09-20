@@ -25,7 +25,7 @@ class Store(QLabel):
         for index, i in enumerate(SHELVES):
             if isinstance(i, Shelf):
                 i.hideForm()
-                self.shelves.append(ShelfInfo(25, 50 + (185 * index), i, self, parent))
+                self.shelves.append(ShelfInfo(25, 50 + (185 * index), i, self, (index + 1), parent))
         
         SHELVES.clear()
         SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, mainWindow, parent))

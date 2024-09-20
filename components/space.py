@@ -8,13 +8,13 @@ from utils.language import Language
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, store, parent, long = False, buttonFromMain = False):
+    def __init__(self, posx, posy, actualFloor, floors, store, parent, long = False, buttonFromMain = False, times5Space = 0):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
 
         self.initVariables(actualFloor, floors, store, parent, long, buttonFromMain)
-        self.initUI(parent)
+        self.initUI(parent, times5Space)
         self.initEvents()
         
     def initVariables(self, actualFloor, floors, store, parent, long, buttonFromMain):
@@ -28,8 +28,10 @@ class Space(QLabel):
         if actualFloor > floors:
             setUnreachableCategory(self.category)
 
-    def initUI(self, parent):
-        self.box = QPushButton(parent)
+    def initUI(self, parent, times5Space):
+        nameSpace = str(times5Space * 5) if times5Space > 0 else ""
+        
+        self.box = QPushButton(nameSpace, parent)
 
         if self.long:
             self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 151)

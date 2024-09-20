@@ -75,9 +75,9 @@ class Shelf(QLabel):
         self.double_shelf = self.sidesNewShelfInput.getValue()
 
 class ShelfInfo():
-    def __init__(self, posx, posy, shelf, store, parent = None):
+    def __init__(self, posx, posy, shelf, store, shelfNumber = 1, parent = None):
         self.initVariables(shelf, store)
-        self.initUI(posx, posy, parent)
+        self.initUI(posx, posy, shelfNumber, parent)
     
     def initVariables(self, shelf, store):
         self.double_shelf = shelf.double_shelf
@@ -86,29 +86,53 @@ class ShelfInfo():
         self.STORE = store
         self.spaces = []
 
-    def initUI(self, posx, posy, parent):
+    def initUI(self, posx, posy, shelfNumber, parent):
+        self.shelfNumber = QLabel(Language.get("shelf") + str(shelfNumber) + ":", parent)
+        self.shelfNumber.setGeometry(posx, posy - 25, 100, 25)
+        self.shelfNumber.hide()
+
         for actualFloor in range(self.STORE.floor):
+            times5 = 0
+
             if self.double_shelf:
                 mod = self.spacesLength % 2
                 sideSpaces = (self.spacesLength / 2).__trunc__()
-                
+
                 for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent))
+                    if (index + 1) % 5 != 0:
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent))
+                    else:
+                        times5 += 1
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent, False, False, times5))
 
                 for index in range(sideSpaces):
                     self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.STORE, parent))
-
+                
                 if mod > 0:
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.STORE, parent, True))
+                    if (sideSpaces + 1) % 5 != 0:
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.STORE, parent, True))
+                    else:
+                        times5 += 1
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.STORE, parent, True, False, times5))
             else:
                 for index in range(self.spacesLength):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent))
+                    mod5 = (index + 1) % 5
+
+                    if mod5 != 0:
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent))
+                    else:
+                        times5 += 1
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent, False, False, times5))
 
     def changeFloor(self, number):
+        self.shelfNumber.show()
+
         for space in self.spaces:
             space.showFloor(number)
 
     def hideSpaces(self):
+        self.shelfNumber.hide()
+
         for space in self.spaces:
             if isinstance(space, Space):
                 space.hideSpace()
