@@ -76,10 +76,12 @@ class Shelf(QLabel):
 
 class ShelfInfo():
     def __init__(self, posx, posy, shelf, store, shelfNumber = 1, parent = None):
-        self.initVariables(shelf, store)
+        self.initVariables(posx, shelf, store)
         self.initUI(posx, posy, shelfNumber, parent)
+        self.initEvents()
     
-    def initVariables(self, shelf, store):
+    def initVariables(self, posx, shelf, store):
+        self.posx = posx
         self.double_shelf = shelf.double_shelf
         self.spacesLength = shelf.spaces
         self.floors = shelf.floors
@@ -88,7 +90,7 @@ class ShelfInfo():
 
     def initUI(self, posx, posy, shelfNumber, parent):
         self.shelfNumber = QLabel(Language.get("shelf") + str(shelfNumber) + ":", parent)
-        self.shelfNumber.setGeometry(posx, posy - 25, 100, 25)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 25), posy - 25, 50, 25)
         self.shelfNumber.hide()
 
         for actualFloor in range(self.STORE.floor):
@@ -123,6 +125,12 @@ class ShelfInfo():
                     else:
                         times5 += 1
                         self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.STORE, parent, False, False, times5))
+
+    def initEvents(self):
+        self.STORE.WINDOW.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalInfoPosition)
+
+    def updateHorizontalInfoPosition(self, value):
+        self.shelfNumber.move(value + int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), self.shelfNumber.pos().y())
 
     def changeFloor(self, number):
         self.shelfNumber.show()
