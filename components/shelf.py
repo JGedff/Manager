@@ -64,7 +64,6 @@ class Shelf(QLabel):
         del SHELVES[SHELVES.__len__() - 1]
 
         self.WINDOW.resizeHeightScroll()
-        self.WINDOW.resizeWidthScroll()
 
     def showForm(self):
         self.show()
