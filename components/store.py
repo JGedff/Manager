@@ -74,7 +74,7 @@ class Store(QLabel):
                 i.hideIcon()
             
         self.changeFloorButton.show()
-        self.changeFloor()
+        self.changeFloor(self.changeFloorButton.currentText())
 
         maxPosY = 0
         maxPosX = 0
@@ -90,8 +90,8 @@ class Store(QLabel):
         self.WINDOW.resizeHeightScroll(maxPosY)
         self.WINDOW.resizeWidthScroll(maxPosX)
 
-    def changeFloor(self):
-        if self.changeFloorButton.currentText().__len__() >= 1:
+    def changeFloor(self, floor):
+        if floor.__len__() >= 1:
             for shelf in self.shelves:
                 shelf.changeFloor(int(self.changeFloorButton.currentText().split(' ')[1]))
 

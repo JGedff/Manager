@@ -112,8 +112,8 @@ class Space(QLabel):
             self.editCategories.show()
             self.configCategory.show()
     
-    def changeCategory(self):
-        setCategoryByName(self.category, self.configCategory.currentText())
+    def changeCategory(self, category):
+        setCategoryByName(self.category, category)
         self.updateSpaceColor()
 
     def showFloor(self, number):

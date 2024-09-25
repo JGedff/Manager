@@ -25,8 +25,8 @@ class LanguageChanger(QLabel):
     def initEvents(self):
         self.changer.currentTextChanged.connect(self.changeLang)
 
-    def changeLang(self):
-        Language.changeTo(self.changer.currentText())
+    def changeLang(self, language):
+        Language.changeTo(language)
         self.updateUI()
 
     def updateUI(self):

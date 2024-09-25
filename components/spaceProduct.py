@@ -7,6 +7,8 @@ from utils.product import Product
 
 class SpaceProduct(QLabel):
     def __init__(self, parent):
+        super().__init__(parent)
+
         self.initVariables()
         self.initUI(parent)
         self.initEvents()
@@ -39,8 +41,8 @@ class SpaceProduct(QLabel):
         self.addProduct.clicked.connect(self.openCreateProduct)
         self.cancelAddProduct.clicked.connect(self.closeCreateProduct)
 
-    def changeProduct(self):
-        if self.productSelector.currentText() == Language.get("no_product"):
+    def changeProduct(self, productName):
+        if productName == Language.get("no_product"):
             self.actualProduct = None
         else:
             self.actualProduct = Product.getByName(self.productSelector.currentText())
