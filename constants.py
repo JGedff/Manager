@@ -18,4 +18,4 @@ DEFAULT_IMAGE = "img/magazine.png"
 
 from utils.productInfo import ProductInfo
 
-PRODUCTS_INFO = [ProductInfo(40258136797, "First product", 5.2, "2024/04/28", "MSelf")]
+PRODUCTS_INFO = [ProductInfo(40258136797, "First product", 5.2, "2024/04/28", "MSelf"), ProductInfo(45, "Second product", 50, "2024/09/28", "MSelf")]

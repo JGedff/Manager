@@ -23,5 +23,6 @@
     "floor": "Floor: ",
     "shelf": "Shelf ",
     "product": "Product: ",
-    "add_product": "+ Add product"
+    "add_product": "+ Add product",
+    "no_product": "Without product"
 }

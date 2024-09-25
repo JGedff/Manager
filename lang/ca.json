@@ -23,5 +23,6 @@
     "floor": "Pis: ",
     "shelf": "Prestatgeria ",
     "product": "Producte: ",
-    "add_product": "+ Afegir producte"
+    "add_product": "+ Afegir producte",
+    "no_product": "Sense producte"
 }

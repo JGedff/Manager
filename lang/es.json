@@ -23,5 +23,6 @@
     "floor": "Piso: ",
     "shelf": "Estantería ",
     "product": "Producto: ",
-    "add_product": "+ Añadir producto"
+    "add_product": "+ Añadir producto",
+    "no_product": "Sin producto"
 }

@@ -86,7 +86,7 @@ class MainWindow(QMainWindow):
         self.categorySpace.hideSpace()
 
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
-        self.editCategories.setGeometry(1316, 610, 100, 30)
+        self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
 
         if STORES.__len__() > 1:
             self.editCategories.show()

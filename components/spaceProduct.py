@@ -9,28 +9,48 @@ class SpaceProduct(QLabel):
     def __init__(self, parent):
         self.initVariables()
         self.initUI(parent)
+        self.initEvents()
 
     def initVariables(self):
-        self.productSelector = None
-        self.actualProduct = {}
+        self.actualProduct = None
         self.amountProducts = 0
 
     def initUI(self, parent):
         self.productLabel = QLabel(Language.get("product"), parent)
         self.productLabel.setGeometry(160, 65, 100, 25)
-        self.productLabel.hide()
 
         self.productSelector = QComboBox(parent)
-        self.productSelector.setGeometry(210, 65, 100, 25)
-        self.productSelector.hide()
+        self.productSelector.setGeometry(210, 65, 125, 25)
 
         self.addProduct = QPushButton(Language.get("add_product"), parent)
-        self.addProduct.setGeometry(320, 65, 100, 25)
-        self.addProduct.hide()
+        self.addProduct.setGeometry(345, 65, 125, 25)
+
+        self.cancelAddProduct = QPushButton(Language.get("cancel"), parent)
+        self.cancelAddProduct.setGeometry(345, 100, 125, 25)
+        self.cancelAddProduct.hide()
+
+        self.productSelector.addItem(Language.get("no_product"))
 
         for prod in PRODUCTS_INFO:
             self.productSelector.addItem(prod.name)
     
+    def initEvents(self):
+        self.productSelector.currentTextChanged.connect(self.changeProduct)
+        self.addProduct.clicked.connect(self.openCreateProduct)
+        self.cancelAddProduct.clicked.connect(self.closeCreateProduct)
+
+    def changeProduct(self):
+        if self.productSelector.currentText() == Language.get("no_product"):
+            self.actualProduct = None
+        else:
+            self.actualProduct = Product.getByName(self.productSelector.currentText())
+
+    def openCreateProduct(self):
+        self.cancelAddProduct.show()
+
+    def closeCreateProduct(self):
+        self.cancelAddProduct.hide()
+
     def hide(self):
         self.addProduct.hide()
         self.productLabel.hide()
@@ -42,13 +62,3 @@ class SpaceProduct(QLabel):
 
         if PRODUCTS_INFO.__len__() >= 1:
             self.productSelector.show()
-
-    def setProduct(self, id, amount):
-        self.actualProduct = Product.get(id)
-        self.amountProducts = amount
-    
-    def createProduct(self, id, info, amount):
-        Product.set(id, info)
-
-        self.actualProduct = info
-        self.amountProducts = amount

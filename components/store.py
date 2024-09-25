@@ -91,8 +91,9 @@ class Store(QLabel):
         self.WINDOW.resizeWidthScroll(maxPosX)
 
     def changeFloor(self):
-        for shelf in self.shelves:
-            shelf.changeFloor(int(self.changeFloorButton.currentText().split(' ')[1]))
+        if self.changeFloorButton.currentText().__len__() >= 1:
+            for shelf in self.shelves:
+                shelf.changeFloor(int(self.changeFloorButton.currentText().split(' ')[1]))
 
     def updateVerticalHeaderPosition(self, value):
         self.changeFloorButton.move(self.changeFloorButton.pos().x(), value + 15)
@@ -106,7 +107,7 @@ class Store(QLabel):
 
     def hideStore(self):
         self.changeFloorButton.hide()
-
+        
         for shelf in self.shelves:
             if isinstance(shelf, ShelfInfo):
                 shelf.hideSpaces()

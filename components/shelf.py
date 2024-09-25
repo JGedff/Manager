@@ -75,20 +75,21 @@ class Shelf(QLabel):
 
 class ShelfInfo():
     def __init__(self, posx, posy, shelf, store, shelfNumber = 1, parent = None):
-        self.initVariables(posx, shelf, store)
-        self.initUI(posx, posy, shelfNumber, parent)
+        self.initVariables(posx, shelf, store, shelfNumber)
+        self.initUI(posx, posy, parent)
         self.initEvents()
     
-    def initVariables(self, posx, shelf, store):
-        self.posx = posx
-        self.double_shelf = shelf.double_shelf
-        self.spacesLength = shelf.spaces
-        self.floors = shelf.floors
-        self.STORE = store
+    def initVariables(self, posx, shelf, store, shelfNumber):
         self.spaces = []
+        self.posx = posx
+        self.STORE = store
+        self.floors = shelf.floors
+        self.actualNumber = shelfNumber
+        self.spacesLength = shelf.spaces
+        self.double_shelf = shelf.double_shelf
 
-    def initUI(self, posx, posy, shelfNumber, parent):
-        self.shelfNumber = QLabel(Language.get("shelf") + str(shelfNumber) + ":", parent)
+    def initUI(self, posx, posy, parent):
+        self.shelfNumber = QLabel(Language.get("shelf") + str(self.actualNumber) + ":", parent)
         self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 25), posy - 25, 50, 25)
         self.shelfNumber.hide()
 
