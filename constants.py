@@ -15,3 +15,7 @@ DEFAULT_SHELF_MARGIN = 150
 DEFAULT_SPACE_MARGIN = 75
 
 DEFAULT_IMAGE = "img/magazine.png"
+
+from utils.productInfo import ProductInfo
+
+PRODUCTS_INFO = [ProductInfo(40258136797, "First product", 5.2, "2024/04/28", "MSelf")]

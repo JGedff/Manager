@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QComboBox
 
 from constants import CATEGORY_NAMES, WINDOW_WIDTH, WINDOW_HEIGHT
 
+from components.spaceProduct import SpaceProduct
 from components.spaceCategory import SpaceCategory
 
 from utils.language import Language
@@ -20,6 +21,7 @@ class Space(QLabel):
     def initVariables(self, actualFloor, floors, store, parent, long, buttonFromMain):
         self.long = long
         self.STORE = store
+        self.product = SpaceProduct(parent)
         self.widget = parent
         self.actualFloor = actualFloor
         self.buttonFromMain = buttonFromMain
@@ -45,10 +47,10 @@ class Space(QLabel):
         self.configBox.setGeometry(26, 26, 76, 76)
 
         self.labelCategory = QLabel(Language.get("category"), parent)
-        self.labelCategory.setGeometry(150, 26, 50, 25)
+        self.labelCategory.setGeometry(152, 26, 50, 25)
 
         self.configCategory = QComboBox(parent)
-        self.configCategory.setGeometry(200, 26, 100, 25)
+        self.configCategory.setGeometry(210, 26, 100, 25)
         self.configCategory.addItem(self.category.name)
 
         for category in CATEGORY_NAMES:
@@ -56,7 +58,7 @@ class Space(QLabel):
                 self.configCategory.addItem(category.capitalize())
 
         self.editCategories = QPushButton("⚙️", parent)
-        self.editCategories.setGeometry(300, 26, 26, 26)
+        self.editCategories.setGeometry(320, 26, 26, 26)
 
         self.updateSpaceColor()
 
@@ -79,6 +81,7 @@ class Space(QLabel):
             self.labelCategory.show()
             self.configCategory.show()
             self.editCategories.show()
+            self.product.show()
             self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
             
     def openConfigCategories(self):
@@ -86,6 +89,7 @@ class Space(QLabel):
             self.openSpaceConfig.show()
             self.category.showUI()
         else:
+            self.product.hide()
             self.configBox.hide()
             self.labelCategory.hide()
             self.configCategory.hide()
@@ -103,6 +107,7 @@ class Space(QLabel):
             self.category.cancelAddCategory()
             self.STORE.configSpace()
             self.configBox.show()
+            self.product.show()
             self.labelCategory.show()
             self.editCategories.show()
             self.configCategory.show()
@@ -119,6 +124,7 @@ class Space(QLabel):
 
     def hideSpace(self):
         self.box.hide()
+        self.product.hide()
         self.configBox.hide()
         self.configCategory.hide()
         self.labelCategory.hide()
@@ -129,6 +135,7 @@ class Space(QLabel):
     def showSpace(self):
         self.updateSpaceColor()
         self.box.show()
+        self.product.hide()
         self.configBox.hide()
 
         self.configCategory.hide()

@@ -23,7 +23,6 @@ class SpaceCategory():
         self.amount = 0
         self.newColor = ''
         self.SPACE = space
-        self.product = None
         self.doubleButtons = []
         self.mainParent = parent
         self.newCategoryName = ""
