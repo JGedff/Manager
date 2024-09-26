@@ -1,5 +1,3 @@
-from PyQt5.QtWidgets import QPushButton
-
 from utils.category import Category
 from utils.doubleButton import DoubleButton
 
@@ -12,7 +10,7 @@ def createCategoryIn(space, categoryName, parent):
     space.category.doubleButtons.append(newDoubleButton)
     space.configCategory.addItem(categoryName)
 
-    if space.category.doubleButtons.__len__() > 1:
+    if space.category.doubleButtons.__len__() > 3:
         space.category.doubleButtons[0].setDisabledButton2(False)
 
 def deleteCategoryFrom(space, indexButtonPressed, categoryName):
@@ -34,8 +32,8 @@ def deleteCategoryFrom(space, indexButtonPressed, categoryName):
         space.category.doubleButtons[0].setDisabledButton2(True)
 
 def updateButtonsPosition(space):
-    posx = 25
-    posy = 25
+    posx = 13
+    posy = 13
 
     for index, _ in enumerate(CATEGORY_NAMES):
         space.category.doubleButtons[index].setGeometry(posx, posy, 450, 50)

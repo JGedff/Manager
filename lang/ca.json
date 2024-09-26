@@ -24,5 +24,7 @@
     "shelf": "Prestatgeria ",
     "product": "Producte: ",
     "add_product": "+ Afegir producte",
-    "no_product": "Sense producte"
+    "no_product": "Sense producte",
+    "name": "Nom",
+    "category_has_product": "Aquesta categoría tindrà productes?"
 }

@@ -2,14 +2,17 @@ from PyQt5.QtWidgets import QPushButton, QLabel, QLineEdit, QColorDialog
 
 from utils.language import Language
 from utils.category import Category
+from utils.inputBool import InputBool
 from utils.doubleButton import DoubleButton
 from utils.functions.globalFunctions import updateNameCategory
 from utils.functions.spaceCategoryFunctions import createCategoryIn, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
 
 from constants import CATEGORY_NAMES, STORES
 
-class SpaceCategory():
+class SpaceCategory(QLabel):
     def __init__(self, space, parent):
+        super().__init__(parent)
+
         self.initVariables(space, parent)
         self.initUI(parent)
         self.initEvents()
@@ -59,33 +62,48 @@ class SpaceCategory():
         posx = 25
         posy = 25
 
-        for category in CATEGORY_NAMES:
-            newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
+        for index, category in enumerate(CATEGORY_NAMES):
+            if index > 2:
+                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
+                posy += 50
 
-            posy += 50
+                self.doubleButtons.append(newDoubleButton)
+            else:
+                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "", self.editCategory, self.deleteCategory, parent)
 
-            self.doubleButtons.append(newDoubleButton)
+                posy += 50
+
+                self.doubleButtons.append(newDoubleButton)
 
         self.addCategory = QPushButton(Language.get("add_category"), parent)
-        self.addCategory.setGeometry(posx, posy, 200, 50)
+        self.addCategory.setGeometry(posx, posy, 200, 25)
         self.addCategory.hide()
 
         self.addCategoryName = QLineEdit(parent)
-        self.addCategoryName.setGeometry(posx, posy, 200, 25)
+        self.addCategoryName.setGeometry(posx, posy - 100, 200, 25)
+        self.addCategoryName.setPlaceholderText(Language.get("name"))
         self.addCategoryName.hide()
 
         self.newCategoryColorButton = QPushButton(Language.get("select_color"), parent)
-        self.newCategoryColorButton.setGeometry(posx + 225, posy, 125, 25)
+        self.newCategoryColorButton.setGeometry(posx + 225, posy - 50, 125, 25)
         self.newCategoryColorButton.hide()
 
         self.cancelButtonAddCategory = QPushButton(Language.get("cancel"), parent)
-        self.cancelButtonAddCategory.setGeometry(posx, posy + 50, 100, 25)
+        self.cancelButtonAddCategory.setGeometry(posx, posy - 50, 100, 25)
         self.cancelButtonAddCategory.hide()
 
         self.createCategoryButton = QPushButton(Language.get("create"), parent)
-        self.createCategoryButton.setGeometry(posx + 125, posy + 50, 100, 25)
+        self.createCategoryButton.setGeometry(posx + 425, posy - 50, 100, 25)
         self.createCategoryButton.setDisabled(True)
         self.createCategoryButton.hide()
+
+        self.newCategoryProductLabel = QLabel(Language.get("category_has_product"), parent)
+        self.newCategoryProductLabel.setGeometry(posx + 225, posy - 100, 200, 25)
+        self.newCategoryProductLabel.hide()
+
+        self.newCategoryWithProduct = InputBool(Language.get("yes"), Language.get("no"), parent)
+        self.newCategoryWithProduct.setGeometry(posx + 425, posy - 125, 100, 75)
+        self.newCategoryWithProduct.hide()
 
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
@@ -124,9 +142,10 @@ class SpaceCategory():
     
     def editCategory(self):
         self.hideUI()
-        self.SPACE.openSpaceConfig.hide()
-        self.showSpace.show()
         self.newColor = ''
+        self.showSpace.show()
+        self.cancelAddCategory()
+        self.SPACE.openSpaceConfig.hide()
             
         # self.doubleButtons[0].button1.sender() will be used as the receptor of events
         self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
@@ -147,6 +166,7 @@ class SpaceCategory():
             button.hide()
         
         self.addCategory.hide()
+
     
     def saveInfo(self):
         newName = self.categoryName.text()
@@ -183,17 +203,21 @@ class SpaceCategory():
     def showAddCategory(self):
         self.creatingCategory = True
 
-        self.addCategoryName.move(self.addCategory.pos().x(), self.addCategory.pos().y())
-        self.newCategoryColorButton.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y())
-        self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 50)
-        self.createCategoryButton.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() + 50)
-
         self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
+        self.addCategoryName.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
+        self.createCategoryButton.move(self.addCategory.pos().x() + 400, self.addCategory.pos().y() - 50)
+        self.newCategoryColorButton.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() - 50)
+        self.newCategoryWithProduct.move(self.addCategory.pos().x() + 400, self.addCategory.pos().y() - 125)
+        self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 50)
+        self.newCategoryProductLabel.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() - 100)
+
         self.addCategory.setDisabled(True)
 
         self.addCategoryName.show()
-        self.newCategoryColorButton.show()
         self.createCategoryButton.show()
+        self.newCategoryColorButton.show()
+        self.newCategoryWithProduct.show()
+        self.newCategoryProductLabel.show()
         self.cancelButtonAddCategory.show()
 
         for button in self.doubleButtons:
@@ -203,6 +227,8 @@ class SpaceCategory():
         self.addCategoryName.hide()
         self.createCategoryButton.hide()
         self.newCategoryColorButton.hide()
+        self.newCategoryWithProduct.hide()
+        self.newCategoryProductLabel.hide()
         self.cancelButtonAddCategory.hide()
 
         self.newCategoryName = ""
@@ -215,6 +241,12 @@ class SpaceCategory():
 
         if self.creatingCategory:
             self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
+            self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() - 100)
+            self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() - 100)
+            self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() - 100)
+            self.newCategoryWithProduct.move(self.newCategoryWithProduct.pos().x(), self.newCategoryWithProduct.pos().y() - 100)
+            self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() - 100)
+            self.newCategoryProductLabel.move(self.newCategoryProductLabel.pos().x(), self.newCategoryProductLabel.pos().y() - 100)
 
         if self.doubleButtons.__len__() > 1:
             for button in self.doubleButtons:
@@ -239,7 +271,7 @@ class SpaceCategory():
             self.createCategoryButton.setDisabled(False)
 
     def createCategory(self):
-        Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+        Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor, self.newCategoryWithProduct.getValue())
 
         createCategoryIn(STORES[0].WINDOW.categorySpace, self.newCategoryName.capitalize(), self.mainParent)
 
@@ -249,11 +281,23 @@ class SpaceCategory():
                     createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
         
         self.showUI()
-        self.creatingCategory = False
         self.cancelAddCategory()
+
+        self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
+        self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() + 50)
+        self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() + 50)
+        self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() + 50)
+        self.newCategoryWithProduct.move(self.newCategoryWithProduct.pos().x(), self.newCategoryWithProduct.pos().y() + 50)
+        self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() + 50)
+        self.newCategoryProductLabel.move(self.newCategoryProductLabel.pos().x(), self.newCategoryProductLabel.pos().y() + 50)
     
     def deleteCategory(self):
-        indexButtonPressed = int((self.doubleButtons[0].button1.sender().pos().y() - 25) / 50)
+        indexButtonPressed = 0
+        
+        for index, send in enumerate(self.doubleButtons):
+            if send.button2 == self.sender():
+                indexButtonPressed = index
+
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 

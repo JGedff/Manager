@@ -24,5 +24,7 @@
     "shelf": "Estantería ",
     "product": "Producto: ",
     "add_product": "+ Añadir producto",
-    "no_product": "Sin producto"
+    "no_product": "Sin producto",
+    "name": "Nombre",
+    "category_has_product": "¿Esta categoría tendrá productos?"
 }

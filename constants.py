@@ -4,8 +4,9 @@ WINDOW_HEIGHT = 720
 STORES = []
 SHELVES = []
 
-CATEGORY_NAMES = ['Empty', 'Unreachable']
-CATEGORY_COLORS = ['white', 'red']
+CATEGORY_NAMES = ['Empty', 'Unreachable', 'Fill']
+CATEGORY_COLORS = ['white', 'red', 'green']
+PRODUCT_CATEGORY = ['Fill']
 
 DEFAULT_SHELF_PREFIX = "Shelf "
 DEFAULT_SHELF_WIDTH = 400

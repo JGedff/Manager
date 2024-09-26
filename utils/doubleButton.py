@@ -22,6 +22,9 @@ class DoubleButton(QLabel):
         self.button2.setGeometry(posx + 225, posy, 0, 0)
         self.button2.setStyleSheet("margin-left: 5px; width: 50px; height: 25px")
 
+        if textButton2 == "":
+            self.button2.hide()
+
         # Add the icon and text to the layout
         layout.addWidget(self.button1)
         layout.addWidget(self.button2)

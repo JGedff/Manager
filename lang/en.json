@@ -24,5 +24,7 @@
     "shelf": "Shelf ",
     "product": "Product: ",
     "add_product": "+ Add product",
-    "no_product": "Without product"
+    "no_product": "Without product",
+    "name": "Name",
+    "category_has_product": "Will this category have products?"
 }

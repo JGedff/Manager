@@ -2,20 +2,22 @@ from PyQt5.QtWidgets import QLabel, QComboBox, QPushButton
 
 from constants import PRODUCTS_INFO
 
+from utils.category import Category
 from utils.language import Language
 from utils.product import Product
 
 class SpaceProduct(QLabel):
-    def __init__(self, parent):
+    def __init__(self, category, parent):
         super().__init__(parent)
 
-        self.initVariables()
+        self.initVariables(category)
         self.initUI(parent)
         self.initEvents()
 
-    def initVariables(self):
-        self.actualProduct = None
+    def initVariables(self, category):
         self.amountProducts = 0
+        self.category = category
+        self.actualProduct = None
 
     def initUI(self, parent):
         self.productLabel = QLabel(Language.get("product"), parent)
@@ -53,14 +55,24 @@ class SpaceProduct(QLabel):
     def closeCreateProduct(self):
         self.cancelAddProduct.hide()
 
+    def categoryChanged(self):
+        if Category.isProductCategory(self.category.name):
+            self.addProduct.show()
+            self.productLabel.show()
+            self.productSelector.show()
+        else:
+            self.addProduct.hide()
+            self.productLabel.hide()
+            self.productSelector.hide()
+
+
     def hide(self):
         self.addProduct.hide()
         self.productLabel.hide()
         self.productSelector.hide()
     
     def show(self):
-        self.addProduct.show()
-        self.productLabel.show()
-
-        if PRODUCTS_INFO.__len__() >= 1:
+        if Category.isProductCategory(self.category.name):
+            self.addProduct.show()
+            self.productLabel.show()
             self.productSelector.show()

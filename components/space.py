@@ -21,11 +21,11 @@ class Space(QLabel):
     def initVariables(self, actualFloor, floors, store, parent, long, buttonFromMain):
         self.long = long
         self.STORE = store
-        self.product = SpaceProduct(parent)
         self.widget = parent
         self.actualFloor = actualFloor
         self.buttonFromMain = buttonFromMain
         self.category = SpaceCategory(self, parent)
+        self.product = SpaceProduct(self.category, parent)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -114,6 +114,7 @@ class Space(QLabel):
     
     def changeCategory(self, category):
         setCategoryByName(self.category, category)
+        self.product.categoryChanged()
         self.updateSpaceColor()
 
     def showFloor(self, number):
