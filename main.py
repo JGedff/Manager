@@ -9,7 +9,7 @@ from components.shelf import Shelf
 from components.store import Store
 from components.languageChanger import LanguageChanger
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES, DEFAULT_IMAGE
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES, DEFAULT_IMAGE
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -22,7 +22,7 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
-        SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, self, self.widget))
+        SHELVES.append(Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, self, self.widget))
 
         self.initUI(self.widget)
         self.initEvents()
@@ -220,7 +220,7 @@ class MainWindow(QMainWindow):
         self.categorySpace.category.hideUI()
 
     def createShelf(self):
-        SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self, self.widget))
+        SHELVES.append(Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self, self.widget))
 
         self.resizeHeightScroll()
 

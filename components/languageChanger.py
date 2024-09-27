@@ -40,12 +40,13 @@ class LanguageChanger(QLabel):
         self.WINDOW.goBackHomeButton.setText(Language.get("go_back"))
         self.WINDOW.editCategories.setText(Language.get("edit_categories"))
 
-        for shelf in SHELVES:
+        for shelfIndex, shelf in enumerate(SHELVES):
             shelf.configNewShelveLabel.setText(Language.get("shelf_question_1"))
             shelf.sidesNewShelf.setText(Language.get("shelf_question_2"))
             shelf.sidesNewShelfInput.trueButton.setText(Language.get("yes"))
             shelf.sidesNewShelfInput.falseButton.setText(Language.get("no"))
             shelf.configFloorsShelfLabel.setText(Language.get("shelf_question_4"))
+            shelf.configNewStoreLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
 
         for store in STORES:
             store.goBackStore.setText(Language.get("go_back"))

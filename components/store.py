@@ -5,7 +5,7 @@ from utils.imageButton import ImageButton
 
 from components.shelf import Shelf, ShelfInfo
 
-from constants import SHELVES, DEFAULT_SHELF_PREFIX, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, STORES
+from constants import SHELVES, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, STORES
 
 class Store(QLabel):
     def __init__(self, name, image, posx, posy, mainWindow, parent):
@@ -28,7 +28,7 @@ class Store(QLabel):
                 self.shelves.append(ShelfInfo(25, 50 + (185 * index), i, self, (index + 1), parent))
         
         SHELVES.clear()
-        SHELVES.append(Shelf(DEFAULT_SHELF_PREFIX + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, mainWindow, parent))
+        SHELVES.append(Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, mainWindow, parent))
 
     def getMaxFloor(self):
         maxFloor = 1

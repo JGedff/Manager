@@ -1,3 +1,5 @@
+from utils.language import Language
+
 WINDOW_WIDTH = 1440
 WINDOW_HEIGHT = 720
 
@@ -8,7 +10,6 @@ CATEGORY_NAMES = ['Empty', 'Unreachable', 'Fill']
 CATEGORY_COLORS = ['white', 'red', 'green']
 PRODUCT_CATEGORY = ['Fill']
 
-DEFAULT_SHELF_PREFIX = "Shelf "
 DEFAULT_SHELF_WIDTH = 400
 DEFAULT_SHELF_HEIGHT = 130
 DEFAULT_SHELF_MARGIN = 150

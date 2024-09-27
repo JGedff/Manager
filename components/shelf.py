@@ -30,7 +30,7 @@ class Shelf(QLabel):
         # Delete shelf
         if SHELVES.__len__() + 1 > 1:
             self.delStore = QPushButton("🗑️", self)
-            self.delStore.setGeometry(50, 10, 50, 20)
+            self.delStore.setGeometry(75, 10, 50, 20)
             self.delStore.clicked.connect(self.delShelf)
 
             self.separator = QLabel(self)
