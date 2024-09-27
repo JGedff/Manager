@@ -34,7 +34,7 @@ class LanguageChanger(QLabel):
         self.WINDOW.setWindowTitle(Language.get("window_title"))
         self.WINDOW.addStoreButton.setText(Language.get("add_store"))
         self.WINDOW.newStoreNameLabel.setText(Language.get("name_store"))
-        self.WINDOW.newStoreNameEdit.setPlaceholderText(Language.get("store") + str(STORES.__len__() - 1))
+        self.WINDOW.newStoreNameEdit.setPlaceholderText(Language.get("store") + str(STORES.__len__()))
         self.WINDOW.createShelfButton.setText(Language.get("add_shelf"))
         self.WINDOW.createStoreButton.setText(Language.get("create_store"))
         self.WINDOW.goBackHomeButton.setText(Language.get("go_back"))
