@@ -88,10 +88,7 @@ class MainWindow(QMainWindow):
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
         self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
 
-        if STORES.__len__() > 1:
-            self.editCategories.show()
-        else:
-            self.editCategories.hide()
+        self.editCategories.show()
 
         for i, instance in enumerate(STORES):
             if i != 0:
@@ -201,11 +198,8 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.languageChanger.raise_()
 
-        if STORES.__len__() > 1:
-            self.editCategories.show()
-            self.editCategories.raise_()
-        else:
-            self.editCategories.hide()
+        self.editCategories.show()
+        self.editCategories.raise_()
 
         for i, instance in enumerate(STORES):
             if i != 0:

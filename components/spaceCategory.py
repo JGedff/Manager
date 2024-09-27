@@ -250,9 +250,8 @@ class SpaceCategory(QLabel):
             self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() - 100)
             self.newCategoryProductLabel.move(self.newCategoryProductLabel.pos().x(), self.newCategoryProductLabel.pos().y() - 100)
 
-        if self.doubleButtons.__len__() > 1:
-            for button in self.doubleButtons:
-                button.setDisabledButton2(False)
+        for button in self.doubleButtons:
+            button.setDisabledButton2(False)
 
         self.creatingCategory = False
 

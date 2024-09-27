@@ -71,6 +71,11 @@ class LanguageChanger(QLabel):
                     space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
                     space.category.createCategoryButton.setText(Language.get("create"))
 
+                    space.category.addCategoryName.setPlaceholderText(Language.get("name"))
+                    space.category.newCategoryProductLabel.setText(Language.get("category_has_product"))
+                    space.category.newCategoryWithProduct.trueButton.setText(Language.get("yes"))
+                    space.category.newCategoryWithProduct.falseButton.setText(Language.get("no"))
+
                     space.product.productLabel.setText(Language.get("product"))
                     space.product.addProduct.setText(Language.get("add_product"))
                     space.product.cancelAddProduct.setText(Language.get("cancel"))
