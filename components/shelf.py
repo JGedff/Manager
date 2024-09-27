@@ -90,7 +90,7 @@ class ShelfInfo():
 
     def initUI(self, posx, posy, parent):
         self.shelfNumber = QLabel(Language.get("shelf") + str(self.actualNumber) + ":", parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 25), posy - 25, 50, 25)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 25), posy - 25, 100, 25)
         self.shelfNumber.hide()
 
         for actualFloor in range(self.STORE.floor):
