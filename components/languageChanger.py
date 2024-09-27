@@ -40,6 +40,27 @@ class LanguageChanger(QLabel):
         self.WINDOW.goBackHomeButton.setText(Language.get("go_back"))
         self.WINDOW.editCategories.setText(Language.get("edit_categories"))
 
+        # Category in main page
+        self.WINDOW.categorySpace.category.showSpace.setText(Language.get("go_back"))
+        self.WINDOW.categorySpace.category.categoryNameLabel.setText(Language.get("category_name"))
+        self.WINDOW.categorySpace.category.categoryColorLabel.setText(Language.get("category_color"))
+        self.WINDOW.categorySpace.category.saveCategory.setText(Language.get("save"))
+        self.WINDOW.categorySpace.category.categoryColor.setText(Language.get("select_color"))
+        self.WINDOW.categorySpace.category.addCategory.setText(Language.get("add_category"))
+        self.WINDOW.categorySpace.category.newCategoryColorButton.setText(Language.get("select_color"))
+        self.WINDOW.categorySpace.category.cancelButtonAddCategory.setText(Language.get("cancel"))
+        self.WINDOW.categorySpace.category.createCategoryButton.setText(Language.get("create"))
+        self.WINDOW.categorySpace.category.addCategoryName.setPlaceholderText(Language.get("name"))
+        self.WINDOW.categorySpace.category.newCategoryProductLabel.setText(Language.get("category_has_product"))
+        self.WINDOW.categorySpace.category.newCategoryWithProduct.trueButton.setText(Language.get("yes"))
+        self.WINDOW.categorySpace.category.newCategoryWithProduct.falseButton.setText(Language.get("no"))
+        self.WINDOW.categorySpace.product.productLabel.setText(Language.get("product"))
+        self.WINDOW.categorySpace.product.addProduct.setText(Language.get("add_product"))
+        self.WINDOW.categorySpace.product.cancelAddProduct.setText(Language.get("cancel"))
+        self.WINDOW.categorySpace.product.productSelector.clear()
+        self.WINDOW.categorySpace.product.productSelector.addItem(Language.get("no_product"))
+
+        # Shelf forms
         for shelfIndex, shelf in enumerate(SHELVES):
             shelf.configNewShelveLabel.setText(Language.get("shelf_question_1"))
             shelf.sidesNewShelf.setText(Language.get("shelf_question_2"))
@@ -48,6 +69,7 @@ class LanguageChanger(QLabel):
             shelf.configFloorsShelfLabel.setText(Language.get("shelf_question_4"))
             shelf.configNewStoreLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
 
+        # Stores
         for store in STORES:
             store.goBackStore.setText(Language.get("go_back"))
             store.changeFloorButton.clear()
@@ -55,9 +77,11 @@ class LanguageChanger(QLabel):
             for index in range(store.floor):
                 store.changeFloorButton.addItem(Language.get("floor") + str(index + 1))
 
+            # Shelf
             for shelf in store.shelves:
                 shelf.shelfNumber.setText(Language.get("shelf") + str(shelf.actualNumber) + ":")
 
+                # Space
                 for space in shelf.spaces:
                     space.openSpaceConfig.setText(Language.get("go_back"))
                     space.labelCategory.setText(Language.get("category"))
