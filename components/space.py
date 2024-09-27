@@ -72,6 +72,8 @@ class Space(QLabel):
         self.editCategories.clicked.connect(self.openConfigCategories)
         self.configCategory.currentTextChanged.connect(self.changeCategory)
 
+        self.STORE.WINDOW.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
+
     def configSpace(self):
         if self.buttonFromMain:
             self.openConfigCategories()
@@ -82,9 +84,11 @@ class Space(QLabel):
             self.configCategory.show()
             self.editCategories.show()
             self.product.show()
-            self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
+            self.updateScrollToDefault()
             
     def openConfigCategories(self):
+        self.updateScroll()
+
         if self.buttonFromMain:
             self.openSpaceConfig.show()
             self.category.showUI()
@@ -98,7 +102,16 @@ class Space(QLabel):
             self.category.showUI()
             self.STORE.configCategories()
     
+    def updateScroll(self):
+        if self.category.doubleButtons[self.category.doubleButtons.__len__() - 1].pos().y() >= 500:
+            self.widget.resize(WINDOW_WIDTH - 20, self.category.doubleButtons[self.category.doubleButtons.__len__() - 1].pos().y() + 200)
+        else:
+            self.updateScrollToDefault()
+
     def stopConfigSpace(self):
+        print('al')
+        self.updateScrollToDefault()
+
         if self.buttonFromMain:
             self.category.hideUI()
             self.openSpaceConfig.hide()
@@ -116,6 +129,9 @@ class Space(QLabel):
         setCategoryByName(self.category, category)
         self.product.categoryChanged()
         self.updateSpaceColor()
+
+    def updateVerticalHeaderPosition(self, value):
+        self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
 
     def showFloor(self, number):
         if number != self.actualFloor:
@@ -149,3 +165,6 @@ class Space(QLabel):
 
     def hideHome(self):
         self.editCategories.hide()
+
+    def updateScrollToDefault(self):
+        self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)

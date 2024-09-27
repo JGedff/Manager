@@ -117,6 +117,7 @@ class SpaceCategory(QLabel):
 
     def stopEditCategory(self):
         self.SPACE.updateSpaceColor()
+        self.SPACE.updateScroll()
 
         self.showUI()
         self.SPACE.openSpaceConfig.show()
@@ -130,7 +131,7 @@ class SpaceCategory(QLabel):
     def showUI(self):
         for button in self.doubleButtons:
             button.show()
-        
+
         self.addCategory.show()
 
     def selectColor(self):
@@ -146,6 +147,7 @@ class SpaceCategory(QLabel):
         self.showSpace.show()
         self.cancelAddCategory()
         self.SPACE.openSpaceConfig.hide()
+        self.SPACE.updateScrollToDefault()
             
         # self.doubleButtons[0].button1.sender() will be used as the receptor of events
         self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
@@ -290,6 +292,8 @@ class SpaceCategory(QLabel):
         self.newCategoryWithProduct.move(self.newCategoryWithProduct.pos().x(), self.newCategoryWithProduct.pos().y() + 50)
         self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() + 50)
         self.newCategoryProductLabel.move(self.newCategoryProductLabel.pos().x(), self.newCategoryProductLabel.pos().y() + 50)
+
+        self.SPACE.updateScroll()
     
     def deleteCategory(self):
         indexButtonPressed = 0
@@ -310,3 +314,5 @@ class SpaceCategory(QLabel):
                     if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
+
+        self.SPACE.updateScroll()
