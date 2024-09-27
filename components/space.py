@@ -109,7 +109,6 @@ class Space(QLabel):
             self.updateScrollToDefault()
 
     def stopConfigSpace(self):
-        print('al')
         self.updateScrollToDefault()
 
         if self.buttonFromMain:
