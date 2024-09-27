@@ -144,7 +144,7 @@ class MainWindow(QMainWindow):
         self.newStoreNameEdit.move(self.newStoreNameEdit.pos().x(), value + 20)
         self.newStoreNameLabel.move(self.newStoreNameLabel.pos().x(), value + 20)
         self.addStoreButton.move(self.addStoreButton.pos().x(), value + (WINDOW_HEIGHT - 75))
-        self.languageChanger.move(self.languageChanger.pos().x(), value + (WINDOW_HEIGHT - 75))
+        self.languageChanger.move(self.languageChanger.pos().x() + 15, value + (WINDOW_HEIGHT - 50))
         self.createStoreButton.move(self.createStoreButton.pos().x(), value + (WINDOW_HEIGHT - 62))
         self.createShelfButton.move(self.createShelfButton.pos().x(), value + (WINDOW_HEIGHT - 62))
         self.createButtonsBackground.move(self.createButtonsBackground.pos().x(), value + (WINDOW_HEIGHT - 75))
