@@ -30,6 +30,10 @@ def deleteCategoryFrom(space, indexButtonPressed, categoryName):
 
     if space.category.doubleButtons.__len__() == 1:
         space.category.doubleButtons[0].setDisabledButton2(True)
+    
+    space.product.productSelector.hide()
+    space.product.addProduct.hide()
+    space.product.productLabel.hide()
 
 def updateButtonsPosition(space):
     posx = 13
