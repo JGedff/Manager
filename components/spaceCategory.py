@@ -161,7 +161,7 @@ class SpaceCategory(QLabel):
         self.saveCategory.show()
         self.categoryColor.show()
         self.categoryName.show()
-        self.SPACE.STORE.WINDOW.goBackHomeButton.hide()
+        self.SPACE.STORE.WINDOW.goHome.hide()
 
     def hideUI(self):
         for button in self.doubleButtons:
@@ -185,7 +185,7 @@ class SpaceCategory(QLabel):
         index = Category.getIndexByName(self.nameModifiedCategory)
         Category.changeCategoryName(index, newName)
 
-        updateNameCategory(STORES[0].WINDOW.categorySpace, self.colorModifiedCategory, self.nameModifiedCategory, newName, index)
+        updateNameCategory(STORES[0].WINDOW.configCategory, self.colorModifiedCategory, self.nameModifiedCategory, newName, index)
 
         for store in STORES:
             for shelf in store.shelves:
@@ -274,7 +274,7 @@ class SpaceCategory(QLabel):
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor, self.newCategoryWithProduct.getValue())
 
-        createCategoryIn(STORES[0].WINDOW.categorySpace, self.newCategoryName.capitalize(), self.mainParent)
+        createCategoryIn(STORES[0].WINDOW.configCategory, self.newCategoryName.capitalize(), self.mainParent)
 
         for store in STORES:
             for shelf in store.shelves:
@@ -304,8 +304,8 @@ class SpaceCategory(QLabel):
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
-        deleteCategoryFrom(STORES[0].WINDOW.categorySpace, indexButtonPressed, categoryName.capitalize())
-        updateButtonsPosition(STORES[0].WINDOW.categorySpace)
+        deleteCategoryFrom(STORES[0].WINDOW.configCategory, indexButtonPressed, categoryName.capitalize())
+        updateButtonsPosition(STORES[0].WINDOW.configCategory)
 
         for store in STORES:
             for shelf in store.shelves:

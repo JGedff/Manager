@@ -66,7 +66,7 @@ class Store(QLabel):
         self.WINDOW.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalHeaderPosition)
 
     def openStore(self):
-        self.WINDOW.openStore()
+        self.WINDOW.hideMainButtons()
         self.goBackStore.hide()
 
         for i in STORES:
@@ -122,7 +122,7 @@ class Store(QLabel):
         self.goBackStore.hide()
 
     def configSpace(self):
-        self.WINDOW.goBackHomeButton.hide()
+        self.WINDOW.goHome.hide()
         self.changeFloorButton.hide()
         self.goBackStore.show()
 

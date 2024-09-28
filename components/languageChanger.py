@@ -30,35 +30,37 @@ class LanguageChanger(QLabel):
         self.updateUI()
 
     def updateUI(self):
-        # Window
-        self.WINDOW.setWindowTitle(Language.get("window_title"))
-        self.WINDOW.addStoreButton.setText(Language.get("add_store"))
-        self.WINDOW.newStoreNameLabel.setText(Language.get("name_store"))
-        self.WINDOW.newStoreNameEdit.setPlaceholderText(Language.get("store") + str(STORES.__len__()))
-        self.WINDOW.createShelfButton.setText(Language.get("add_shelf"))
+        self.WINDOW.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__()))
         self.WINDOW.createStoreButton.setText(Language.get("create_store"))
-        self.WINDOW.goBackHomeButton.setText(Language.get("go_back"))
         self.WINDOW.editCategories.setText(Language.get("edit_categories"))
+        self.WINDOW.storeNameLabel.setText(Language.get("name_store"))
+        self.WINDOW.addStoreButton.setText(Language.get("add_store"))
+        self.WINDOW.addShelfButton.setText(Language.get("add_shelf"))
+        self.WINDOW.setWindowTitle(Language.get("window_title"))
+        self.WINDOW.goHome.setText(Language.get("go_back"))
 
-        # Category in main page
-        self.WINDOW.categorySpace.category.showSpace.setText(Language.get("go_back"))
-        self.WINDOW.categorySpace.category.categoryNameLabel.setText(Language.get("category_name"))
-        self.WINDOW.categorySpace.category.categoryColorLabel.setText(Language.get("category_color"))
-        self.WINDOW.categorySpace.category.saveCategory.setText(Language.get("save"))
-        self.WINDOW.categorySpace.category.categoryColor.setText(Language.get("select_color"))
-        self.WINDOW.categorySpace.category.addCategory.setText(Language.get("add_category"))
-        self.WINDOW.categorySpace.category.newCategoryColorButton.setText(Language.get("select_color"))
-        self.WINDOW.categorySpace.category.cancelButtonAddCategory.setText(Language.get("cancel"))
-        self.WINDOW.categorySpace.category.createCategoryButton.setText(Language.get("create"))
-        self.WINDOW.categorySpace.category.addCategoryName.setPlaceholderText(Language.get("name"))
-        self.WINDOW.categorySpace.category.newCategoryProductLabel.setText(Language.get("category_has_product"))
-        self.WINDOW.categorySpace.category.newCategoryWithProduct.trueButton.setText(Language.get("yes"))
-        self.WINDOW.categorySpace.category.newCategoryWithProduct.falseButton.setText(Language.get("no"))
-        self.WINDOW.categorySpace.product.productLabel.setText(Language.get("product"))
-        self.WINDOW.categorySpace.product.addProduct.setText(Language.get("add_product"))
-        self.WINDOW.categorySpace.product.cancelAddProduct.setText(Language.get("cancel"))
-        self.WINDOW.categorySpace.product.productSelector.clear()
-        self.WINDOW.categorySpace.product.productSelector.addItem(Language.get("no_product"))
+        self.WINDOW.configCategory.category.showSpace.setText(Language.get("go_back"))
+        self.WINDOW.configCategory.category.saveCategory.setText(Language.get("save"))
+        self.WINDOW.configCategory.category.addCategory.setText(Language.get("add_category"))
+        self.WINDOW.configCategory.category.categoryColor.setText(Language.get("select_color"))
+        self.WINDOW.configCategory.category.createCategoryButton.setText(Language.get("create"))
+        self.WINDOW.configCategory.category.cancelButtonAddCategory.setText(Language.get("cancel"))
+        self.WINDOW.configCategory.category.categoryNameLabel.setText(Language.get("category_name"))
+        self.WINDOW.configCategory.category.addCategoryName.setPlaceholderText(Language.get("name"))
+        self.WINDOW.configCategory.category.categoryColorLabel.setText(Language.get("category_color"))
+        self.WINDOW.configCategory.category.newCategoryColorButton.setText(Language.get("select_color"))
+        self.WINDOW.configCategory.category.newCategoryWithProduct.trueButton.setText(Language.get("yes"))
+        self.WINDOW.configCategory.category.newCategoryWithProduct.falseButton.setText(Language.get("no"))
+        self.WINDOW.configCategory.category.newCategoryProductLabel.setText(Language.get("category_has_product"))
+        
+        self.WINDOW.configCategory.product.productSelector.addItem(Language.get("no_product"))
+        self.WINDOW.configCategory.product.cancelAddProduct.setText(Language.get("cancel"))
+        self.WINDOW.configCategory.product.addProduct.setText(Language.get("add_product"))
+        self.WINDOW.configCategory.product.productLabel.setText(Language.get("product"))
+        self.WINDOW.configCategory.product.productSelector.clear()
+
+        for prod in PRODUCTS_INFO:
+            self.WINDOW.configCategory.product.productSelector.addItem(prod.name)
 
         # Shelf forms
         for shelfIndex, shelf in enumerate(SHELVES):
@@ -111,7 +113,7 @@ class LanguageChanger(QLabel):
                         space.product.productSelector.addItem(prod.name)
         
         self.WINDOW.reOpenHome()
-        self.WINDOW.categorySpace.STORE.hideStore()
+        self.WINDOW.configCategory.STORE.hideStore()
     
     def hide(self):
         self.changer.hide()
