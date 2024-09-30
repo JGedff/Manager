@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
 from utils.functions.globalFunctions import useLessFunction
 
 class InputBool(QLabel):
-    def __init__(self, trueString, falseString, parent = None, actionTrue = None, actionFalse = None):
+    def __init__(self, trueString, falseString, parent = None, actionTrue = useLessFunction, actionFalse = useLessFunction):
         super().__init__(parent)
 
         self.initVariables(actionTrue, actionFalse)
@@ -15,12 +15,6 @@ class InputBool(QLabel):
 
         self.actionTrue = actionTrue
         self.actionFalse = actionFalse
-
-        if actionTrue == None:
-            self.actionTrue = useLessFunction
-
-        if actionFalse == None:
-            self.actionFalse = useLessFunction
 
     def initUI(self, trueString, falseString):
         layout = QHBoxLayout(self)

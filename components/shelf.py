@@ -1,8 +1,11 @@
 from PyQt5.QtWidgets import QLabel, QPushButton
 
+from utils.functions.shelfFunctions import updateShelfPosition
+
 from utils.language import Language
 from utils.inputBool import InputBool
 from utils.inputNumber import InputNumber
+
 from components.space import Space
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SPACE_MARGIN
@@ -60,10 +63,21 @@ class Shelf(QLabel):
         self.hide()
 
     def delShelf(self):
-        SHELVES[SHELVES.__len__() - 1].hide()
-        del SHELVES[SHELVES.__len__() - 1]
+        shelfToDelete = 0
+        
+        for index, shelf in enumerate(SHELVES):
+            try:
+                if shelf.delStore and self.sender() == shelf.delStore:
+                    shelfToDelete = index
+                    break
+            except AttributeError:
+                continue
+        
+        SHELVES[shelfToDelete].hide()
+        del SHELVES[shelfToDelete]
 
         self.WINDOW.resizeHeightScroll()
+        updateShelfPosition()
 
     def showForm(self):
         self.show()

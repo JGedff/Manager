@@ -20,13 +20,14 @@ class Category():
         for newIndex, categoryName in enumerate(PRODUCT_CATEGORY):
             if categoryName == CATEGORY_NAMES[index]:
                 delIndex = newIndex
+                break
         
+        # If category exists, remove it
         if delIndex != -1:
             PRODUCT_CATEGORY.pop(delIndex)
 
         CATEGORY_COLORS.pop(index)
         CATEGORY_NAMES.pop(index)
-
 
     def getIndexByName(name):
         for index, cat in enumerate(CATEGORY_NAMES):
@@ -37,11 +38,6 @@ class Category():
         for index, cat in enumerate(CATEGORY_NAMES):
             if cat.lower() == name.lower():
                 return CATEGORY_COLORS[index]
-
-    def getIndexByColor(color):
-        for index, cat in enumerate(CATEGORY_COLORS):
-            if cat.lower() == color.lower():
-                return index
 
     def getNameByIndex(index):
         return CATEGORY_NAMES[index]

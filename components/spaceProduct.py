@@ -15,7 +15,6 @@ class SpaceProduct(QLabel):
         self.initEvents()
 
     def initVariables(self, category):
-        self.amountProducts = 0
         self.category = category
         self.actualProduct = None
 

@@ -4,14 +4,15 @@ from utils.doubleButton import DoubleButton
 from constants import CATEGORY_NAMES, CATEGORY_COLORS
 
 def createCategoryIn(space, categoryName, parent):
+    # Create a button to acces the config of the category
     newDoubleButton = DoubleButton(25, 50 * CATEGORY_NAMES.__len__() - 25, categoryName, "🗑️", space.category.editCategory, space.category.deleteCategory, parent)
-
-    space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
     space.category.doubleButtons.append(newDoubleButton)
-    space.configCategory.addItem(categoryName)
 
-    if space.category.doubleButtons.__len__() > 3:
-        space.category.doubleButtons[0].setDisabledButton2(False)
+    # Updates the position of the form to create a new category
+    space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+
+    # Add the new category to the comboBox
+    space.configCategory.addItem(categoryName)
 
 def deleteCategoryFrom(space, indexButtonPressed, categoryName):
     items = []
@@ -19,21 +20,17 @@ def deleteCategoryFrom(space, indexButtonPressed, categoryName):
     for index in range(space.configCategory.count()):
         items.append(space.configCategory.itemText(index))
 
+    # Removes the category from the comboBox
     for index, item in enumerate(items):
         if item == categoryName:
             space.configCategory.removeItem(index)
 
+    # Hide the buttons before removing them
     space.category.doubleButtons[indexButtonPressed].hide()
-    
     space.category.doubleButtons.pop(indexButtonPressed)
-    space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
 
-    if space.category.doubleButtons.__len__() == 1:
-        space.category.doubleButtons[0].setDisabledButton2(True)
-    
-    space.product.productSelector.hide()
-    space.product.addProduct.hide()
-    space.product.productLabel.hide()
+    # Moves the form to add a new category
+    space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
 
 def updateButtonsPosition(space):
     posx = 13

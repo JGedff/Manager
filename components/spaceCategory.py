@@ -23,7 +23,6 @@ class SpaceCategory(QLabel):
     def initVariables(self, space, parent):
         self.name = ''
         self.color = ''
-        self.amount = 0
         self.newColor = ''
         self.SPACE = space
         self.doubleButtons = []
@@ -304,6 +303,8 @@ class SpaceCategory(QLabel):
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
+        STORES[0].WINDOW.configCategory.hideProductForm()
+        
         deleteCategoryFrom(STORES[0].WINDOW.configCategory, indexButtonPressed, categoryName.capitalize())
         updateButtonsPosition(STORES[0].WINDOW.configCategory)
 
@@ -311,6 +312,8 @@ class SpaceCategory(QLabel):
             for shelf in store.shelves:
                 for space in shelf.spaces:
                     if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
+                        space.hideProductForm()
+
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 

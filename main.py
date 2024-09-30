@@ -9,7 +9,7 @@ from components.shelf import Shelf
 from components.store import Store
 from components.languageChanger import LanguageChanger
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SHELF_WIDTH, DEFAULT_SHELF_HEIGHT, DEFAULT_SHELF_MARGIN, STORES, DEFAULT_IMAGE
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, STORES, DEFAULT_IMAGE
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -191,7 +191,7 @@ class MainWindow(QMainWindow):
         self.editCategories.hide()
 
     def createShelf(self):
-        newShelf = Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + DEFAULT_SHELF_MARGIN, self, self.widget)
+        newShelf = Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), SHELVES[SHELVES.__len__() - 1].pos().x(), SHELVES[SHELVES.__len__() - 1].pos().y() + 150, self, self.widget)
         newShelf.showForm()
         
         SHELVES.append(newShelf)

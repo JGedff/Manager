@@ -1,6 +1,6 @@
-import re
-
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
+
+from utils.functions.checkFunctions import checkIsNum
 
 class InputNumber(QLabel):
     def __init__(self, defaultNumber = 0, writeNumber = False, parent = None):
@@ -16,6 +16,7 @@ class InputNumber(QLabel):
 
     def initUI(self, writeNumber):
         layout = QHBoxLayout(self)
+
         self.inputNum = QLineEdit(self)
         self.inputNum.setText(str(self.defaultNumber))
         self.inputNum.setReadOnly(writeNumber)
@@ -47,13 +48,7 @@ class InputNumber(QLabel):
 
     def checkNumber(self):
         textToCheck = self.inputNum.text()
-        isNumber = False
-
-        try:
-            int(textToCheck)
-            isNumber = True
-        except ValueError:
-            isNumber = False
+        isNumber = checkIsNum(textToCheck)
 
         if textToCheck == "" or not isNumber or int(textToCheck) < self.defaultNumber:
             self.inputNum.setText(str(self.lastNumber))

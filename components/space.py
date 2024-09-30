@@ -167,3 +167,8 @@ class Space(QLabel):
 
     def updateScrollToDefault(self):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
+
+    def hideProductForm(self):
+        self.product.productSelector.hide()
+        self.product.addProduct.hide()
+        self.product.productLabel.hide()
