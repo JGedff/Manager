@@ -9,7 +9,7 @@ from utils.language import Language
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, store, parent, long = False, buttonFromMain = False, times5Space = 0):
+    def __init__(self, posx, posy, actualFloor, floors, store, parent = None, long = False, buttonFromMain = False, times5Space = 0):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)

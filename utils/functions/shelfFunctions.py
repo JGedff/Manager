@@ -11,6 +11,6 @@ def updateShelfPosition():
         shelf.setGeometry(x, y, WINDOW_WIDTH, WINDOW_HEIGHT)
 
         # Updates the name of the shelf
-        shelf.configNewStoreLabel.setText(Language.get("shelf") + str(index + 1))
+        shelf.shelfLabel.setText(Language.get("shelf") + str(index + 1))
 
         y += 150

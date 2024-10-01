@@ -4,8 +4,7 @@ from utils.language import Language
 from utils.category import Category
 from utils.inputBool import InputBool
 from utils.doubleButton import DoubleButton
-from utils.functions.globalFunctions import updateNameCategory
-from utils.functions.spaceCategoryFunctions import createCategoryIn, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
+from utils.functions.spaceCategoryFunctions import createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
 
 from constants import CATEGORY_NAMES, STORES
 

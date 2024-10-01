@@ -25,10 +25,10 @@ class Store(QLabel):
         for index, i in enumerate(SHELVES):
             if isinstance(i, Shelf):
                 i.hideForm()
-                self.shelves.append(ShelfInfo(25, 50 + (185 * index), i, self, (index + 1), parent))
+                self.shelves.append(ShelfInfo(25, 50 + (185 * index), i.floors, i.spaces, i.double_shelf, self, (index + 1), parent))
         
         SHELVES.clear()
-        SHELVES.append(Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), 400, 100, mainWindow, parent))
+        SHELVES.append(Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), 400, 100, self.WINDOW, parent))
 
     def getMaxFloor(self):
         maxFloor = 1

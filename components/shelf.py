@@ -13,6 +13,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES, DEFAULT_SPACE_MARGIN
 class Shelf(QLabel):
     def __init__(self, name, posx, posy, mainWindow, parent = None):
         super().__init__(parent)
+        
         self.setGeometry(posx, posy, WINDOW_WIDTH, WINDOW_HEIGHT)
 
         self.initVariables(mainWindow)
@@ -26,38 +27,37 @@ class Shelf(QLabel):
         self.floors = 1
 
     def initUI(self, name):
-        # Init shelf
-        self.configNewStoreLabel = QLabel(name, self)
-        self.configNewStoreLabel.setGeometry(0, 0, 100, 35)
+        # Config shelf
+        self.shelfLabel = QLabel(name, self)
+        self.shelfLabel.setGeometry(0, 0, 100, 35)
 
-        # Delete shelf
+        self.inputSpacesLabel = QLabel(Language.get("shelf_question_1"), self)
+        self.inputSpacesLabel.setGeometry(0, 35, 200, 35)
+
+        self.inputSpaces = InputNumber(1, True, self)
+        self.inputSpaces.setGeometry(390, 25, 175, 50)
+
+        self.doubleShelfLabel = QLabel(Language.get("shelf_question_2"), self)
+        self.doubleShelfLabel.setGeometry(0, 65, 300, 35)
+
+        self.doubleShelfInput = InputBool(Language.get("yes"), Language.get("no"), self)
+        self.doubleShelfInput.setGeometry(390, 60, 175, 50)
+
+        self.shelfFloorsLabel = QLabel(Language.get("shelf_question_4"), self)
+        self.shelfFloorsLabel.setGeometry(0, 95, 200, 35)
+
+        self.shelfFloorsInput = InputNumber(1, True, self)
+        self.shelfFloorsInput.setGeometry(390, 95, 175, 50)
+
+        # Option to delete shelf if there is more than one shelf
         if SHELVES.__len__() + 1 > 1:
-            self.delStore = QPushButton("🗑️", self)
-            self.delStore.setGeometry(75, 10, 50, 20)
-            self.delStore.clicked.connect(self.delShelf)
+            self.delShelfButton = QPushButton("🗑️", self)
+            self.delShelfButton.setGeometry(75, 10, 50, 20)
+            self.delShelfButton.clicked.connect(self.delShelf)
 
             self.separator = QLabel(self)
             self.separator.setGeometry(0, 0, 700, 3)
             self.separator.setStyleSheet("background-color: black;")
-
-        # Config shelf
-        self.configNewShelveLabel = QLabel(Language.get("shelf_question_1"), self)
-        self.configNewShelveLabel.setGeometry(0, 35, 200, 35)
-
-        self.configNewShelveInput = InputNumber(1, True, self)
-        self.configNewShelveInput.setGeometry(390, 25, 175, 50)
-
-        self.sidesNewShelf = QLabel(Language.get("shelf_question_2"), self)
-        self.sidesNewShelf.setGeometry(0, 65, 300, 35)
-
-        self.sidesNewShelfInput = InputBool(Language.get("yes"), Language.get("no"), self)
-        self.sidesNewShelfInput.setGeometry(390, 60, 175, 50)
-
-        self.configFloorsShelfLabel = QLabel(Language.get("shelf_question_4"), self)
-        self.configFloorsShelfLabel.setGeometry(0, 95, 200, 35)
-
-        self.configFloorsShelfInput = InputNumber(1, True, self)
-        self.configFloorsShelfInput.setGeometry(390, 95, 175, 50)
 
     def hideForm(self):
         self.hide()
@@ -67,7 +67,7 @@ class Shelf(QLabel):
         
         for index, shelf in enumerate(SHELVES):
             try:
-                if shelf.delStore and self.sender() == shelf.delStore:
+                if self.sender() == shelf.delShelfButton:
                     shelfToDelete = index
                     break
             except AttributeError:
@@ -83,28 +83,28 @@ class Shelf(QLabel):
         self.show()
 
     def saveInfo(self):
-        self.spaces = self.configNewShelveInput.getNum()
-        self.floors = self.configFloorsShelfInput.getNum()
-        self.double_shelf = self.sidesNewShelfInput.getValue()
+        self.spaces = self.inputSpaces.getNum()
+        self.floors = self.shelfFloorsInput.getNum()
+        self.double_shelf = self.doubleShelfInput.getValue()
 
 class ShelfInfo():
-    def __init__(self, posx, posy, shelf, store, shelfNumber = 1, parent = None):
-        self.initVariables(posx, shelf, store, shelfNumber)
+    def __init__(self, posx, posy, floors, spaces, double_shelf, store, shelfNumber = 1, parent = None):
+        self.initVariables(posx, floors, spaces, double_shelf, store, shelfNumber)
         self.initUI(posx, posy, parent)
         self.initEvents()
     
-    def initVariables(self, posx, shelf, store, shelfNumber):
+    def initVariables(self, posx, floors, spaces, double_shelf, store, shelfNumber):
         self.spaces = []
         self.posx = posx
         self.STORE = store
-        self.floors = shelf.floors
+        self.floors = floors
         self.actualNumber = shelfNumber
-        self.spacesLength = shelf.spaces
-        self.double_shelf = shelf.double_shelf
+        self.spacesLength = spaces
+        self.double_shelf = double_shelf
 
     def initUI(self, posx, posy, parent):
         self.shelfNumber = QLabel(Language.get("shelf") + str(self.actualNumber) + ":", parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 25), posy - 25, 100, 25)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), posy - 25, 100, 25)
         self.shelfNumber.hide()
 
         for actualFloor in range(self.STORE.floor):

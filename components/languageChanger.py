@@ -64,12 +64,12 @@ class LanguageChanger(QLabel):
 
         # Shelf forms
         for shelfIndex, shelf in enumerate(SHELVES):
-            shelf.configNewShelveLabel.setText(Language.get("shelf_question_1"))
-            shelf.sidesNewShelf.setText(Language.get("shelf_question_2"))
-            shelf.sidesNewShelfInput.trueButton.setText(Language.get("yes"))
-            shelf.sidesNewShelfInput.falseButton.setText(Language.get("no"))
-            shelf.configFloorsShelfLabel.setText(Language.get("shelf_question_4"))
-            shelf.configNewStoreLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
+            shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
+            shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
+            shelf.doubleShelfInput.trueButton.setText(Language.get("yes"))
+            shelf.doubleShelfInput.falseButton.setText(Language.get("no"))
+            shelf.shelfFloorsLabel.setText(Language.get("shelf_question_4"))
+            shelf.shelfLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
 
         # Stores
         for store in STORES:
