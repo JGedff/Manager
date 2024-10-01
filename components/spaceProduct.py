@@ -6,10 +6,8 @@ from utils.category import Category
 from utils.language import Language
 from utils.product import Product
 
-class SpaceProduct(QLabel):
+class SpaceProduct():
     def __init__(self, category, parent):
-        super().__init__(parent)
-
         self.initVariables(category)
         self.initUI(parent)
         self.initEvents()

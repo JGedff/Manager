@@ -49,13 +49,13 @@ class SpaceCategory(QLabel):
         self.categoryColorLabel.setGeometry(25, 75, 125, 25)
         self.categoryColorLabel.hide()
 
-        self.saveCategory = QPushButton(Language.get("save"), parent)
-        self.saveCategory.setGeometry(175, 125, 125, 25)
-        self.saveCategory.hide()
-
         self.categoryColor = QPushButton(Language.get("select_color"), parent)
         self.categoryColor.setGeometry(175, 75, 125, 25)
         self.categoryColor.hide()
+
+        self.saveCategory = QPushButton(Language.get("save"), parent)
+        self.saveCategory.setGeometry(175, 125, 125, 25)
+        self.saveCategory.hide()
 
         posx = 25
         posy = 25

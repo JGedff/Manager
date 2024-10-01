@@ -1,26 +1,25 @@
-from PyQt5.QtWidgets import QLabel, QComboBox, QPushButton
+from PyQt5.QtWidgets import QComboBox, QPushButton
 
 from utils.language import Language
 from utils.imageButton import ImageButton
+from utils.functions.globalFunctions import getMaxFloor
 
 from components.shelf import Shelf, ShelfInfo
 
 from constants import SHELVES, STORES
 
-class Store(QLabel):
+class Store():
     def __init__(self, name, image, posx, posy, mainWindow, parent):
-        super().__init__(parent)
-        
         self.setupStore(mainWindow, parent)
-        self.updateWindow()
 
         self.initUI(name, image, posx, posy, parent)
         self.initEvents()
+        self.updateWindow()
     
     def setupStore(self, mainWindow, parent):
         self.WINDOW = mainWindow
         self.shelves = []
-        self.floor = self.getMaxFloor()
+        self.floor = getMaxFloor()
 
         for index, i in enumerate(SHELVES):
             if isinstance(i, Shelf):
@@ -29,20 +28,6 @@ class Store(QLabel):
         
         SHELVES.clear()
         SHELVES.append(Shelf(Language.get("shelf") + str(SHELVES.__len__() + 1), 400, 100, self.WINDOW, parent))
-
-    def getMaxFloor(self):
-        maxFloor = 1
-
-        for shelf in SHELVES:
-            if isinstance(shelf, Shelf):
-                if maxFloor < shelf.floors:
-                    maxFloor = shelf.floors
-        
-        return maxFloor
-
-    def updateWindow(self):
-        self.WINDOW.resizeHeightScroll()
-        self.WINDOW.resizeWidthScroll()
 
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
@@ -62,8 +47,13 @@ class Store(QLabel):
         self.storeIcon.clicked.connect(self.openStore)
         self.goBackStore.clicked.connect(self.openStore)
         self.changeFloorButton.currentTextChanged.connect(self.changeFloor)
+
         self.WINDOW.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
         self.WINDOW.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalHeaderPosition)
+
+    def updateWindow(self):
+        self.WINDOW.resizeHeightScroll()
+        self.WINDOW.resizeWidthScroll()
 
     def openStore(self):
         self.WINDOW.hideMainButtons()
@@ -76,6 +66,9 @@ class Store(QLabel):
         self.changeFloorButton.show()
         self.changeFloor(self.changeFloorButton.currentText())
 
+        self.updateSpacePositions()
+
+    def updateSpacePositions(self):
         maxPosY = 0
         maxPosX = 0
 
@@ -86,7 +79,7 @@ class Store(QLabel):
 
                 if shelf.spaces[shelf.spaces.__len__() - 1].pos().x() > maxPosX:
                     maxPosX = shelf.spaces[shelf.spaces.__len__() - 1].pos().x()
-    
+        
         self.WINDOW.resizeHeightScroll(maxPosY)
         self.WINDOW.resizeWidthScroll(maxPosX)
 

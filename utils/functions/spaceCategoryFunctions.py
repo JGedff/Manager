@@ -12,7 +12,7 @@ def createCategoryIn(space, categoryName, parent):
     space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
 
     # Add the new category to the comboBox
-    space.configCategory.addItem(categoryName)
+    space.categorySelector.addItem(categoryName)
 
 def updateNameCategory(space, color, actualName, newName, index):
     if space.category.color == color:
@@ -23,7 +23,7 @@ def updateNameCategory(space, color, actualName, newName, index):
                 break
 
         # Updates the name in the comboBox
-        space.configCategory.setItemText(0, newName)
+        space.categorySelector.setItemText(index, newName)
 
         # Updates the name in the space
         space.category.name = newName
@@ -35,18 +35,18 @@ def updateNameCategory(space, color, actualName, newName, index):
                 break
         
         # Updates the name in the comboBox
-        space.configCategory.setItemText(index, newName)
+        space.categorySelector.setItemText(index, newName)
 
 def deleteCategoryFrom(space, indexButtonPressed, categoryName):
     items = []
 
-    for index in range(space.configCategory.count()):
-        items.append(space.configCategory.itemText(index))
+    for index in range(space.categorySelector.count()):
+        items.append(space.categorySelector.itemText(index))
 
     # Removes the category from the comboBox
     for index, item in enumerate(items):
         if item == categoryName:
-            space.configCategory.removeItem(index)
+            space.categorySelector.removeItem(index)
 
     # Hide the buttons before removing them
     space.category.doubleButtons[indexButtonPressed].hide()

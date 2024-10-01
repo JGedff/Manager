@@ -49,13 +49,13 @@ class Space(QLabel):
         self.labelCategory = QLabel(Language.get("category"), parent)
         self.labelCategory.setGeometry(152, 26, 50, 25)
 
-        self.configCategory = QComboBox(parent)
-        self.configCategory.setGeometry(210, 26, 100, 25)
-        self.configCategory.addItem(self.category.name)
+        self.categorySelector = QComboBox(parent)
+        self.categorySelector.setGeometry(210, 26, 100, 25)
+        self.categorySelector.addItem(self.category.name)
 
         for category in CATEGORY_NAMES:
             if category != self.category.name:
-                self.configCategory.addItem(category.capitalize())
+                self.categorySelector.addItem(category.capitalize())
 
         self.editCategories = QPushButton("⚙️", parent)
         self.editCategories.setGeometry(320, 26, 26, 26)
@@ -70,7 +70,7 @@ class Space(QLabel):
         self.box.clicked.connect(self.configSpace)
         self.openSpaceConfig.clicked.connect(self.stopConfigSpace)
         self.editCategories.clicked.connect(self.openConfigCategories)
-        self.configCategory.currentTextChanged.connect(self.changeCategory)
+        self.categorySelector.currentTextChanged.connect(self.changeCategory)
 
         self.STORE.WINDOW.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
 
@@ -81,7 +81,7 @@ class Space(QLabel):
             self.STORE.configSpace()
             self.configBox.show()
             self.labelCategory.show()
-            self.configCategory.show()
+            self.categorySelector.show()
             self.editCategories.show()
             self.product.show()
             self.updateScrollToDefault()
@@ -96,7 +96,7 @@ class Space(QLabel):
             self.product.hide()
             self.configBox.hide()
             self.labelCategory.hide()
-            self.configCategory.hide()
+            self.categorySelector.hide()
             self.editCategories.hide()
             self.openSpaceConfig.show()
             self.category.showUI()
@@ -122,12 +122,13 @@ class Space(QLabel):
             self.product.show()
             self.labelCategory.show()
             self.editCategories.show()
-            self.configCategory.show()
+            self.categorySelector.show()
     
     def changeCategory(self, category):
         setCategoryByName(self.category, category)
-        self.product.categoryChanged()
         self.updateSpaceColor()
+
+        self.product.categoryChanged()
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -142,7 +143,7 @@ class Space(QLabel):
         self.box.hide()
         self.product.hide()
         self.configBox.hide()
-        self.configCategory.hide()
+        self.categorySelector.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
         self.openSpaceConfig.hide()
@@ -150,11 +151,11 @@ class Space(QLabel):
 
     def showSpace(self):
         self.updateSpaceColor()
+
         self.box.show()
         self.product.hide()
         self.configBox.hide()
-
-        self.configCategory.hide()
+        self.categorySelector.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
         self.openSpaceConfig.hide()
