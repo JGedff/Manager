@@ -1,4 +1,4 @@
-from constants import CATEGORY_NAMES, CATEGORY_COLORS, PRODUCT_CATEGORY
+from constants import CATEGORY_NAMES, CATEGORY_COLORS
 
 class Category():
     def changeCategoryColor(index, color):
@@ -7,25 +7,11 @@ class Category():
     def changeCategoryName(index, name):
         CATEGORY_NAMES[index] = name
 
-    def addCategory(name, color, product = False):
+    def addCategory(name, color):
         CATEGORY_NAMES.append(name)
         CATEGORY_COLORS.append(color)
 
-        if product:
-            PRODUCT_CATEGORY.append(name)
-
     def delCategory(index):
-        delIndex = -1
-
-        for newIndex, categoryName in enumerate(PRODUCT_CATEGORY):
-            if categoryName == CATEGORY_NAMES[index]:
-                delIndex = newIndex
-                break
-        
-        # If category exists, remove it
-        if delIndex != -1:
-            PRODUCT_CATEGORY.pop(delIndex)
-
         CATEGORY_COLORS.pop(index)
         CATEGORY_NAMES.pop(index)
 
@@ -41,10 +27,3 @@ class Category():
 
     def getNameByIndex(index):
         return CATEGORY_NAMES[index]
-    
-    def isProductCategory(name):
-        for categoryName in PRODUCT_CATEGORY:
-            if categoryName == name:
-                return True
-        
-        return False

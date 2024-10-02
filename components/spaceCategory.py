@@ -95,14 +95,6 @@ class SpaceCategory(QLabel):
         self.createCategoryButton.setDisabled(True)
         self.createCategoryButton.hide()
 
-        self.newCategoryProductLabel = QLabel(Language.get("category_has_product"), parent)
-        self.newCategoryProductLabel.setGeometry(posx + 225, posy - 100, 200, 25)
-        self.newCategoryProductLabel.hide()
-
-        self.newCategoryWithProduct = InputBool(Language.get("yes"), Language.get("no"), parent)
-        self.newCategoryWithProduct.setGeometry(posx + 425, posy - 125, 100, 75)
-        self.newCategoryWithProduct.hide()
-
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
         self.categoryColor.clicked.connect(self.selectColor)
@@ -207,17 +199,13 @@ class SpaceCategory(QLabel):
         self.addCategoryName.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
         self.createCategoryButton.move(self.addCategory.pos().x() + 400, self.addCategory.pos().y() - 50)
         self.newCategoryColorButton.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() - 50)
-        self.newCategoryWithProduct.move(self.addCategory.pos().x() + 400, self.addCategory.pos().y() - 125)
         self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 50)
-        self.newCategoryProductLabel.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() - 100)
 
         self.addCategory.setDisabled(True)
 
         self.addCategoryName.show()
         self.createCategoryButton.show()
         self.newCategoryColorButton.show()
-        self.newCategoryWithProduct.show()
-        self.newCategoryProductLabel.show()
         self.cancelButtonAddCategory.show()
 
         for button in self.doubleButtons:
@@ -227,8 +215,6 @@ class SpaceCategory(QLabel):
         self.addCategoryName.hide()
         self.createCategoryButton.hide()
         self.newCategoryColorButton.hide()
-        self.newCategoryWithProduct.hide()
-        self.newCategoryProductLabel.hide()
         self.cancelButtonAddCategory.hide()
 
         self.newCategoryName = ""
@@ -244,9 +230,7 @@ class SpaceCategory(QLabel):
             self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() - 100)
             self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() - 100)
             self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() - 100)
-            self.newCategoryWithProduct.move(self.newCategoryWithProduct.pos().x(), self.newCategoryWithProduct.pos().y() - 100)
             self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() - 100)
-            self.newCategoryProductLabel.move(self.newCategoryProductLabel.pos().x(), self.newCategoryProductLabel.pos().y() - 100)
 
         for button in self.doubleButtons:
             button.setDisabledButton2(False)
@@ -270,7 +254,7 @@ class SpaceCategory(QLabel):
             self.createCategoryButton.setDisabled(False)
 
     def createCategory(self):
-        Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor, self.newCategoryWithProduct.getValue())
+        Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(STORES[0].WINDOW.configCategory, self.newCategoryName.capitalize(), self.mainParent)
 
@@ -286,10 +270,8 @@ class SpaceCategory(QLabel):
         self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() + 50)
         self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() + 50)
         self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() + 50)
-        self.newCategoryWithProduct.move(self.newCategoryWithProduct.pos().x(), self.newCategoryWithProduct.pos().y() + 50)
         self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() + 50)
-        self.newCategoryProductLabel.move(self.newCategoryProductLabel.pos().x(), self.newCategoryProductLabel.pos().y() + 50)
-
+        
         self.SPACE.updateScroll()
     
     def deleteCategory(self):
@@ -302,8 +284,6 @@ class SpaceCategory(QLabel):
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
-        STORES[0].WINDOW.configCategory.hideProductForm()
-        
         deleteCategoryFrom(STORES[0].WINDOW.configCategory, indexButtonPressed, categoryName.capitalize())
         updateButtonsPosition(STORES[0].WINDOW.configCategory)
 
@@ -311,8 +291,6 @@ class SpaceCategory(QLabel):
             for shelf in store.shelves:
                 for space in shelf.spaces:
                     if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
-                        space.hideProductForm()
-
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 

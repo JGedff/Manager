@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QLabel, QComboBox
 
 from utils.language import Language
 
-from constants import WINDOW_HEIGHT, STORES, SHELVES, PRODUCTS_INFO
+from constants import WINDOW_HEIGHT, STORES, SHELVES
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
@@ -49,19 +49,7 @@ class LanguageChanger(QLabel):
         self.WINDOW.configCategory.category.addCategoryName.setPlaceholderText(Language.get("name"))
         self.WINDOW.configCategory.category.categoryColorLabel.setText(Language.get("category_color"))
         self.WINDOW.configCategory.category.newCategoryColorButton.setText(Language.get("select_color"))
-        self.WINDOW.configCategory.category.newCategoryWithProduct.trueButton.setText(Language.get("yes"))
-        self.WINDOW.configCategory.category.newCategoryWithProduct.falseButton.setText(Language.get("no"))
-        self.WINDOW.configCategory.category.newCategoryProductLabel.setText(Language.get("category_has_product"))
         
-        self.WINDOW.configCategory.product.productSelector.addItem(Language.get("no_product"))
-        self.WINDOW.configCategory.product.cancelAddProduct.setText(Language.get("cancel"))
-        self.WINDOW.configCategory.product.addProduct.setText(Language.get("add_product"))
-        self.WINDOW.configCategory.product.productLabel.setText(Language.get("product"))
-        self.WINDOW.configCategory.product.productSelector.clear()
-
-        for prod in PRODUCTS_INFO:
-            self.WINDOW.configCategory.product.productSelector.addItem(prod.name)
-
         # Shelf forms
         for shelfIndex, shelf in enumerate(SHELVES):
             shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
@@ -97,20 +85,7 @@ class LanguageChanger(QLabel):
                     space.category.newCategoryColorButton.setText(Language.get("select_color"))
                     space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
                     space.category.createCategoryButton.setText(Language.get("create"))
-
                     space.category.addCategoryName.setPlaceholderText(Language.get("name"))
-                    space.category.newCategoryProductLabel.setText(Language.get("category_has_product"))
-                    space.category.newCategoryWithProduct.trueButton.setText(Language.get("yes"))
-                    space.category.newCategoryWithProduct.falseButton.setText(Language.get("no"))
-
-                    space.product.productLabel.setText(Language.get("product"))
-                    space.product.addProduct.setText(Language.get("add_product"))
-                    space.product.cancelAddProduct.setText(Language.get("cancel"))
-                    space.product.productSelector.clear()
-                    space.product.productSelector.addItem(Language.get("no_product"))
-
-                    for prod in PRODUCTS_INFO:
-                        space.product.productSelector.addItem(prod.name)
         
         self.WINDOW.reOpenHome()
         self.WINDOW.configCategory.STORE.hideStore()
