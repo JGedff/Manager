@@ -8,17 +8,18 @@ from utils.language import Language
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, parent = None, long = False, buttonFromMain = False, times5Space = 0):
+    def __init__(self, posx, posy, actualFloor, floors, store, parent = None, long = False, buttonFromMain = False, times5Space = 0):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
 
-        self.initVariables(actualFloor, floors, parent, long, buttonFromMain)
+        self.initVariables(actualFloor, floors, store, parent, long, buttonFromMain)
         self.initUI(parent, times5Space)
         self.initEvents()
         
-    def initVariables(self, actualFloor, floors, parent, long, buttonFromMain):
+    def initVariables(self, actualFloor, floors, store, parent, long, buttonFromMain):
         self.long = long
+        self.STORE = store
         self.widget = parent
         self.actualFloor = actualFloor
         self.buttonFromMain = buttonFromMain
@@ -69,10 +70,13 @@ class Space(QLabel):
         self.editCategories.clicked.connect(self.openConfigCategories)
         self.categorySelector.currentTextChanged.connect(self.changeCategory)
 
+        self.STORE.WINDOW.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
+
     def configSpace(self):
         if self.buttonFromMain:
             self.openConfigCategories()
         else:
+            self.STORE.configSpace()
             self.configBox.show()
             self.labelCategory.show()
             self.categorySelector.show()
@@ -92,6 +96,7 @@ class Space(QLabel):
             self.editCategories.hide()
             self.openSpaceConfig.show()
             self.category.showUI()
+            self.STORE.configCategories()
     
     def updateScroll(self):
         if self.category.doubleButtons[self.category.doubleButtons.__len__() - 1].pos().y() >= 500:
@@ -105,8 +110,10 @@ class Space(QLabel):
         if self.buttonFromMain:
             self.category.hideUI()
             self.openSpaceConfig.hide()
+            self.STORE.WINDOW.reOpenHome()
         else:
             self.category.cancelAddCategory()
+            self.STORE.configSpace()
             self.configBox.show()
             self.labelCategory.show()
             self.editCategories.show()

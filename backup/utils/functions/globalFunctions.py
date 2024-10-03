@@ -1,4 +1,4 @@
-from constants import SHELVES_FORMS
+from constants import SHELVES
 
 def useLessFunction():
     pass
@@ -6,7 +6,7 @@ def useLessFunction():
 def getMaxFloor():
     maxFloor = 1
 
-    for shelf in SHELVES_FORMS:
+    for shelf in SHELVES:
         if maxFloor < shelf.floors:
             maxFloor = shelf.floors
     

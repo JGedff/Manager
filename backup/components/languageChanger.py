@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QLabel, QComboBox
 
 from utils.language import Language
 
-from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS
+from constants import WINDOW_HEIGHT, STORES, SHELVES
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
@@ -51,7 +51,7 @@ class LanguageChanger(QLabel):
         self.WINDOW.configCategory.category.newCategoryColorButton.setText(Language.get("select_color"))
         
         # Shelf forms
-        for shelfIndex, shelf in enumerate(SHELVES_FORMS):
+        for shelfIndex, shelf in enumerate(SHELVES):
             shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
             shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
             shelf.doubleShelfInput.trueButton.setText(Language.get("yes"))
