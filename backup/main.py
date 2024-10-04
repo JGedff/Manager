@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         # Main buttons
         self.languageChanger = LanguageChanger(self, parent)
 
-        self.goHome = QPushButton(Language.get("go_back"), parent)
+        self.goHome = QPushButton(Language.get(""), parent)
         self.goHome.setGeometry(1300, 10, 100, 50)
         self.goHome.hide()
 

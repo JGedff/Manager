@@ -1,21 +1,319 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QPushButton
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName
+from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
 
 from utils.language import Language
+from utils.category import Category
 from utils.imageButton import ImageButton
+from utils.doubleButton import DoubleButton
 
 from components.shelf import Shelf
-from components.spaceCategory import SpaceCategory
 from components.languageChanger import LanguageChanger
 
 app = QApplication(sys.argv)
+
+class SpaceCategory(QLabel):
+    def __init__(self, storeIndex = 0, parent = None, shortcut = False):
+        super().__init__(parent)
+
+        self.initVariables(storeIndex, parent, shortcut)
+        self.initUI(parent)
+        self.initEvents()
+
+        setEmptyCategory(self)
+
+    def initVariables(self, storeIndex, parent, shortcut):
+        self.name = ''
+        self.color = ''
+        self.newColor = ''
+        self.doubleButtons = []
+        self.mainParent = parent
+        self.shortcut = shortcut
+        self.newCategoryName = ""
+        self.newCategoryColor = ""
+        self.storeIndex = storeIndex
+        self.creatingCategory = False
+        self.nameModifiedCategory = ''
+        self.colorModifiedCategory = ""
+
+    def initUI(self, parent):
+        self.showSpace = QPushButton(Language.get("go_back"), parent)
+        self.showSpace.setGeometry(1300, 15, 100, 50)
+        self.showSpace.hide()
+
+        self.categoryNameLabel = QLabel(Language.get("category_name"), parent)
+        self.categoryNameLabel.setGeometry(25, 25, 125, 25)
+        self.categoryNameLabel.hide()
+
+        self.categoryName = QLineEdit(parent)
+        self.categoryName.setGeometry(175, 25, 125, 25)
+        self.categoryName.hide()
+        
+        self.categoryColorLabel = QLabel(Language.get("category_color"), parent)
+        self.categoryColorLabel.setGeometry(25, 75, 125, 25)
+        self.categoryColorLabel.hide()
+
+        self.categoryColor = QPushButton(Language.get("select_color"), parent)
+        self.categoryColor.setGeometry(175, 75, 125, 25)
+        self.categoryColor.hide()
+
+        self.saveCategory = QPushButton(Language.get("save"), parent)
+        self.saveCategory.setGeometry(175, 125, 125, 25)
+        self.saveCategory.hide()
+
+        posx = 25
+        posy = 25
+
+        for index, category in enumerate(CATEGORY_NAMES):
+            if index > 2:
+                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
+                posy += 50
+
+                self.doubleButtons.append(newDoubleButton)
+            else:
+                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "", self.editCategory, self.deleteCategory, parent)
+
+                posy += 50
+
+                self.doubleButtons.append(newDoubleButton)
+
+        self.addCategory = QPushButton(Language.get("add_category"), parent)
+        self.addCategory.setGeometry(posx, posy, 200, 25)
+        self.addCategory.hide()
+
+        self.addCategoryName = QLineEdit(parent)
+        self.addCategoryName.setGeometry(posx, posy - 100, 200, 25)
+        self.addCategoryName.setPlaceholderText(Language.get("name"))
+        self.addCategoryName.hide()
+
+        self.newCategoryColorButton = QPushButton(Language.get("select_color"), parent)
+        self.newCategoryColorButton.setGeometry(posx + 225, posy - 50, 125, 25)
+        self.newCategoryColorButton.hide()
+
+        self.cancelButtonAddCategory = QPushButton(Language.get("cancel"), parent)
+        self.cancelButtonAddCategory.setGeometry(posx, posy - 50, 100, 25)
+        self.cancelButtonAddCategory.hide()
+
+        self.createCategoryButton = QPushButton(Language.get("create"), parent)
+        self.createCategoryButton.setGeometry(posx + 425, posy - 50, 100, 25)
+        self.createCategoryButton.setDisabled(True)
+        self.createCategoryButton.hide()
+
+    def initEvents(self):
+        self.showSpace.clicked.connect(self.stopEditCategory)
+        self.categoryColor.clicked.connect(self.selectColor)
+        self.saveCategory.clicked.connect(self.saveInfo)
+        self.addCategory.clicked.connect(self.showAddCategory)
+        self.cancelButtonAddCategory.clicked.connect(self.cancelAddCategory)
+        self.createCategoryButton.clicked.connect(self.createCategory)
+        self.newCategoryColorButton.clicked.connect(self.selectColorNewCategory)
+        self.addCategoryName.textChanged.connect(self.changeNewCategoryName)
+
+    def stopEditCategory(self):
+        print('STOP EDIT CATEGORY')
+        self.showUI()
+        self.showSpace.hide()
+        self.categoryNameLabel.hide()
+        self.categoryColorLabel.hide()
+        self.saveCategory.hide()
+        self.categoryColor.hide()
+        self.categoryName.hide()
+
+        if self.shortcut:
+            window.hideMainButtons()
+        else:
+            SHELVES[self.storeIndex][0].spaces[0].openSpaceConfig.show()
+
+    def showUI(self):
+        for button in self.doubleButtons:
+            button.show()
+
+        self.addCategory.show()
+
+        if self.shortcut:
+            window.goHome.hide()
+
+    def selectColor(self):
+        color = QColorDialog.getColor()
+        
+        if color.isValid():
+            self.categoryColor.setStyleSheet("background-color: " + color.name())
+            self.newColor = color.name()
+    
+    def editCategory(self):
+        self.hideUI()
+        self.newColor = ''
+        self.showSpace.show()
+        self.cancelAddCategory()
+            
+        # self.doubleButtons[0].button1.sender() will be used as the receptor of events
+        self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
+        color = Category.getColorByName(self.nameModifiedCategory)
+        self.colorModifiedCategory = color
+
+        self.categoryColor.setStyleSheet("background-color: " + color)
+
+        self.categoryNameLabel.show()
+        self.categoryColorLabel.show()
+        self.saveCategory.show()
+        self.categoryColor.show()
+        self.categoryName.show()
+
+        if self.shortcut:
+            window.hideAllButtons()
+        else:
+            Store.hideAllStores()
+
+    def hideUI(self):
+        for button in self.doubleButtons:
+            button.hide()
+        
+        self.addCategory.hide()
+
+        if self.shortcut:
+            window.goHome.show()
+
+    
+    def saveInfo(self):
+        newName = self.categoryName.text()
+
+        if newName != "":
+            self.reloadNameCategories(newName)
+
+        if self.newColor != "" and newName != "":
+            self.reloadColorCategories(newName)
+        elif self.newColor != "":
+            self.reloadColorCategories(self.nameModifiedCategory)
+
+    def reloadNameCategories(self, newName):
+        index = Category.getIndexByName(self.nameModifiedCategory)
+        Category.changeCategoryName(index, newName)
+
+        updateNameCategory(window.categoryManager, self.colorModifiedCategory, self.nameModifiedCategory, newName, index, True)
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    updateNameCategory(space, self.colorModifiedCategory, self.nameModifiedCategory, newName, index)
+
+    def reloadColorCategories(self, newName):
+        index = Category.getIndexByName(newName)
+        Category.changeCategoryColor(index, self.newColor)
+
+        if window.categoryManager.name == newName:
+            window.categoryManager.color = self.newColor
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    if space.category.name == newName:
+                        space.category.color = self.newColor
+
+    def showAddCategory(self):
+        self.creatingCategory = True
+
+        self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
+        self.addCategoryName.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
+        self.createCategoryButton.move(self.addCategory.pos().x() + 400, self.addCategory.pos().y() - 50)
+        self.newCategoryColorButton.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() - 50)
+        self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 50)
+
+        self.addCategory.setDisabled(True)
+
+        self.addCategoryName.show()
+        self.createCategoryButton.show()
+        self.newCategoryColorButton.show()
+        self.cancelButtonAddCategory.show()
+
+        for button in self.doubleButtons:
+            button.setDisabledButton2(True)
+
+    def cancelAddCategory(self):
+        self.addCategoryName.hide()
+        self.createCategoryButton.hide()
+        self.newCategoryColorButton.hide()
+        self.cancelButtonAddCategory.hide()
+
+        self.newCategoryName = ""
+        self.newCategoryColor = ""
+
+        self.addCategoryName.setText("")
+        self.addCategory.setDisabled(False)
+        self.createCategoryButton.setDisabled(True)
+        self.newCategoryColorButton.setStyleSheet("background-color: white")
+
+        if self.creatingCategory:
+            self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
+            self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() - 100)
+            self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() - 100)
+            self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() - 100)
+            self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() - 100)
+
+        for button in self.doubleButtons:
+            button.setDisabledButton2(False)
+
+        self.creatingCategory = False
+
+    def selectColorNewCategory(self):
+        color = QColorDialog.getColor()
+        
+        if color.isValid():
+            self.newCategoryColorButton.setStyleSheet("background-color: " + color.name())
+            self.newCategoryColor = color.name()
+        
+        if self.newCategoryColor != "" and self.newCategoryName != "":
+            self.createCategoryButton.setDisabled(False)
+
+    def changeNewCategoryName(self):
+        self.newCategoryName = self.addCategoryName.text()
+
+        if self.newCategoryColor != "" and self.newCategoryName != "":
+            self.createCategoryButton.setDisabled(False)
+
+    def createCategory(self):
+        Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+
+        createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
+        
+        self.showUI()
+        self.cancelAddCategory()
+
+        self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
+        self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() + 50)
+        self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() + 50)
+        self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() + 50)
+        self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() + 50)
+    
+    def deleteCategory(self):
+        indexButtonPressed = 0
+        
+        for index, send in enumerate(self.doubleButtons):
+            if send.button2 == self.sender():
+                indexButtonPressed = index
+
+        categoryName = Category.getNameByIndex(indexButtonPressed)
+        Category.delCategory(indexButtonPressed)
+
+        deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
+        updateButtonsPosition(window.categoryManager, True)
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
+                        deleteCategoryFrom(space, indexButtonPressed, categoryName)
+                        updateButtonsPosition(space)
 
 class Space(QLabel):
     def __init__(self, posx, posy, actualFloor, floors, storeIndex, parent = None, long = False, times5Space = 0):
@@ -31,7 +329,7 @@ class Space(QLabel):
         self.long = long
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
-        self.category = SpaceCategory(self, parent)
+        self.category = SpaceCategory(storeIndex, parent)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -91,12 +389,15 @@ class Space(QLabel):
         self.updateScrollToDefault()
             
     def openConfigCategories(self):
+        Store.configCategory(self.storeIndex)
+
         self.updateScroll()
 
         self.configBox.hide()
         self.labelCategory.hide()
         self.categorySelector.hide()
         self.editCategories.hide()
+
         self.openSpaceConfig.show()
         self.category.showUI()
     
@@ -110,10 +411,16 @@ class Space(QLabel):
         self.updateScrollToDefault()
 
         self.category.cancelAddCategory()
+
         self.configBox.show()
         self.labelCategory.show()
         self.editCategories.show()
         self.categorySelector.show()
+
+        self.openSpaceConfig.hide()
+        self.category.hideUI()
+
+        Store.stopConfigCategory(self.storeIndex)
     
     def changeCategory(self, category):
         setCategoryByName(self.category, category)
@@ -289,6 +596,14 @@ class Store():
         STORES[indexStore].changeFloorButton.hide()
         STORES[indexStore].goBackStore.show()
 
+    @staticmethod
+    def configCategory(indexStore):
+        STORES[indexStore].goBackStore.hide()
+
+    @staticmethod
+    def stopConfigCategory(indexStore):
+        STORES[indexStore].goBackStore.show()
+
     def __init__(self, name, image, posx, posy, parent):
         self.setupStore(parent)
         self.initUI(name, image, posx, posy, parent)
@@ -392,6 +707,8 @@ class MainWindow(QMainWindow):
         self.widget = QWidget()
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
+
+        self.categoryManager = SpaceCategory(0, self.widget, True)
 
     def initUI(self, parent):
         # Main buttons
@@ -500,6 +817,8 @@ class MainWindow(QMainWindow):
 
     # UI functions
     def reOpenHome(self):
+        self.categoryManager.hideUI()
+
         self.showMainButtons()
         self.hideAddStoreForm()
         self.raiseMainButtons()
@@ -547,6 +866,8 @@ class MainWindow(QMainWindow):
     
     def configCategories(self):
         Store.hideAllStoreIcons()
+
+        self.categoryManager.showUI()
 
         self.hideMainButtons()
 
@@ -607,6 +928,8 @@ class MainWindow(QMainWindow):
 window = MainWindow()
 
 class main():
+    window.categoryManager.hideUI()
+    window.goHome.hide()
     window.show()
 
     sys.exit(app.exec_())
