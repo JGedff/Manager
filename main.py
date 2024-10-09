@@ -19,16 +19,16 @@ from components.languageChanger import LanguageChanger
 app = QApplication(sys.argv)
 
 class SpaceCategory(QLabel):
-    def __init__(self, storeIndex = 0, parent = None, shortcut = False):
+    def __init__(self, storeIndex = 0, shelfIndex = 0, spaceIndex = 0, parent = None, shortcut = False):
         super().__init__(parent)
 
-        self.initVariables(storeIndex, parent, shortcut)
+        self.initVariables(storeIndex, shelfIndex, spaceIndex, parent, shortcut)
         self.initUI(parent)
         self.initEvents()
 
         setEmptyCategory(self)
 
-    def initVariables(self, storeIndex, parent, shortcut):
+    def initVariables(self, storeIndex, shelfIndex, spaceIndex, parent, shortcut):
         self.name = ''
         self.color = ''
         self.newColor = ''
@@ -38,6 +38,8 @@ class SpaceCategory(QLabel):
         self.newCategoryName = ""
         self.newCategoryColor = ""
         self.storeIndex = storeIndex
+        self.shelfIndex = shelfIndex
+        self.spaceIndex = spaceIndex
         self.creatingCategory = False
         self.nameModifiedCategory = ''
         self.colorModifiedCategory = ""
@@ -116,7 +118,6 @@ class SpaceCategory(QLabel):
         self.addCategoryName.textChanged.connect(self.changeNewCategoryName)
 
     def stopEditCategory(self):
-        print('STOP EDIT CATEGORY')
         self.showUI()
         self.showSpace.hide()
         self.categoryNameLabel.hide()
@@ -128,7 +129,7 @@ class SpaceCategory(QLabel):
         if self.shortcut:
             window.hideMainButtons()
         else:
-            SHELVES[self.storeIndex][0].spaces[0].openSpaceConfig.show()
+            SHELVES[self.storeIndex][self.shelfIndex].spaces[self.spaceIndex + 1].openSpaceConfig.show()
 
     def showUI(self):
         for button in self.doubleButtons:
@@ -181,7 +182,7 @@ class SpaceCategory(QLabel):
 
     
     def saveInfo(self):
-        newName = self.categoryName.text()
+        newName = self.categoryName.text().capitalize()
 
         if newName != "":
             self.reloadNameCategories(newName)
@@ -195,12 +196,12 @@ class SpaceCategory(QLabel):
         index = Category.getIndexByName(self.nameModifiedCategory)
         Category.changeCategoryName(index, newName)
 
-        updateNameCategory(window.categoryManager, self.colorModifiedCategory, self.nameModifiedCategory, newName, index, True)
+        updateNameCategory(window.categoryManager, self.colorModifiedCategory, self.nameModifiedCategory, newName, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    updateNameCategory(space, self.colorModifiedCategory, self.nameModifiedCategory, newName, index)
+                    updateNameCategory(space, self.colorModifiedCategory, self.nameModifiedCategory, newName)
 
     def reloadColorCategories(self, newName):
         index = Category.getIndexByName(newName)
@@ -316,20 +317,20 @@ class SpaceCategory(QLabel):
                         updateButtonsPosition(space)
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, storeIndex, parent = None, long = False, times5Space = 0):
+    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent = None, long = False, times5Space = 0):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
 
-        self.initVariables(actualFloor, floors, storeIndex, parent, long)
+        self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent, long)
         self.initUI(parent, times5Space)
         self.initEvents()
         
-    def initVariables(self, actualFloor, floors, storeIndex, parent, long):
+    def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent, long):
         self.long = long
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
-        self.category = SpaceCategory(storeIndex, parent)
+        self.category = SpaceCategory(storeIndex, shelfIndex, spaceIndex, parent)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -409,18 +410,18 @@ class Space(QLabel):
 
     def stopConfigSpace(self):
         self.updateScrollToDefault()
+        self.updateSpaceColor()
 
         self.category.cancelAddCategory()
 
+        ShelfInfo.hideAllSpaces()
+        Store.stopConfigCategory(self.storeIndex)
+
+        self.configBox.show()
         self.configBox.show()
         self.labelCategory.show()
         self.editCategories.show()
         self.categorySelector.show()
-
-        self.openSpaceConfig.hide()
-        self.category.hideUI()
-
-        Store.stopConfigCategory(self.storeIndex)
     
     def changeCategory(self, category):
         setCategoryByName(self.category, category)
@@ -526,29 +527,29 @@ class ShelfInfo():
 
                 for index in range(sideSpaces):
                     if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, parent))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, parent, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
 
                 for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, parent))
+                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
                 
                 if mod > 0:
                     if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, parent, True))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, True))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, parent, True, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, True, times5))
             else:
                 for index in range(self.spacesLength):
                     mod5 = (index + 1) % 5
 
                     if mod5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, parent))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, parent, False, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, False, times5))
 
     def initEvents(self):
         updateShelfPosition()
@@ -708,7 +709,7 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
-        self.categoryManager = SpaceCategory(0, self.widget, True)
+        self.categoryManager = SpaceCategory(0, 0, 0, self.widget, True)
 
     def initUI(self, parent):
         # Main buttons

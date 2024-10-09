@@ -22,7 +22,7 @@ def createCategoryIn(space, categoryName, parent, shortcut = False):
         # Updates the position of the form to create a new category
         space.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
 
-def updateNameCategory(space, color, actualName, newName, index, shortcut = False):
+def updateNameCategory(space, color, actualName, newName, shortcut = False):
     if not shortcut:
         if space.category.color == color:
             # Change the name of the button with the actual category to the new name for the category
@@ -32,7 +32,9 @@ def updateNameCategory(space, color, actualName, newName, index, shortcut = Fals
                     break
 
             # Updates the name in the comboBox
-            space.categorySelector.setItemText(index, newName)
+            for i in range(space.categorySelector.count()):
+                if space.categorySelector.itemText(i) == actualName:
+                    space.categorySelector.setItemText(i, newName)
 
             # Updates the name in the space
             space.category.name = newName
@@ -44,7 +46,9 @@ def updateNameCategory(space, color, actualName, newName, index, shortcut = Fals
                     break
             
             # Updates the name in the comboBox
-            space.categorySelector.setItemText(index, newName)
+            for i in range(space.categorySelector.count()):
+                if space.categorySelector.itemText(i) == actualName:
+                    space.categorySelector.setItemText(i, newName)
     else:
         for button in space.doubleButtons:
             if button.textButton1() == actualName:
