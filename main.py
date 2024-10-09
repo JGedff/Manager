@@ -661,7 +661,8 @@ class Store():
         self.changeFloor(self.changeFloorButton.currentText())
 
     def changeFloor(self, floor):
-        ShelfInfo.changeFloor(self.indexShelves, int(floor.split(' ')[1]))
+        if floor.strip() != "":
+            ShelfInfo.changeFloor(self.indexShelves, int(floor.split(' ')[1]))
 
     def updateVerticalHeaderPosition(self, value):
         self.changeFloorButton.move(self.changeFloorButton.pos().x(), value + 15)
