@@ -125,6 +125,7 @@ class SpaceCategory(QLabel):
         self.saveCategory.hide()
         self.categoryColor.hide()
         self.categoryName.hide()
+        self.categoryName.setText("")
 
         if self.shortcut:
             window.hideMainButtons()
@@ -165,6 +166,7 @@ class SpaceCategory(QLabel):
         self.saveCategory.show()
         self.categoryColor.show()
         self.categoryName.show()
+        self.categoryName.setPlaceholderText(self.nameModifiedCategory)
 
         if self.shortcut:
             window.hideAllButtons()
