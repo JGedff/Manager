@@ -22,19 +22,20 @@ from components.languageChanger import LanguageChanger
 app = QApplication(sys.argv)
 
 class SpaceCategory(QLabel):
-    def __init__(self, storeIndex = 0, shelfIndex = 0, spaceIndex = 0, parent = None, shortcut = False):
+    def __init__(self, storeIndex = 0, shelfIndex = 0, spacesInFloorShelf = 0, floor = 0, spaceIndex = 0, parent = None, shortcut = False):
         super().__init__(parent)
 
-        self.initVariables(storeIndex, shelfIndex, spaceIndex, parent, shortcut)
+        self.initVariables(storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut)
         self.initUI(parent)
         self.initEvents()
 
         setEmptyCategory(self)
 
-    def initVariables(self, storeIndex, shelfIndex, spaceIndex, parent, shortcut):
+    def initVariables(self, storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut):
         self.name = ''
         self.color = ''
         self.newColor = ''
+        self.floor = floor
         self.doubleButtons = []
         self.mainParent = parent
         self.shortcut = shortcut
@@ -46,6 +47,7 @@ class SpaceCategory(QLabel):
         self.creatingCategory = False
         self.nameModifiedCategory = ''
         self.colorModifiedCategory = ""
+        self.spacesInFloorShelf = spacesInFloorShelf
 
     def initUI(self, parent):
         self.showSpace = QPushButton(Language.get("go_back"), parent)
@@ -133,13 +135,17 @@ class SpaceCategory(QLabel):
         if self.shortcut:
             window.hideMainButtons()
         else:
-            SHELVES[self.storeIndex][self.shelfIndex].spaces[self.spaceIndex + 1].openSpaceConfig.show()
+            print((self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex)
+            print(SHELVES[self.storeIndex][self.shelfIndex].spaces.__len__())
+            SHELVES[self.storeIndex][self.shelfIndex].spaces[(self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex].openSpaceConfig.show()
 
     def showUI(self):
         for button in self.doubleButtons:
             button.show()
+            button.raise_()
 
         self.addCategory.show()
+        self.addCategory.raise_()
 
         if self.shortcut:
             window.goHome.hide()
@@ -169,7 +175,12 @@ class SpaceCategory(QLabel):
         self.saveCategory.show()
         self.categoryColor.show()
         self.categoryName.show()
+
         self.categoryName.setPlaceholderText(self.nameModifiedCategory)
+
+        self.saveCategory.raise_()
+        self.categoryColor.raise_()
+        self.categoryName.raise_()
 
         if self.shortcut:
             window.hideAllButtons()
@@ -236,6 +247,11 @@ class SpaceCategory(QLabel):
         self.createCategoryButton.show()
         self.newCategoryColorButton.show()
         self.cancelButtonAddCategory.show()
+
+        self.addCategoryName.raise_()
+        self.createCategoryButton.raise_()
+        self.newCategoryColorButton.raise_()
+        self.cancelButtonAddCategory.raise_()
 
         for button in self.doubleButtons:
             button.setDisabledButton2(True)
@@ -322,22 +338,20 @@ class SpaceCategory(QLabel):
                         updateButtonsPosition(space)
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent = None, long = False, times5Space = 0):
-        print('****************')
-        print(parent)
+    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
 
-        self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent, long)
+        self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
         self.initUI(parent, times5Space)
         self.initEvents()
         
-    def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent, long):
+    def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
         self.long = long
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
-        self.category = SpaceCategory(storeIndex, shelfIndex, spaceIndex, parent)
+        self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -456,11 +470,14 @@ class Space(QLabel):
         self.updateSpaceColor()
 
         self.box.show()
+
         self.configBox.hide()
         self.categorySelector.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
         self.openSpaceConfig.hide()
+
+        self.box.raise_()
 
     def updateScrollToDefault(self):
         window.resizeHeightScroll()
@@ -529,34 +546,40 @@ class ShelfInfo():
             times5 = 0
 
             if self.double_shelf:
+                indexSpace = 0
                 mod = self.spacesLength % 2
                 sideSpaces = (self.spacesLength / 2).__trunc__()
 
                 for index in range(sideSpaces):
                     if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
+
+                    indexSpace += 1
 
                 for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
+                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                    indexSpace += 1
                 
                 if mod > 0:
                     if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, True))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, True, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
+
+                    indexSpace += 1
             else:
                 for index in range(self.spacesLength):
                     mod5 = (index + 1) % 5
 
                     if mod5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
 
     def initEvents(self):
         updateShelfPosition()
@@ -717,7 +740,7 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
-        self.categoryManager = SpaceCategory(0, 0, 0, self.widget, True)
+        self.categoryManager = SpaceCategory(0, 0, 0, 0, 0, self.widget, True)
 
     def initUI(self, parent):
         # Main buttons
@@ -936,12 +959,15 @@ class MainWindow(QMainWindow):
 
 window = MainWindow()
 
+# WHEN CHANGING NAME OF CATEGORY THEN GO BACK ALSO WORKS WIERD
 async def getMongoInfo():
     client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017/")
 
     db = client['manager']
     storesCollection = db['stores']
     shelvesCollection = db['shelfs']
+
+    storeIndex = 0
 
     async for store in storesCollection.find():
         for index, shelf_id in enumerate(store['storeShelves']):
@@ -952,16 +978,19 @@ async def getMongoInfo():
             SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'])
             SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
             SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
+            SHELVES_FORMS[index].hideForm()
         
         Store.createStore(store['name'], window.widget, store['image'])
+
+        STORES[storeIndex].goBackStore.hide()
+        
+        storeIndex =+ 1
 
     client.close()
 
 class main():
     asyncio.run(getMongoInfo())
 
-    window.categoryManager.hideUI()
-    window.goHome.hide()
     window.reOpenHome()
     window.show()
 
