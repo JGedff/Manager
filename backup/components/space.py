@@ -2,7 +2,6 @@ from PyQt5.QtWidgets import QLabel, QPushButton, QComboBox
 
 from constants import CATEGORY_NAMES, WINDOW_WIDTH, WINDOW_HEIGHT
 
-from components.spaceProduct import SpaceProduct
 from components.spaceCategory import SpaceCategory
 
 from utils.language import Language
@@ -25,7 +24,6 @@ class Space(QLabel):
         self.actualFloor = actualFloor
         self.buttonFromMain = buttonFromMain
         self.category = SpaceCategory(self, parent)
-        self.product = SpaceProduct(self.category, parent)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -83,7 +81,6 @@ class Space(QLabel):
             self.labelCategory.show()
             self.categorySelector.show()
             self.editCategories.show()
-            self.product.show()
             self.updateScrollToDefault()
             
     def openConfigCategories(self):
@@ -93,7 +90,6 @@ class Space(QLabel):
             self.openSpaceConfig.show()
             self.category.showUI()
         else:
-            self.product.hide()
             self.configBox.hide()
             self.labelCategory.hide()
             self.categorySelector.hide()
@@ -119,7 +115,6 @@ class Space(QLabel):
             self.category.cancelAddCategory()
             self.STORE.configSpace()
             self.configBox.show()
-            self.product.show()
             self.labelCategory.show()
             self.editCategories.show()
             self.categorySelector.show()
@@ -127,8 +122,6 @@ class Space(QLabel):
     def changeCategory(self, category):
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
-
-        self.product.categoryChanged()
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -141,7 +134,6 @@ class Space(QLabel):
 
     def hideSpace(self):
         self.box.hide()
-        self.product.hide()
         self.configBox.hide()
         self.categorySelector.hide()
         self.labelCategory.hide()
@@ -153,7 +145,6 @@ class Space(QLabel):
         self.updateSpaceColor()
 
         self.box.show()
-        self.product.hide()
         self.configBox.hide()
         self.categorySelector.hide()
         self.labelCategory.hide()
@@ -168,8 +159,3 @@ class Space(QLabel):
 
     def updateScrollToDefault(self):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
-
-    def hideProductForm(self):
-        self.product.productSelector.hide()
-        self.product.addProduct.hide()
-        self.product.productLabel.hide()

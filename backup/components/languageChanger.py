@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import QLabel, QComboBox
 
 from utils.language import Language
 
-from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
+from constants import WINDOW_HEIGHT, STORES, SHELVES
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
@@ -39,19 +39,19 @@ class LanguageChanger(QLabel):
         self.WINDOW.setWindowTitle(Language.get("window_title"))
         self.WINDOW.goHome.setText(Language.get("go_back"))
 
-        self.WINDOW.categoryManager.showSpace.setText(Language.get("go_back"))
-        self.WINDOW.categoryManager.saveCategory.setText(Language.get("save"))
-        self.WINDOW.categoryManager.addCategory.setText(Language.get("add_category"))
-        self.WINDOW.categoryManager.categoryColor.setText(Language.get("select_color"))
-        self.WINDOW.categoryManager.createCategoryButton.setText(Language.get("create"))
-        self.WINDOW.categoryManager.cancelButtonAddCategory.setText(Language.get("cancel"))
-        self.WINDOW.categoryManager.categoryNameLabel.setText(Language.get("category_name"))
-        self.WINDOW.categoryManager.addCategoryName.setPlaceholderText(Language.get("name"))
-        self.WINDOW.categoryManager.categoryColorLabel.setText(Language.get("category_color"))
-        self.WINDOW.categoryManager.newCategoryColorButton.setText(Language.get("select_color"))
+        self.WINDOW.configCategory.category.showSpace.setText(Language.get("go_back"))
+        self.WINDOW.configCategory.category.saveCategory.setText(Language.get("save"))
+        self.WINDOW.configCategory.category.addCategory.setText(Language.get("add_category"))
+        self.WINDOW.configCategory.category.categoryColor.setText(Language.get("select_color"))
+        self.WINDOW.configCategory.category.createCategoryButton.setText(Language.get("create"))
+        self.WINDOW.configCategory.category.cancelButtonAddCategory.setText(Language.get("cancel"))
+        self.WINDOW.configCategory.category.categoryNameLabel.setText(Language.get("category_name"))
+        self.WINDOW.configCategory.category.addCategoryName.setPlaceholderText(Language.get("name"))
+        self.WINDOW.configCategory.category.categoryColorLabel.setText(Language.get("category_color"))
+        self.WINDOW.configCategory.category.newCategoryColorButton.setText(Language.get("select_color"))
         
         # Shelf forms
-        for shelfIndex, shelf in enumerate(SHELVES_FORMS):
+        for shelfIndex, shelf in enumerate(SHELVES):
             shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
             shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
             shelf.doubleShelfInput.trueButton.setText(Language.get("yes"))
@@ -67,9 +67,8 @@ class LanguageChanger(QLabel):
             for index in range(store.floor):
                 store.changeFloorButton.addItem(Language.get("floor") + str(index + 1))
 
-        # Shelf
-        for storage in SHELVES:
-            for shelf in storage:
+            # Shelf
+            for shelf in store.shelves:
                 shelf.shelfNumber.setText(Language.get("shelf") + str(shelf.actualNumber) + ":")
 
                 # Space
@@ -89,6 +88,7 @@ class LanguageChanger(QLabel):
                     space.category.addCategoryName.setPlaceholderText(Language.get("name"))
         
         self.WINDOW.reOpenHome()
+        self.WINDOW.configCategory.STORE.hideStore()
     
     def hide(self):
         self.changer.hide()
