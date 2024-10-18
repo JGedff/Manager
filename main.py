@@ -1,5 +1,8 @@
 import sys
 
+import motor.motor_asyncio
+import asyncio
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
@@ -320,6 +323,8 @@ class SpaceCategory(QLabel):
 
 class Space(QLabel):
     def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent = None, long = False, times5Space = 0):
+        print('****************')
+        print(parent)
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
@@ -551,7 +556,7 @@ class ShelfInfo():
                         self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
 
     def initEvents(self):
         updateShelfPosition()
@@ -562,7 +567,7 @@ class ShelfInfo():
 
 class Store():
     @staticmethod
-    def createStore(storeName, parent):
+    def createStore(storeName, parent, image = DEFAULT_IMAGE):
         saveShelfInfo()
 
         posx = 25
@@ -575,7 +580,7 @@ class Store():
                 posx = 25
                 posy += 170
 
-        STORES.append(Store(storeName, DEFAULT_IMAGE, posx, posy, parent))
+        STORES.append(Store(storeName, image, posx, posy, parent))
 
         SHELVES_FORMS.clear()
     
@@ -931,9 +936,33 @@ class MainWindow(QMainWindow):
 
 window = MainWindow()
 
+async def getMongoInfo():
+    client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017/")
+
+    db = client['manager']
+    storesCollection = db['stores']
+    shelvesCollection = db['shelfs']
+
+    async for store in storesCollection.find():
+        for index, shelf_id in enumerate(store['storeShelves']):
+            shelf = await shelvesCollection.find_one({"_id": shelf_id})
+
+            Shelf.createShelf(window.widget)
+
+            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'])
+            SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
+            SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
+        
+        Store.createStore(store['name'], window.widget, store['image'])
+
+    client.close()
+
 class main():
+    asyncio.run(getMongoInfo())
+
     window.categoryManager.hideUI()
     window.goHome.hide()
+    window.reOpenHome()
     window.show()
 
     sys.exit(app.exec_())

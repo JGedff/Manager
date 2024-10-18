@@ -49,3 +49,9 @@ class InputBool(QLabel):
 
     def getValue(self):
         return self.value
+    
+    def setValue(self, boolean):
+        if boolean:
+            self.buttonTrueClicked()
+        else:
+            self.buttonFalseClicked()
