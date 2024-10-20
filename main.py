@@ -1,7 +1,5 @@
 import sys
-
-import motor.motor_asyncio
-import asyncio
+from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog
 
@@ -9,7 +7,9 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
+from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
+
+from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, STORES_COLLECTION, SHELVES_COLLECTION
 
 from utils.language import Language
 from utils.category import Category
@@ -135,8 +135,6 @@ class SpaceCategory(QLabel):
         if self.shortcut:
             window.hideMainButtons()
         else:
-            print((self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex)
-            print(SHELVES[self.storeIndex][self.shelfIndex].spaces.__len__())
             SHELVES[self.storeIndex][self.shelfIndex].spaces[(self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex].openSpaceConfig.show()
 
     def showUI(self):
@@ -590,6 +588,35 @@ class ShelfInfo():
 
 class Store():
     @staticmethod
+    def createMongoStore(name, image = DEFAULT_IMAGE):
+        shelvesInfo = []
+
+        storeFloors = getMaxFloor()
+        id_empty_category = getMongoCategoryByName(getEmptyCategoryName())
+        id_unreachable_category = getMongoCategoryByName(getUnreachableCategoryName())
+
+        for i in SHELVES_FORMS:
+            spacesInfo = []
+
+            for floor in range(storeFloors):
+                for _ in range(i.spaces):
+                    id_category = id_unreachable_category if i.floors < floor else id_empty_category 
+
+                    spacesInfo.append({
+                        "actual_floor": floor,
+                        "category": id_category
+                    })
+            
+            shelvesInfo.append({
+                "floors": i.floors,
+                "spaces": spacesInfo,
+                "double_shelf": i.double_shelf,
+                "creation_date": datetime.now()
+            })
+            
+        addStoreToMongo(shelvesInfo, name, image)
+        
+    @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):
         saveShelfInfo()
 
@@ -887,6 +914,8 @@ class MainWindow(QMainWindow):
         if storeName == "":
             storeName = Language.get("store") + str(STORES.__len__() + 1)
 
+        Store.createMongoStore(storeName)
+
         Shelf.hideAllForms()
         Store.createStore(storeName, self.widget)
 
@@ -957,25 +986,16 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.editCategories.raise_()
 
-window = MainWindow()
-
-# WHEN CHANGING NAME OF CATEGORY THEN GO BACK ALSO WORKS WIERD
-async def getMongoInfo():
-    client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017/")
-
-    db = client['manager']
-    storesCollection = db['stores']
-    shelvesCollection = db['shelfs']
-
+def getMongoInfo():
     storeIndex = 0
 
-    async for store in storesCollection.find():
+    for store in STORES_COLLECTION.find({}):
         for index, shelf_id in enumerate(store['storeShelves']):
-            shelf = await shelvesCollection.find_one({"_id": shelf_id})
+            shelf = SHELVES_COLLECTION.find_one({ "_id": shelf_id })
 
             Shelf.createShelf(window.widget)
 
-            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'])
+            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__())
             SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
             SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
             SHELVES_FORMS[index].hideForm()
@@ -986,15 +1006,17 @@ async def getMongoInfo():
         
         storeIndex =+ 1
 
-    client.close()
+window = MainWindow()
 
 class main():
-    asyncio.run(getMongoInfo())
+    getMongoInfo()
 
     window.reOpenHome()
     window.show()
 
     sys.exit(app.exec_())
+
+    closeMongoConnection()
 
 if __name__ == "__main__":
     main()

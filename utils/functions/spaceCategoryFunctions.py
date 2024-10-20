@@ -107,3 +107,9 @@ def setUnreachableCategory(category):
 def setCategoryByName(category, name):
     category.name = name
     category.color = Category.getColorByName(name)
+
+def getEmptyCategoryName():
+    return CATEGORY_NAMES[0]
+
+def getUnreachableCategoryName():
+    return CATEGORY_NAMES[1]
