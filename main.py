@@ -603,8 +603,9 @@ class Store():
                     id_category = id_unreachable_category if i.floors < floor else id_empty_category 
 
                     spacesInfo.append({
-                        "actual_floor": floor,
-                        "category": id_category
+                        "actual_floor": floor + 1,
+                        "category": id_category,
+                        "creation_date": datetime.now()
                     })
             
             shelvesInfo.append({

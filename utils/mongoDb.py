@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pymongo import MongoClient
 
 MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
@@ -5,6 +7,7 @@ MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 DB = MONGO_CLIENT['manager']
 
 STORES_COLLECTION = DB['stores']
+SPACES_COLLECTION = DB['spaces']
 SHELVES_COLLECTION = DB['shelfs']
 CATEGORIES_COLLECTION = DB['categorys']
 
@@ -12,7 +15,33 @@ def closeMongoConnection():
     MONGO_CLIENT.close()
 
 def addShelvesToMongo(arrayInfo = []):
-    SHELVES_COLLECTION.insert_many(arrayInfo)
+    arrayToInsert = []
+
+    for shelves in arrayInfo:
+        insertShelf = {
+            "floors": shelves['floors'],
+            "spaces": [],
+            "double_shelf": shelves['double_shelf'],
+            "creation_date": datetime.now()
+        }
+
+        SPACES_COLLECTION.insert_many(shelves['spaces'])
+
+        insertShelf['spaces'] = getLastSpacesCreated(shelves['spaces'].__len__())
+    
+        arrayToInsert.append(insertShelf)
+
+    SHELVES_COLLECTION.insert_many(arrayToInsert)
+
+def getLastSpacesCreated(num):
+    spacesId = []
+
+    lastSpaces = SPACES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+
+    for doc in lastSpaces:
+        spacesId.append(doc['_id'])
+
+    return spacesId
 
 def getLastShelvesCreated(num):
     shelvesId = []
