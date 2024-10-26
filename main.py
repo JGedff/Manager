@@ -1,4 +1,5 @@
 import sys
+import time
 from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog
@@ -9,7 +10,7 @@ from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
-from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, STORES_COLLECTION, SHELVES_COLLECTION
+from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
 
 from utils.language import Language
 from utils.category import Category
@@ -598,29 +599,28 @@ class Store():
         for i in SHELVES_FORMS:
             spacesInfo = []
 
+            time.sleep(0.01)
+
             for floor in range(storeFloors):
                 for _ in range(i.spaces):
-                    id_category = id_unreachable_category if i.floors < floor else id_empty_category 
+                    id_category = id_unreachable_category if i.floors - 1 < floor else id_empty_category 
 
                     spacesInfo.append({
-                        "actual_floor": floor + 1,
                         "category": id_category,
-                        "creation_date": datetime.now()
+                        "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                     })
             
             shelvesInfo.append({
                 "floors": i.floors,
                 "spaces": spacesInfo,
                 "double_shelf": i.double_shelf,
-                "creation_date": datetime.now()
+                "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             })
             
         addStoreToMongo(shelvesInfo, name, image)
         
     @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):
-        saveShelfInfo()
-
         posx = 25
         posy = 25
             
@@ -910,6 +910,8 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def saveStoreInfo(self):
+        saveShelfInfo()
+
         storeName = self.storeNameInput.text().strip()
 
         if storeName == "":
@@ -991,19 +993,32 @@ def getMongoInfo():
     storeIndex = 0
 
     for store in STORES_COLLECTION.find({}):
+        spacesInfo = []
+
         for index, shelf_id in enumerate(store['storeShelves']):
             shelf = SHELVES_COLLECTION.find_one({ "_id": shelf_id })
-
+            mongoSpaces = SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
+            
             Shelf.createShelf(window.widget)
 
-            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__())
+            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__() / store['storeFloors'])
             SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
             SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
             SHELVES_FORMS[index].hideForm()
+
+            spacesInfo.append(mongoSpaces)
+        
+        saveShelfInfo()
         
         Store.createStore(store['name'], window.widget, store['image'])
 
         STORES[storeIndex].goBackStore.hide()
+
+        for shelfIndex in range(store['storeShelves'].__len__()):
+            for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
+                category = CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
+                SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
+                SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
         
         storeIndex =+ 1
 

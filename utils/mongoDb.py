@@ -22,13 +22,13 @@ def addShelvesToMongo(arrayInfo = []):
             "floors": shelves['floors'],
             "spaces": [],
             "double_shelf": shelves['double_shelf'],
-            "creation_date": datetime.now()
+            "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
         }
 
         SPACES_COLLECTION.insert_many(shelves['spaces'])
 
         insertShelf['spaces'] = getLastSpacesCreated(shelves['spaces'].__len__())
-    
+
         arrayToInsert.append(insertShelf)
 
     SHELVES_COLLECTION.insert_many(arrayToInsert)
@@ -58,7 +58,13 @@ def addStoreToMongo(arrayShelves, name, image):
 
     idNewShelves = getLastShelvesCreated(arrayShelves.__len__())
 
-    STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves })
+    maxFloor = 0
+
+    for shelf in arrayShelves:
+        if shelf['floors'] > maxFloor:
+            maxFloor = shelf['floors']
+
+    STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves, "storeFloors": maxFloor })
 
 def getMongoCategoryByName(name):
     file = CATEGORIES_COLLECTION.find_one({ "name": name })

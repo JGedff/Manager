@@ -61,4 +61,4 @@ class InputNumber(QLabel):
             self.inputNum.setText(str(self.lastNumber))
 
     def getNum(self):
-        return int(self.inputNum.text())
+        return int(float(self.inputNum.text()))
