@@ -10,7 +10,7 @@ from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
-from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
+from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, updateMongoSpaceCategory, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
 
 from utils.language import Language
 from utils.category import Category
@@ -347,6 +347,7 @@ class Space(QLabel):
         self.initEvents()
         
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
+        self.mongo_id = None
         self.long = long
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
@@ -446,6 +447,8 @@ class Space(QLabel):
     def changeCategory(self, category):
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
+
+        updateMongoSpaceCategory(self.mongo_id, category)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -591,6 +594,7 @@ class Store():
     @staticmethod
     def createMongoStore(name, image = DEFAULT_IMAGE):
         shelvesInfo = []
+        mongo_id = 0
 
         storeFloors = getMaxFloor()
         id_empty_category = getMongoCategoryByName(getEmptyCategoryName())
@@ -607,8 +611,11 @@ class Store():
 
                     spacesInfo.append({
                         "category": id_category,
+                        "mongo_id": name + "_" + str(mongo_id),
                         "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
                     })
+
+                    mongo_id += 1
             
             shelvesInfo.append({
                 "floors": i.floors,
@@ -1016,6 +1023,8 @@ def getMongoInfo():
 
         for shelfIndex in range(store['storeShelves'].__len__()):
             for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
+                SHELVES[storeIndex][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
+
                 category = CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
                 SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
                 SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
@@ -1027,6 +1036,7 @@ window = MainWindow()
 class main():
     getMongoInfo()
 
+    window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
     window.reOpenHome()
     window.show()
 

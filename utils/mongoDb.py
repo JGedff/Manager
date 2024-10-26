@@ -70,3 +70,9 @@ def getMongoCategoryByName(name):
     file = CATEGORIES_COLLECTION.find_one({ "name": name })
 
     return file['_id']
+
+def updateMongoSpaceCategory(spaceId, category):
+    if spaceId != None:
+        categoryId = getMongoCategoryByName(category)
+
+        SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
