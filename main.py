@@ -2,15 +2,15 @@ import sys
 import time
 from datetime import datetime
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, CATEGORY_COLORS
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
-from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, updateMongoSpaceCategory, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
+from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, updateMongoSpaceCategory, updateMongoCategoryName, updateMongoCategoryColor, delMongoCategory, addMongoCategory, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
 
 from utils.language import Language
 from utils.category import Category
@@ -78,18 +78,11 @@ class SpaceCategory(QLabel):
         posx = 25
         posy = 25
 
-        for index, category in enumerate(CATEGORY_NAMES):
-            if index > 2:
-                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
-                posy += 50
+        for category in CATEGORY_NAMES:
+            newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
+            posy += 50
 
-                self.doubleButtons.append(newDoubleButton)
-            else:
-                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "", self.editCategory, self.deleteCategory, parent)
-
-                posy += 50
-
-                self.doubleButtons.append(newDoubleButton)
+            self.doubleButtons.append(newDoubleButton)
 
         self.addCategory = QPushButton(Language.get("add_category"), parent)
         self.addCategory.setGeometry(posx, posy, 200, 25)
@@ -146,9 +139,6 @@ class SpaceCategory(QLabel):
         self.addCategory.show()
         self.addCategory.raise_()
 
-        if self.shortcut:
-            window.goHome.hide()
-
     def selectColor(self):
         color = QColorDialog.getColor()
         
@@ -202,10 +192,14 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-        if self.newColor != "" and newName != "":
-            self.reloadColorCategories(newName)
-        elif self.newColor != "":
+            updateMongoCategoryName(self.nameModifiedCategory, newName)
+
+            self.nameModifiedCategory = newName
+
+        if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
+
+            updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
         index = Category.getIndexByName(self.nameModifiedCategory)
@@ -299,6 +293,7 @@ class SpaceCategory(QLabel):
 
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+        addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
 
@@ -325,6 +320,7 @@ class SpaceCategory(QLabel):
 
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
+        delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
         updateButtonsPosition(window.categoryManager, True)
@@ -333,8 +329,16 @@ class SpaceCategory(QLabel):
             for shelf in store:
                 for space in shelf.spaces:
                     if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
+                        oldName = space.category.name
+
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
+
+                        if categoryName == oldName:
+                            updateMongoSpaceCategory(space.mongo_id, space.category.name)
+
+        if self.doubleButtons.__len__() <= 1:
+            self.doubleButtons[0].setDisabledButton2(True)
 
 class Space(QLabel):
     def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
@@ -445,10 +449,12 @@ class Space(QLabel):
         self.categorySelector.show()
     
     def changeCategory(self, category):
+        oldName = self.category.name
+
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
 
-        updateMongoSpaceCategory(self.mongo_id, category)
+        updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -998,6 +1004,32 @@ class MainWindow(QMainWindow):
 
 def getMongoInfo():
     storeIndex = 0
+    mongoCategories = 0
+
+    for category in CATEGORIES_COLLECTION.find({}):
+        Category.addCategory(category['name'], category['color'])
+
+        createCategoryIn(window.categoryManager, category['name'], window.widget, True)
+        mongoCategories += 1
+
+    if mongoCategories <= 0:
+        message = QMessageBox()
+        message.setText("You don't have any category in the database.\nYou'll use the default categories.")
+        message.setIcon(QMessageBox.Warning)
+        message.setStandardButtons(QMessageBox.Ok)
+        message.exec_()
+
+        Category.addCategory('Empty', 'white')
+        Category.addCategory('Unreachable', 'red')
+        Category.addCategory('Fill', 'green')
+
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+
+        updateButtonsPosition(window.categoryManager, True)
+        
+    setEmptyCategory(window.categoryManager)
 
     for store in STORES_COLLECTION.find({}):
         spacesInfo = []
@@ -1025,9 +1057,11 @@ def getMongoInfo():
             for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
                 SHELVES[storeIndex][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
 
-                category = CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
-                SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
-                SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+                if mongoCategories > 0:
+                    category = CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
+                    SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
+                    SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
+                    SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
         
         storeIndex =+ 1
 

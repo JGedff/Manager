@@ -66,13 +66,32 @@ def addStoreToMongo(arrayShelves, name, image):
 
     STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves, "storeFloors": maxFloor })
 
-def getMongoCategoryByName(name):
+def getMongoCategoryByName(name, oldName):
     file = CATEGORIES_COLLECTION.find_one({ "name": name })
 
-    return file['_id']
+    if file: return file['_id']
+    else:
+        file = CATEGORIES_COLLECTION.find_one({ "name": oldName })
 
-def updateMongoSpaceCategory(spaceId, category):
+        return file['_id']
+
+def updateMongoSpaceCategory(spaceId, category, oldName = None):
     if spaceId != None:
-        categoryId = getMongoCategoryByName(category)
+        categoryId = getMongoCategoryByName(category, oldName)
 
         SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
+
+def updateMongoCategoryName(oldName, newName):
+    CATEGORIES_COLLECTION.update_one({ "name": oldName }, { "$set": { "name": newName } })
+
+def updateMongoCategoryColor(name, color):
+    CATEGORIES_COLLECTION.update_one({ "name": name }, { "$set": { "color": color } })
+
+def delMongoCategory(name):
+    CATEGORIES_COLLECTION.delete_one({ "name": name })
+
+def addMongoCategory(name, color):
+    CATEGORIES_COLLECTION.insert_one({
+        "name": name,
+        "color": color
+    })
