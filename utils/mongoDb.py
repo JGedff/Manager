@@ -49,7 +49,7 @@ def getLastShelvesCreated(num):
     lastShelves = SHELVES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
 
     for doc in lastShelves:
-        shelvesId.append(doc['_id'])
+        shelvesId.insert(0, doc['_id'])
 
     return shelvesId
 
