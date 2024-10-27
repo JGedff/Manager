@@ -2,96 +2,108 @@ from datetime import datetime
 
 from pymongo import MongoClient
 
-MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+class Mongo:
+    MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 
-DB = MONGO_CLIENT['manager']
+    DB = MONGO_CLIENT['manager']
 
-STORES_COLLECTION = DB['stores']
-SPACES_COLLECTION = DB['spaces']
-SHELVES_COLLECTION = DB['shelfs']
-CATEGORIES_COLLECTION = DB['categorys']
+    STORES_COLLECTION = DB['stores']
+    SPACES_COLLECTION = DB['spaces']
+    SHELVES_COLLECTION = DB['shelfs']
+    CATEGORIES_COLLECTION = DB['categorys']
 
-def closeMongoConnection():
-    MONGO_CLIENT.close()
+    @staticmethod
+    def closeMongoConnection():
+        Mongo.MONGO_CLIENT.close()
 
-def addShelvesToMongo(arrayInfo = []):
-    arrayToInsert = []
+    @classmethod
+    def addShelvesToMongo(cls, arrayInfo = []):
+        arrayToInsert = []
 
-    for shelves in arrayInfo:
-        insertShelf = {
-            "floors": shelves['floors'],
-            "spaces": [],
-            "double_shelf": shelves['double_shelf'],
-            "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-        }
+        for shelves in arrayInfo:
+            insertShelf = {
+                "floors": shelves['floors'],
+                "spaces": [],
+                "double_shelf": shelves['double_shelf'],
+                "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            }
 
-        SPACES_COLLECTION.insert_many(shelves['spaces'])
+            cls.SPACES_COLLECTION.insert_many(shelves['spaces'])
 
-        insertShelf['spaces'] = getLastSpacesCreated(shelves['spaces'].__len__())
+            insertShelf['spaces'] = cls.getLastSpacesCreated(shelves['spaces'].__len__())
 
-        arrayToInsert.append(insertShelf)
+            arrayToInsert.append(insertShelf)
 
-    SHELVES_COLLECTION.insert_many(arrayToInsert)
+        cls.SHELVES_COLLECTION.insert_many(arrayToInsert)
 
-def getLastSpacesCreated(num):
-    spacesId = []
+    @classmethod
+    def getLastSpacesCreated(cls, num):
+        spacesId = []
 
-    lastSpaces = SPACES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+        lastSpaces = cls.SPACES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
 
-    for doc in lastSpaces:
-        spacesId.append(doc['_id'])
+        for doc in lastSpaces:
+            spacesId.append(doc['_id'])
 
-    return spacesId
+        return spacesId
 
-def getLastShelvesCreated(num):
-    shelvesId = []
+    @classmethod
+    def getLastShelvesCreated(cls, num):
+        shelvesId = []
 
-    lastShelves = SHELVES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+        lastShelves = cls.SHELVES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
 
-    for doc in lastShelves:
-        shelvesId.insert(0, doc['_id'])
+        for doc in lastShelves:
+            shelvesId.insert(0, doc['_id'])
 
-    return shelvesId
+        return shelvesId
 
-def addStoreToMongo(arrayShelves, name, image):
-    addShelvesToMongo(arrayShelves)
+    @classmethod
+    def addStoreToMongo(cls, arrayShelves, name, image):
+        cls.addShelvesToMongo(arrayShelves)
 
-    idNewShelves = getLastShelvesCreated(arrayShelves.__len__())
+        idNewShelves = cls.getLastShelvesCreated(arrayShelves.__len__())
 
-    maxFloor = 0
+        maxFloor = 0
 
-    for shelf in arrayShelves:
-        if shelf['floors'] > maxFloor:
-            maxFloor = shelf['floors']
+        for shelf in arrayShelves:
+            if shelf['floors'] > maxFloor:
+                maxFloor = shelf['floors']
 
-    STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves, "storeFloors": maxFloor })
+        cls.STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves, "storeFloors": maxFloor })
 
-def getMongoCategoryByName(name, oldName):
-    file = CATEGORIES_COLLECTION.find_one({ "name": name })
+    @classmethod
+    def getMongoCategoryByName(cls, name, oldName):
+        file = cls.CATEGORIES_COLLECTION.find_one({ "name": name })
 
-    if file: return file['_id']
-    else:
-        file = CATEGORIES_COLLECTION.find_one({ "name": oldName })
+        if file: return file['_id']
+        else:
+            file = cls.CATEGORIES_COLLECTION.find_one({ "name": oldName })
 
-        return file['_id']
+            return file['_id']
 
-def updateMongoSpaceCategory(spaceId, category, oldName = None):
-    if spaceId != None:
-        categoryId = getMongoCategoryByName(category, oldName)
+    @classmethod
+    def updateMongoSpaceCategory(cls, spaceId, category, oldName = None):
+        if spaceId != None:
+            categoryId = cls.getMongoCategoryByName(category, oldName)
 
-        SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
+            cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
 
-def updateMongoCategoryName(oldName, newName):
-    CATEGORIES_COLLECTION.update_one({ "name": oldName }, { "$set": { "name": newName } })
+    @classmethod
+    def updateMongoCategoryName(cls, oldName, newName):
+        cls.CATEGORIES_COLLECTION.update_one({ "name": oldName }, { "$set": { "name": newName } })
 
-def updateMongoCategoryColor(name, color):
-    CATEGORIES_COLLECTION.update_one({ "name": name }, { "$set": { "color": color } })
+    @classmethod
+    def updateMongoCategoryColor(cls, name, color):
+        cls.CATEGORIES_COLLECTION.update_one({ "name": name }, { "$set": { "color": color } })
 
-def delMongoCategory(name):
-    CATEGORIES_COLLECTION.delete_one({ "name": name })
+    @classmethod
+    def delMongoCategory(cls, name):
+        cls.CATEGORIES_COLLECTION.delete_one({ "name": name })
 
-def addMongoCategory(name, color):
-    CATEGORIES_COLLECTION.insert_one({
-        "name": name,
-        "color": color
-    })
+    @classmethod
+    def addMongoCategory(cls, name, color):
+        cls.CATEGORIES_COLLECTION.insert_one({
+            "name": name,
+            "color": color
+        })

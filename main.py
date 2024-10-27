@@ -4,13 +4,13 @@ from datetime import datetime
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, CATEGORY_COLORS
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
-from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, updateMongoSpaceCategory, updateMongoCategoryName, updateMongoCategoryColor, delMongoCategory, addMongoCategory, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
+from utils.mongoDb import Mongo
 
 from utils.language import Language
 from utils.category import Category
@@ -192,14 +192,14 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-            updateMongoCategoryName(self.nameModifiedCategory, newName)
+            Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
 
             self.nameModifiedCategory = newName
 
         if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
 
-            updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
+            Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
         index = Category.getIndexByName(self.nameModifiedCategory)
@@ -293,7 +293,7 @@ class SpaceCategory(QLabel):
 
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
-        addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+        Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
 
@@ -320,7 +320,7 @@ class SpaceCategory(QLabel):
 
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
-        delMongoCategory(categoryName)
+        Mongo.delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
         updateButtonsPosition(window.categoryManager, True)
@@ -335,7 +335,7 @@ class SpaceCategory(QLabel):
                         updateButtonsPosition(space)
 
                         if categoryName == oldName:
-                            updateMongoSpaceCategory(space.mongo_id, space.category.name)
+                            Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
 
         if self.doubleButtons.__len__() <= 1:
             self.doubleButtons[0].setDisabledButton2(True)
@@ -454,7 +454,7 @@ class Space(QLabel):
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
 
-        updateMongoSpaceCategory(self.mongo_id, category, oldName)
+        Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -603,8 +603,8 @@ class Store():
         mongo_id = 0
 
         storeFloors = getMaxFloor()
-        id_empty_category = getMongoCategoryByName(getEmptyCategoryName())
-        id_unreachable_category = getMongoCategoryByName(getUnreachableCategoryName())
+        id_empty_category = Mongo.getMongoCategoryByName(getEmptyCategoryName())
+        id_unreachable_category = Mongo.getMongoCategoryByName(getUnreachableCategoryName())
 
         for i in SHELVES_FORMS:
             spacesInfo = []
@@ -630,7 +630,7 @@ class Store():
                 "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             })
             
-        addStoreToMongo(shelvesInfo, name, image)
+        Mongo.addStoreToMongo(shelvesInfo, name, image)
         
     @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):
@@ -1006,7 +1006,7 @@ def getMongoInfo():
     storeIndex = 0
     mongoCategories = 0
 
-    for category in CATEGORIES_COLLECTION.find({}):
+    for category in Mongo.CATEGORIES_COLLECTION.find({}):
         Category.addCategory(category['name'], category['color'])
 
         createCategoryIn(window.categoryManager, category['name'], window.widget, True)
@@ -1031,12 +1031,12 @@ def getMongoInfo():
         
     setEmptyCategory(window.categoryManager)
 
-    for store in STORES_COLLECTION.find({}):
+    for store in Mongo.STORES_COLLECTION.find({}):
         spacesInfo = []
 
         for index, shelf_id in enumerate(store['storeShelves']):
-            shelf = SHELVES_COLLECTION.find_one({ "_id": shelf_id })
-            mongoSpaces = SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
+            shelf = Mongo.SHELVES_COLLECTION.find_one({ "_id": shelf_id })
+            mongoSpaces = Mongo.SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
             
             Shelf.createShelf(window.widget)
 
@@ -1058,7 +1058,7 @@ def getMongoInfo():
                 SHELVES[storeIndex][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
 
                 if mongoCategories > 0:
-                    category = CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
+                    category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
                     SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
                     SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
                     SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
@@ -1076,7 +1076,7 @@ class main():
 
     sys.exit(app.exec_())
 
-    closeMongoConnection()
+    Mongo.closeMongoConnection()
 
 if __name__ == "__main__":
     main()
