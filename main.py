@@ -1,12 +1,16 @@
 import sys
+import time
+from datetime import datetime
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, CATEGORY_COLORS
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory
+from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
+
+from utils.mongoDb import addStoreToMongo, closeMongoConnection, getMongoCategoryByName, updateMongoSpaceCategory, updateMongoCategoryName, updateMongoCategoryColor, delMongoCategory, addMongoCategory, STORES_COLLECTION, SHELVES_COLLECTION, CATEGORIES_COLLECTION, SPACES_COLLECTION
 
 from utils.language import Language
 from utils.category import Category
@@ -19,19 +23,20 @@ from components.languageChanger import LanguageChanger
 app = QApplication(sys.argv)
 
 class SpaceCategory(QLabel):
-    def __init__(self, storeIndex = 0, shelfIndex = 0, spaceIndex = 0, parent = None, shortcut = False):
+    def __init__(self, storeIndex = 0, shelfIndex = 0, spacesInFloorShelf = 0, floor = 0, spaceIndex = 0, parent = None, shortcut = False):
         super().__init__(parent)
 
-        self.initVariables(storeIndex, shelfIndex, spaceIndex, parent, shortcut)
+        self.initVariables(storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut)
         self.initUI(parent)
         self.initEvents()
 
         setEmptyCategory(self)
 
-    def initVariables(self, storeIndex, shelfIndex, spaceIndex, parent, shortcut):
+    def initVariables(self, storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut):
         self.name = ''
         self.color = ''
         self.newColor = ''
+        self.floor = floor
         self.doubleButtons = []
         self.mainParent = parent
         self.shortcut = shortcut
@@ -43,6 +48,7 @@ class SpaceCategory(QLabel):
         self.creatingCategory = False
         self.nameModifiedCategory = ''
         self.colorModifiedCategory = ""
+        self.spacesInFloorShelf = spacesInFloorShelf
 
     def initUI(self, parent):
         self.showSpace = QPushButton(Language.get("go_back"), parent)
@@ -72,18 +78,11 @@ class SpaceCategory(QLabel):
         posx = 25
         posy = 25
 
-        for index, category in enumerate(CATEGORY_NAMES):
-            if index > 2:
-                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
-                posy += 50
+        for category in CATEGORY_NAMES:
+            newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
+            posy += 50
 
-                self.doubleButtons.append(newDoubleButton)
-            else:
-                newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "", self.editCategory, self.deleteCategory, parent)
-
-                posy += 50
-
-                self.doubleButtons.append(newDoubleButton)
+            self.doubleButtons.append(newDoubleButton)
 
         self.addCategory = QPushButton(Language.get("add_category"), parent)
         self.addCategory.setGeometry(posx, posy, 200, 25)
@@ -130,16 +129,15 @@ class SpaceCategory(QLabel):
         if self.shortcut:
             window.hideMainButtons()
         else:
-            SHELVES[self.storeIndex][self.shelfIndex].spaces[self.spaceIndex + 1].openSpaceConfig.show()
+            SHELVES[self.storeIndex][self.shelfIndex].spaces[(self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex].openSpaceConfig.show()
 
     def showUI(self):
         for button in self.doubleButtons:
             button.show()
+            button.raise_()
 
         self.addCategory.show()
-
-        if self.shortcut:
-            window.goHome.hide()
+        self.addCategory.raise_()
 
     def selectColor(self):
         color = QColorDialog.getColor()
@@ -166,7 +164,12 @@ class SpaceCategory(QLabel):
         self.saveCategory.show()
         self.categoryColor.show()
         self.categoryName.show()
+
         self.categoryName.setPlaceholderText(self.nameModifiedCategory)
+
+        self.saveCategory.raise_()
+        self.categoryColor.raise_()
+        self.categoryName.raise_()
 
         if self.shortcut:
             window.hideAllButtons()
@@ -189,10 +192,14 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-        if self.newColor != "" and newName != "":
-            self.reloadColorCategories(newName)
-        elif self.newColor != "":
+            updateMongoCategoryName(self.nameModifiedCategory, newName)
+
+            self.nameModifiedCategory = newName
+
+        if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
+
+            updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
         index = Category.getIndexByName(self.nameModifiedCategory)
@@ -233,6 +240,11 @@ class SpaceCategory(QLabel):
         self.createCategoryButton.show()
         self.newCategoryColorButton.show()
         self.cancelButtonAddCategory.show()
+
+        self.addCategoryName.raise_()
+        self.createCategoryButton.raise_()
+        self.newCategoryColorButton.raise_()
+        self.cancelButtonAddCategory.raise_()
 
         for button in self.doubleButtons:
             button.setDisabledButton2(True)
@@ -281,6 +293,7 @@ class SpaceCategory(QLabel):
 
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+        addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
 
@@ -307,6 +320,7 @@ class SpaceCategory(QLabel):
 
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
+        delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
         updateButtonsPosition(window.categoryManager, True)
@@ -315,24 +329,33 @@ class SpaceCategory(QLabel):
             for shelf in store:
                 for space in shelf.spaces:
                     if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
+                        oldName = space.category.name
+
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 
+                        if categoryName == oldName:
+                            updateMongoSpaceCategory(space.mongo_id, space.category.name)
+
+        if self.doubleButtons.__len__() <= 1:
+            self.doubleButtons[0].setDisabledButton2(True)
+
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent = None, long = False, times5Space = 0):
+    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
 
-        self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent, long)
+        self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
         self.initUI(parent, times5Space)
         self.initEvents()
         
-    def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spaceIndex, parent, long):
+    def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
+        self.mongo_id = None
         self.long = long
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
-        self.category = SpaceCategory(storeIndex, shelfIndex, spaceIndex, parent)
+        self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -426,8 +449,12 @@ class Space(QLabel):
         self.categorySelector.show()
     
     def changeCategory(self, category):
+        oldName = self.category.name
+
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
+
+        updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -451,11 +478,14 @@ class Space(QLabel):
         self.updateSpaceColor()
 
         self.box.show()
+
         self.configBox.hide()
         self.categorySelector.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
         self.openSpaceConfig.hide()
+
+        self.box.raise_()
 
     def updateScrollToDefault(self):
         window.resizeHeightScroll()
@@ -524,34 +554,40 @@ class ShelfInfo():
             times5 = 0
 
             if self.double_shelf:
+                indexSpace = 0
                 mod = self.spacesLength % 2
                 sideSpaces = (self.spacesLength / 2).__trunc__()
 
                 for index in range(sideSpaces):
                     if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
+
+                    indexSpace += 1
 
                 for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
+                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                    indexSpace += 1
                 
                 if mod > 0:
                     if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, True))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, True, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
+
+                    indexSpace += 1
             else:
                 for index in range(self.spacesLength):
                     mod5 = (index + 1) % 5
 
                     if mod5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, False, times5))
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
 
     def initEvents(self):
         updateShelfPosition()
@@ -562,9 +598,42 @@ class ShelfInfo():
 
 class Store():
     @staticmethod
-    def createStore(storeName, parent):
-        saveShelfInfo()
+    def createMongoStore(name, image = DEFAULT_IMAGE):
+        shelvesInfo = []
+        mongo_id = 0
 
+        storeFloors = getMaxFloor()
+        id_empty_category = getMongoCategoryByName(getEmptyCategoryName())
+        id_unreachable_category = getMongoCategoryByName(getUnreachableCategoryName())
+
+        for i in SHELVES_FORMS:
+            spacesInfo = []
+
+            time.sleep(0.01)
+
+            for floor in range(storeFloors):
+                for _ in range(i.spaces):
+                    id_category = id_unreachable_category if i.floors - 1 < floor else id_empty_category 
+
+                    spacesInfo.append({
+                        "category": id_category,
+                        "mongo_id": name + "_" + str(mongo_id),
+                        "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                    })
+
+                    mongo_id += 1
+            
+            shelvesInfo.append({
+                "floors": i.floors,
+                "spaces": spacesInfo,
+                "double_shelf": i.double_shelf,
+                "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            })
+            
+        addStoreToMongo(shelvesInfo, name, image)
+        
+    @staticmethod
+    def createStore(storeName, parent, image = DEFAULT_IMAGE):
         posx = 25
         posy = 25
             
@@ -575,7 +644,7 @@ class Store():
                 posx = 25
                 posy += 170
 
-        STORES.append(Store(storeName, DEFAULT_IMAGE, posx, posy, parent))
+        STORES.append(Store(storeName, image, posx, posy, parent))
 
         SHELVES_FORMS.clear()
     
@@ -712,7 +781,7 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
-        self.categoryManager = SpaceCategory(0, 0, 0, self.widget, True)
+        self.categoryManager = SpaceCategory(0, 0, 0, 0, 0, self.widget, True)
 
     def initUI(self, parent):
         # Main buttons
@@ -854,10 +923,14 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def saveStoreInfo(self):
+        saveShelfInfo()
+
         storeName = self.storeNameInput.text().strip()
 
         if storeName == "":
             storeName = Language.get("store") + str(STORES.__len__() + 1)
+
+        Store.createMongoStore(storeName)
 
         Shelf.hideAllForms()
         Store.createStore(storeName, self.widget)
@@ -929,14 +1002,81 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.editCategories.raise_()
 
+def getMongoInfo():
+    storeIndex = 0
+    mongoCategories = 0
+
+    for category in CATEGORIES_COLLECTION.find({}):
+        Category.addCategory(category['name'], category['color'])
+
+        createCategoryIn(window.categoryManager, category['name'], window.widget, True)
+        mongoCategories += 1
+
+    if mongoCategories <= 0:
+        message = QMessageBox()
+        message.setText("You don't have any category in the database.\nYou'll use the default categories.")
+        message.setIcon(QMessageBox.Warning)
+        message.setStandardButtons(QMessageBox.Ok)
+        message.exec_()
+
+        Category.addCategory('Empty', 'white')
+        Category.addCategory('Unreachable', 'red')
+        Category.addCategory('Fill', 'green')
+
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+
+        updateButtonsPosition(window.categoryManager, True)
+        
+    setEmptyCategory(window.categoryManager)
+
+    for store in STORES_COLLECTION.find({}):
+        spacesInfo = []
+
+        for index, shelf_id in enumerate(store['storeShelves']):
+            shelf = SHELVES_COLLECTION.find_one({ "_id": shelf_id })
+            mongoSpaces = SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
+            
+            Shelf.createShelf(window.widget)
+
+            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__() / store['storeFloors'])
+            SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
+            SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
+            SHELVES_FORMS[index].hideForm()
+
+            spacesInfo.append(mongoSpaces)
+        
+        saveShelfInfo()
+        
+        Store.createStore(store['name'], window.widget, store['image'])
+
+        STORES[storeIndex].goBackStore.hide()
+
+        for shelfIndex in range(store['storeShelves'].__len__()):
+            for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
+                SHELVES[storeIndex][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
+
+                if mongoCategories > 0:
+                    category = CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
+                    SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
+                    SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
+                    SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+        
+        storeIndex =+ 1
+
 window = MainWindow()
 
 class main():
-    window.categoryManager.hideUI()
-    window.goHome.hide()
+    getMongoInfo()
+
+    window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+    window.reOpenHome()
     window.show()
 
     sys.exit(app.exec_())
+
+    closeMongoConnection()
 
 if __name__ == "__main__":
     main()

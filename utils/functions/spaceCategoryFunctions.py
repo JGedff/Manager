@@ -71,6 +71,15 @@ def deleteCategoryFrom(space, indexButtonPressed, categoryName, shortcut = False
         space.category.doubleButtons[indexButtonPressed].hide()
         space.category.doubleButtons.pop(indexButtonPressed)
 
+        if space.category.name == categoryName:
+            if indexButtonPressed > 0:
+                space.category.name = space.category.doubleButtons[indexButtonPressed - 1].button1.text()
+            else:
+                space.category.name = space.category.doubleButtons[indexButtonPressed].button1.text()
+            
+            space.category.color = Category.getColorByName(space.category.name)
+            #space.categorySelector.setCurrentText(space.category.name)
+
         # Moves the form to add a new category
         space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
     else:
@@ -97,8 +106,9 @@ def updateButtonsPosition(space, shortcut = False):
             posy += 50
 
 def setEmptyCategory(category):
-    category.name = CATEGORY_NAMES[0]
-    category.color = CATEGORY_COLORS[0]
+    if CATEGORY_NAMES.__len__() > 0:
+        category.name = CATEGORY_NAMES[0]
+        category.color = CATEGORY_COLORS[0]
 
 def setUnreachableCategory(category):
     category.name = CATEGORY_NAMES[1]
@@ -107,3 +117,9 @@ def setUnreachableCategory(category):
 def setCategoryByName(category, name):
     category.name = name
     category.color = Category.getColorByName(name)
+
+def getEmptyCategoryName():
+    return CATEGORY_NAMES[0]
+
+def getUnreachableCategoryName():
+    return CATEGORY_NAMES[1]
