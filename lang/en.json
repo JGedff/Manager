@@ -26,5 +26,10 @@
     "add_product": "+ Add product",
     "no_product": "Without product",
     "name": "Name",
-    "category_has_product": "Will this category have products?"
+    "category_has_product": "Will this category have products?",
+    "log_in": "Log in",
+    "register": "Register",
+    "user_name": "User name:",
+    "password": "Password:",
+    "access_offline": "Access offilne"
 }
