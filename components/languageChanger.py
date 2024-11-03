@@ -114,3 +114,6 @@ class LanguageChanger(QLabel):
 
     def setGeometry(self, x, y, width, height):
         self.changer.setGeometry(x, y, width, height)
+
+    def setCurrentText(self, item):
+        self.changer.setCurrentText(item)

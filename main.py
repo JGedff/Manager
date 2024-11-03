@@ -194,14 +194,16 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-            Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
+            if window.userRole == 'Admin':
+                Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
 
             self.nameModifiedCategory = newName
 
         if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
 
-            Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
+            if window.userRole == 'Admin':
+                Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
         index = Category.getIndexByName(self.nameModifiedCategory)
@@ -295,7 +297,9 @@ class SpaceCategory(QLabel):
 
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
-        Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+
+        if window.userRole == 'Admin':
+            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
 
@@ -322,7 +326,9 @@ class SpaceCategory(QLabel):
 
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
-        Mongo.delMongoCategory(categoryName)
+
+        if window.userRole == 'Admin':
+            Mongo.delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
         updateButtonsPosition(window.categoryManager, True)
@@ -336,7 +342,7 @@ class SpaceCategory(QLabel):
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 
-                        if categoryName == oldName:
+                        if categoryName == oldName and window.userRole == 'Admin':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
 
         if self.doubleButtons.__len__() <= 1:
@@ -390,7 +396,11 @@ class Space(QLabel):
                 self.categorySelector.addItem(category.capitalize())
 
         self.editCategories = QPushButton("⚙️", parent)
-        self.editCategories.setGeometry(320, 26, 26, 26)
+
+        if window.userRole == 'Offline' or window.userRole == 'Admin':
+            self.editCategories.setGeometry(320, 26, 26, 26)
+        else:
+            self.editCategories.setGeometry(0, 0, 0, 0)
 
         self.updateSpaceColor()
 
@@ -456,7 +466,8 @@ class Space(QLabel):
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
 
-        Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
+        if window.userRole == 'Admin':
+            Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -773,6 +784,8 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def initVariables(self):
+        self.userRole = 'Guest'
+
         # Window config
         self.setWindowTitle(Language.get("window_title"))
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -792,10 +805,14 @@ class MainWindow(QMainWindow):
         self.goHome.hide()
 
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
-        self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
-
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
-        self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+        
+        if self.userRole == 'Offline' or self.userRole == 'Admin':
+            self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
+            self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+        else:
+            self.addStoreButton.setGeometry(0, 0, 0, 0)
+            self.editCategories.setGeometry(0, 0, 0, 0)
 
         # Header Form
         self.headerFormBackground = QLabel("", parent)
@@ -932,7 +949,8 @@ class MainWindow(QMainWindow):
         if storeName == "":
             storeName = Language.get("store") + str(STORES.__len__() + 1)
 
-        Store.createMongoStore(storeName)
+        if window.userRole == 'Admin':
+            Store.createMongoStore(storeName)
 
         Shelf.hideAllForms()
         Store.createStore(storeName, self.widget)
@@ -1004,6 +1022,24 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.editCategories.raise_()
 
+    def changeUserRole(self, role):
+        self.userRole = role
+
+        if self.userRole == 'Offline' or self.userRole == 'Admin':
+            self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
+            self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+        else:
+            self.addStoreButton.setGeometry(0, 0, 0, 0)
+            self.editCategories.setGeometry(0, 0, 0, 0)
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    if window.userRole == 'Offline' or window.userRole == 'Admin':
+                        space.editCategories.setGeometry(320, 26, 26, 26)
+                    else:
+                        space.editCategories.setGeometry(0, 0, 0, 0)
+
 class LogInWindow(QMainWindow):
     def __init__(self, mainApp):
         super().__init__()
@@ -1062,7 +1098,7 @@ class LogInWindow(QMainWindow):
         if authenticated == 'NoInternet':
             self.accessOffline()
         elif authenticated != None:
-            self.loggedSuccessful()
+            self.loggedSuccessful(self.userQLineEdit.text())
         else:
             self.loggedUnsuccessful()
         
@@ -1072,7 +1108,7 @@ class LogInWindow(QMainWindow):
         if registred == 'NoInternet':
             self.accessOffline()
         elif registred != None:
-            self.loggedSuccessful()
+            self.loggedSuccessful(self.userQLineEdit.text())
         else:
             QMessageBox.warning(self, "Error: Duplicated", "The user already exists")
             self.loggedUnsuccessful()
@@ -1081,20 +1117,31 @@ class LogInWindow(QMainWindow):
         QMessageBox.warning(self, "Login Failed", "Incorrect username or password.")
 
     def accessOffline(self):
-        QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
+        if UserManager.username != 'Guest' or UserManager.username != 'Offline':
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
 
         self.close()
 
+        window.changeUserRole('Offline')
         window.languageChanger.changeLang(self.languageChanger.language)
-        window.languageChanger.setText(self.languageChanger.language)
+        window.languageChanger.setCurrentText(self.languageChanger.language)
         window.languageChanger.update()
 
         window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
         window.reOpenHome()
         window.show()
         
-    def loggedSuccessful(self):
-        QMessageBox.information(self, "Login successful", "Login successful")
+    def loggedSuccessful(self, username):
+        [_, role] = UserManager.findUser(username)
+        UserManager.setUser(username, role)
+
+        window.changeUserRole(role)
+
+        if UserManager.username == 'Guest' and UserManager.username == 'Offline':
+            QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
+        else:
+            QMessageBox.information(self, "Login successful", "Login successful")
 
         self.close()
 

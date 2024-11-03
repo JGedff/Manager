@@ -163,6 +163,9 @@ class UserManager:
 
     USERS_COLLECTION = DB['users']
 
+    username = ''
+    role = ''
+
     @classmethod
     def register(cls, username, password):
         try:
@@ -204,3 +207,23 @@ class UserManager:
             QMessageBox.warning(cls, "The user was deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(cls, "There was an issue deleting the user", f"Write error: {e.details}")
+
+    @classmethod
+    def findUser(cls, username):
+        try:
+            user = cls.USERS_COLLECTION.find_one({ "username": username })
+
+            return [user['username'], user['role']]
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            return ['Guest', 'Offline']
+        except InvalidDocument:
+            return ['Guest', 'Offline']
+        
+    @classmethod
+    def setUser(cls, username, role):
+        cls.username = username
+        cls.role = role
+
+    @classmethod
+    def getUserRole(cls):
+        return cls.role
