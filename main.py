@@ -5,6 +5,8 @@ from datetime import datetime
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
+from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
@@ -1053,6 +1055,7 @@ class LogInWindow(QMainWindow):
 
     def initVariables(self, mainApp):
         self.logged = ""
+        self.logIn = True
         self.mainApp = mainApp
 
         self.setWindowTitle(Language.get("log_in"))
@@ -1065,33 +1068,94 @@ class LogInWindow(QMainWindow):
     
     def initUI(self, parent):
         self.languageChanger = LanguageChanger(self, parent)
-        self.languageChanger.setGeometry(275, 15, 100, 30)
+        self.languageChanger.setGeometry(265, 15, 100, 30)
+
+        self.logInTitle = QLabel(Language.get("log_in"), parent)
+        self.logInTitle.setGeometry(85, 55, 225, 50)
+        
+        self.registerTitle = QLabel(Language.get("register"), parent)
+        self.registerTitle.setGeometry(85, 55, 225, 50)
+        self.registerTitle.hide()
 
         self.userLabel = QLabel(Language.get("user_name"), parent)
-        self.userLabel.setGeometry(26, 75, 100, 25)
+        self.userLabel.setGeometry(15, 120, 200, 25)
 
         self.passwordLabel = QLabel(Language.get("password"), parent)
-        self.passwordLabel.setGeometry(26, 125, 100, 25)
+        self.passwordLabel.setGeometry(15, 220, 200, 25)
+
+        self.repeatPasswordLabel = QLabel(Language.get("repeat_password"), parent)
+        self.repeatPasswordLabel.setGeometry(15, 325, 340, 25)
+        self.repeatPasswordLabel.hide()
         
         self.userQLineEdit = QLineEdit(parent)
-        self.userQLineEdit.setGeometry(100, 75, 135, 25)
+        self.userQLineEdit.setGeometry(15, 150, 355, 50)
+        self.userQLineEdit.setPlaceholderText(Language.get("enter_user_name"))
 
         self.passwordQLineEdit = QLineEdit(parent)
-        self.passwordQLineEdit.setGeometry(100, 125, 135, 25)
+        self.passwordQLineEdit.setGeometry(15, 250, 355, 50)
         self.passwordQLineEdit.setEchoMode(QLineEdit.Password)
+        self.passwordQLineEdit.setPlaceholderText(Language.get("enter_password"))
+
+        self.repeatPasswordQLineEdit = QLineEdit(parent)
+        self.repeatPasswordQLineEdit.setGeometry(15, 355, 355, 50)
+        self.repeatPasswordQLineEdit.setEchoMode(QLineEdit.Password)
+        self.repeatPasswordQLineEdit.setPlaceholderText(Language.get("enter_password"))
+        self.repeatPasswordQLineEdit.hide()
 
         self.logInButton = QPushButton(Language.get("log_in"), parent)
-        self.logInButton.setGeometry(25, 175, 350, 25)
+        self.logInButton.setGeometry(15, 490, 355, 50)
 
         self.registerButton = QPushButton(Language.get("register"), parent)
-        self.registerButton.setGeometry(25, 225, 350, 25)
+        self.registerButton.setGeometry(270, 555, 100, 30)
 
         self.accessOfflineButton = QPushButton(Language.get("access_offline"), parent)
-        self.accessOfflineButton.setGeometry(25, 275, 350, 25)
+        self.accessOfflineButton.setGeometry(15, 555, 150, 30)
+
+        titleFont = QFont()
+        titleFont.setPointSize(24)
+
+        bigTextFont = QFont()
+        bigTextFont.setPointSize(16)
+
+        textFont = QFont()
+        textFont.setPointSize(14)
+
+        smallTextFont = QFont()
+        smallTextFont.setPointSize(12)
+        
+        self.logInTitle.setFont(titleFont)
+        self.logInTitle.setStyleSheet("font-weight: bold")
+        self.logInTitle.setAlignment(Qt.AlignCenter)
+
+        self.registerTitle.setFont(titleFont)
+        self.registerTitle.setStyleSheet("font-weight: bold")
+        self.registerTitle.setAlignment(Qt.AlignCenter)
+
+        self.logInButton.setFont(bigTextFont)
+        self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+
+        self.userLabel.setFont(textFont)
+        self.passwordLabel.setFont(textFont)
+        self.repeatPasswordLabel.setFont(textFont)
+
+        self.registerButton.setFont(smallTextFont)
+        self.registerButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
+
+        self.accessOfflineButton.setFont(smallTextFont)
+        self.accessOfflineButton.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
+
+        self.userQLineEdit.setFont(smallTextFont)
+        self.userQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
+
+        self.passwordQLineEdit.setFont(smallTextFont)
+        self.passwordQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
+
+        self.repeatPasswordQLineEdit.setFont(smallTextFont)
+        self.repeatPasswordQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
 
     def initEvents(self):
         self.logInButton.clicked.connect(self.checkLogging)
-        self.registerButton.clicked.connect(self.register)
+        self.registerButton.clicked.connect(self.changeToRegisterForm)
         self.accessOfflineButton.clicked.connect(self.openOfflineVersion)
 
     def checkLogging(self):
@@ -1103,16 +1167,55 @@ class LogInWindow(QMainWindow):
             self.loggedSuccessful(self.userQLineEdit.text())
         else:
             self.loggedUnsuccessful()
+
+    def changeToRegisterForm(self):
+        self.logIn = not self.logIn
+
+        self.logInButton.clicked.disconnect()
+
+        if self.logIn:
+            self.registerTitle.hide()
+            self.repeatPasswordLabel.hide()
+            self.repeatPasswordQLineEdit.hide()
+
+            self.logInTitle.show()
+
+            self.logInButton.clicked.connect(self.checkLogging)
+
+            self.logInButton.setText(Language.get("log_in"))
+            self.registerButton.setText(Language.get("register"))
+
+            self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+            self.registerButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
+        else:
+            self.logInTitle.hide()
+
+            self.registerTitle.show()
+            self.repeatPasswordLabel.show()
+            self.repeatPasswordQLineEdit.show()
+
+            self.logInButton.clicked.connect(self.register)
+
+            self.logInButton.setText(Language.get("register"))
+            self.registerButton.setText(Language.get("log_in"))
+
+            self.registerButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+            self.logInButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
         
     def register(self):
-        registred = UserManager.register(self.userQLineEdit.text(), self.passwordQLineEdit.text())
+        if self.passwordQLineEdit.text().__len__() < 8 or self.repeatPasswordQLineEdit.text().strip().__len__() < 8:
+            QMessageBox.warning(None, "Weak password", "The passwords must be 8 digits long")
+        elif self.passwordQLineEdit.text() != self.repeatPasswordQLineEdit.text():
+            QMessageBox.warning(None, "Diferent passwords", "The passwords must be the same")
+        else:
+            registred = UserManager.register(self.userQLineEdit.text(), self.passwordQLineEdit.text())
 
-        if registred == 'NoInternet':
-            self.accessOffline()
-        elif registred == 'Duplicated':
-            QMessageBox.warning(None, "Error: Duplicated", "The user already exists")
-        elif registred != None:
-            self.loggedSuccessful(self.userQLineEdit.text())
+            if registred == 'NoInternet':
+                self.accessOffline()
+            elif registred == 'Duplicated':
+                QMessageBox.warning(None, "Error: Duplicated", "The user already exists")
+            elif registred != None:
+                self.loggedSuccessful(self.userQLineEdit.text())
     
     def loggedUnsuccessful(self):
         QMessageBox.warning(None, "Login Failed", "Incorrect username or password.")

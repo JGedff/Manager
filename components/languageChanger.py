@@ -106,11 +106,23 @@ class LanguageChanger(QLabel):
             
             self.WINDOW.reOpenHome()
         except:
+            self.WINDOW.setWindowTitle(Language.get("log_in"))
+            self.WINDOW.logInTitle.setText(Language.get("log_in"))
             self.WINDOW.userLabel.setText(Language.get("user_name"))
             self.WINDOW.passwordLabel.setText(Language.get("password"))
-            self.WINDOW.logInButton.setText(Language.get("log_in"))
-            self.WINDOW.registerButton.setText(Language.get("register"))
+            self.WINDOW.registerTitle.setText(Language.get("register"))
             self.WINDOW.accessOfflineButton.setText(Language.get("access_offline"))
+            self.WINDOW.repeatPasswordLabel.setText(Language.get("repeat_password"))
+            self.WINDOW.userQLineEdit.setPlaceholderText(Language.get("enter_user_name"))
+            self.WINDOW.passwordQLineEdit.setPlaceholderText(Language.get("enter_password"))
+            self.WINDOW.repeatPasswordQLineEdit.setPlaceholderText(Language.get("enter_password"))
+
+            if self.WINDOW.logIn:
+                self.WINDOW.logInButton.setText(Language.get("log_in"))
+                self.WINDOW.registerButton.setText(Language.get("register"))
+            else:
+                self.WINDOW.logInButton.setText(Language.get("register"))
+                self.WINDOW.registerButton.setText(Language.get("log_in"))
     
     def hide(self):
         self.changer.hide()

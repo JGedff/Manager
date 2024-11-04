@@ -27,13 +27,13 @@
     "no_product": "Sin producto",
     "name": "Nombre",
     "category_has_product": "¿Esta categoría tendrá productos?",
-    "log_in": "Inicio de sesión",
+    "log_in": "Iniciar sesión",
     "register": "Registrarse",
-    "user_name": "Nombre de usuario:",
+    "user_name": "🤖Nombre de usuario:",
     "password": "🔒Contraseña:",
     "enter_user_name": "Escribe tu nombre de usuario:",
     "enter_password": "Escribe tu contraseña:",
-    "repeat_password": "Vuelve a escribir tu contraseña:",
-    "access_offline": "Acceder sin conexión",
+    "repeat_password": "🔐Vuelve a escribir tu contraseña:",
+    "access_offline": "Sin conexión",
     "forgot_password": "¿Olvidaste tu contraseña?"
 }

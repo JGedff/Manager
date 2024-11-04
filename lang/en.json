@@ -29,11 +29,11 @@
     "category_has_product": "Will this category have products?",
     "log_in": "Log in",
     "register": "Register",
-    "user_name": "User name:",
+    "user_name": "🤖User name:",
     "password": "🔒Password:",
     "enter_user_name": "Enter your user name",
     "enter_password": "Enter your password",
-    "repeat_password": "Rewrite your password",
-    "access_offline": "Access offilne",
+    "repeat_password": "🔐Rewrite your password:",
+    "access_offline": "Offilne",
     "forgot_password": "Forgot your password?"
 }

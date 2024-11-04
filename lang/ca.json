@@ -27,13 +27,13 @@
     "no_product": "Sense producte",
     "name": "Nom",
     "category_has_product": "Aquesta categoría tindrà productes?",
-    "log_in": "Inici de sessió",
+    "log_in": "Iniciar sessió",
     "register": "Registrarse",
-    "user_name": "Nom d'usuari:",
+    "user_name": "🤖Nom d'usuari:",
     "password": "🔒Contrasenya:",
     "enter_user_name": "Escriu el teu nom d'usuari",
     "enter_password": "Escriu la teva contrasenya",
-    "repeat_password": "Torna a escriure la teva contrasenya",
-    "access_offline": "Accedir sense connexió",
+    "repeat_password": "🔐Torna a escriure la teva contrasenya:",
+    "access_offline": "Sense connexió",
     "forgot_password": "Has oblidat la teva contrasenya?"
 }
