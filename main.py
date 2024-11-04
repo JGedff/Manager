@@ -12,7 +12,8 @@ from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
-from utils.mongoDb import Mongo, UserManager
+from utils.mongoDb import Mongo
+from utils.userManager import UserManager
 
 from utils.language import Language
 from utils.category import Category
@@ -1073,10 +1074,11 @@ class LogInWindow(QMainWindow):
         self.passwordLabel.setGeometry(26, 125, 100, 25)
         
         self.userQLineEdit = QLineEdit(parent)
-        self.userQLineEdit.setGeometry(130, 75, 100, 25)
+        self.userQLineEdit.setGeometry(100, 75, 135, 25)
 
         self.passwordQLineEdit = QLineEdit(parent)
-        self.passwordQLineEdit.setGeometry(130, 125, 100, 25)
+        self.passwordQLineEdit.setGeometry(100, 125, 135, 25)
+        self.passwordQLineEdit.setEchoMode(QLineEdit.Password)
 
         self.logInButton = QPushButton(Language.get("log_in"), parent)
         self.logInButton.setGeometry(25, 175, 210, 25)
@@ -1107,14 +1109,13 @@ class LogInWindow(QMainWindow):
 
         if registred == 'NoInternet':
             self.accessOffline()
+        elif registred == 'Duplicated':
+            QMessageBox.warning(None, "Error: Duplicated", "The user already exists")
         elif registred != None:
             self.loggedSuccessful(self.userQLineEdit.text())
-        else:
-            QMessageBox.warning(self, "Error: Duplicated", "The user already exists")
-            self.loggedUnsuccessful()
     
     def loggedUnsuccessful(self):
-        QMessageBox.warning(self, "Login Failed", "Incorrect username or password.")
+        QMessageBox.warning(None, "Login Failed", "Incorrect username or password.")
 
     def accessOffline(self):
         if UserManager.username != 'Guest' or UserManager.username != 'Offline':
@@ -1139,9 +1140,9 @@ class LogInWindow(QMainWindow):
         window.changeUserRole(role)
 
         if UserManager.username == 'Guest' and UserManager.username == 'Offline':
-            QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
+            QMessageBox.information(None, "You don't have internet connection", "There was an issue with the network")
         else:
-            QMessageBox.information(self, "Login successful", "Login successful")
+            QMessageBox.information(None, "Login successful", "Login successful")
 
         self.close()
 
@@ -1226,7 +1227,7 @@ def getMongoInfo():
             
             storeIndex =+ 1
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-        QMessageBox.warning(window, "Network error", "There was an issue with the network")
+        QMessageBox.warning(None, "Network error", "There was an issue with the network")
 
 window = MainWindow()
 
