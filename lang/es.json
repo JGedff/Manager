@@ -30,6 +30,10 @@
     "log_in": "Inicio de sesión",
     "register": "Registrarse",
     "user_name": "Nombre de usuario:",
-    "password": "Contraseña:",
-    "access_offline": "Acceder sin conexión"
+    "password": "🔒Contraseña:",
+    "enter_user_name": "Escribe tu nombre de usuario:",
+    "enter_password": "Escribe tu contraseña:",
+    "repeat_password": "Vuelve a escribir tu contraseña:",
+    "access_offline": "Acceder sin conexión",
+    "forgot_password": "¿Olvidaste tu contraseña?"
 }

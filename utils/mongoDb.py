@@ -5,6 +5,8 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Opera
 
 from PyQt5.QtWidgets import QMessageBox
 
+from utils.userManager import UserManager
+
 class Mongo:
     MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 
@@ -34,6 +36,7 @@ class Mongo:
             try:
                 cls.SPACES_COLLECTION.insert_many(shelves['spaces'])
             except (ConnectionFailure, ServerSelectionTimeoutError):
+                UserManager.setUser('Guest', 'Offline')
                 QMessageBox.warning(None, "The spaces were not created", "There was an issue with the network")
                 break
 
@@ -44,6 +47,7 @@ class Mongo:
         try:
             cls.SHELVES_COLLECTION.insert_many(arrayToInsert)
         except (ConnectionFailure, ServerSelectionTimeoutError):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The shelves were not created", "There was an issue with the network")
 
     @classmethod
@@ -56,6 +60,7 @@ class Mongo:
             for doc in lastSpaces:
                 spacesId.append(doc['_id'])
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "Spaces not found", "There was an issue with the network")
 
         return spacesId
@@ -70,6 +75,7 @@ class Mongo:
             for doc in lastShelves:
                 shelvesId.insert(0, doc['_id'])
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "Shelves not found", "There was an issue with the network")
 
         return shelvesId
@@ -89,6 +95,7 @@ class Mongo:
         try:
             cls.STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves, "storeFloors": maxFloor })
         except (ConnectionFailure, ServerSelectionTimeoutError):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The store was not created", "There was an issue with the network")
 
     @classmethod
@@ -102,6 +109,7 @@ class Mongo:
 
                 return file['_id']
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "Category not found", "There was an issue with the network")
 
             return name
@@ -114,6 +122,7 @@ class Mongo:
             try:
                 cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
             except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+                UserManager.setUser('Guest', 'Offline')
                 QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
             except (OperationFailure, WriteError) as e:
                 QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
@@ -123,6 +132,7 @@ class Mongo:
         try:
             cls.CATEGORIES_COLLECTION.update_one({ "name": oldName }, { "$set": { "name": newName } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
         except (OperationFailure, WriteError) as e:
             QMessageBox.warning(None, "The category was not updated", f"Operation failed: {e.details}")
@@ -132,6 +142,7 @@ class Mongo:
         try:
             cls.CATEGORIES_COLLECTION.update_one({ "name": name }, { "$set": { "color": color } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
         except (OperationFailure, WriteError) as e:
             QMessageBox.warning(None, "The category was not updated", f"Operation failed: {e.details}")
@@ -141,6 +152,7 @@ class Mongo:
         try:
             cls.CATEGORIES_COLLECTION.delete_one({ "name": name })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The user was deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
@@ -154,4 +166,5 @@ class Mongo:
                 "color": color
             })
         except (ConnectionFailure, ServerSelectionTimeoutError):
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not created", "There was an issue with the network")

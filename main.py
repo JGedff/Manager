@@ -1056,16 +1056,16 @@ class LogInWindow(QMainWindow):
         self.mainApp = mainApp
 
         self.setWindowTitle(Language.get("log_in"))
-        self.setFixedSize(265, 330)
+        self.setFixedSize(395, 605)
 
         self.scroll = QScrollArea()
         self.widget = QWidget()
-        self.widget.resize(265 - 5, 330 - 5)
+        self.widget.resize(390, 600)
         self.scroll.setWidget(self.widget)
     
     def initUI(self, parent):
         self.languageChanger = LanguageChanger(self, parent)
-        self.languageChanger.setGeometry(25, 25, 210, 25)
+        self.languageChanger.setGeometry(275, 15, 100, 30)
 
         self.userLabel = QLabel(Language.get("user_name"), parent)
         self.userLabel.setGeometry(26, 75, 100, 25)
@@ -1081,18 +1081,18 @@ class LogInWindow(QMainWindow):
         self.passwordQLineEdit.setEchoMode(QLineEdit.Password)
 
         self.logInButton = QPushButton(Language.get("log_in"), parent)
-        self.logInButton.setGeometry(25, 175, 210, 25)
+        self.logInButton.setGeometry(25, 175, 350, 25)
 
         self.registerButton = QPushButton(Language.get("register"), parent)
-        self.registerButton.setGeometry(25, 225, 210, 25)
+        self.registerButton.setGeometry(25, 225, 350, 25)
 
         self.accessOfflineButton = QPushButton(Language.get("access_offline"), parent)
-        self.accessOfflineButton.setGeometry(25, 275, 210, 25)
+        self.accessOfflineButton.setGeometry(25, 275, 350, 25)
 
     def initEvents(self):
         self.logInButton.clicked.connect(self.checkLogging)
         self.registerButton.clicked.connect(self.register)
-        self.accessOfflineButton.clicked.connect(self.accessOffline)
+        self.accessOfflineButton.clicked.connect(self.openOfflineVersion)
 
     def checkLogging(self):
         authenticated = UserManager.authenticate(self.userQLineEdit.text(), self.passwordQLineEdit.text())
@@ -1117,10 +1117,16 @@ class LogInWindow(QMainWindow):
     def loggedUnsuccessful(self):
         QMessageBox.warning(None, "Login Failed", "Incorrect username or password.")
 
+    def openOfflineVersion(self):
+        UserManager.setUser('Guest', 'Offline')
+        self.accessOffline()
+
     def accessOffline(self):
-        if UserManager.username != 'Guest' or UserManager.username != 'Offline':
+        if UserManager.username != 'Guest' and UserManager.role != 'Offline':
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
+        else:
+            QMessageBox.information(self, "Offline version", "You opened the offline version")
 
         self.close()
 
@@ -1139,7 +1145,8 @@ class LogInWindow(QMainWindow):
 
         window.changeUserRole(role)
 
-        if UserManager.username == 'Guest' and UserManager.username == 'Offline':
+        if UserManager.username == 'Guest' and UserManager.role == 'Offline':
+            UserManager.setUser('Guest', 'Offline')
             QMessageBox.information(None, "You don't have internet connection", "There was an issue with the network")
         else:
             QMessageBox.information(None, "Login successful", "Login successful")
@@ -1165,6 +1172,8 @@ def getMongoInfo():
             createCategoryIn(window.categoryManager, category['name'], window.widget, True)
             mongoCategories += 1
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+        UserManager.setUser('Guest', 'Offline')
+
         errorNetwork = QMessageBox()
         errorNetwork.setText("Categories not found\nThere was an issue with the network")
         errorNetwork.setIcon(QMessageBox.Warning)
@@ -1227,6 +1236,7 @@ def getMongoInfo():
             
             storeIndex =+ 1
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+        UserManager.setUser('Guest', 'Offline')
         QMessageBox.warning(None, "Network error", "There was an issue with the network")
 
 window = MainWindow()

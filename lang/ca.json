@@ -30,6 +30,10 @@
     "log_in": "Inici de sessió",
     "register": "Registrarse",
     "user_name": "Nom d'usuari:",
-    "password": "Contrasenya:",
-    "access_offline": "Accedir sense connexió"
+    "password": "🔒Contrasenya:",
+    "enter_user_name": "Escriu el teu nom d'usuari",
+    "enter_password": "Escriu la teva contrasenya",
+    "repeat_password": "Torna a escriure la teva contrasenya",
+    "access_offline": "Accedir sense connexió",
+    "forgot_password": "Has oblidat la teva contrasenya?"
 }

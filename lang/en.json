@@ -30,6 +30,10 @@
     "log_in": "Log in",
     "register": "Register",
     "user_name": "User name:",
-    "password": "Password:",
-    "access_offline": "Access offilne"
+    "password": "🔒Password:",
+    "enter_user_name": "Enter your user name",
+    "enter_password": "Enter your password",
+    "repeat_password": "Rewrite your password",
+    "access_offline": "Access offilne",
+    "forgot_password": "Forgot your password?"
 }

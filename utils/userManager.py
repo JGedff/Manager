@@ -2,7 +2,7 @@ from pymongo.errors import DuplicateKeyError, ConnectionFailure, ServerSelection
 
 from PyQt5.QtWidgets import QMessageBox
 
-from utils.mongoDb import MongoClient
+from pymongo import MongoClient
 from utils.encrypt import Encrypt
 
 class UserManager:
