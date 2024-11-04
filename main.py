@@ -2,6 +2,8 @@ import sys
 import time
 from datetime import datetime
 
+from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
@@ -11,6 +13,7 @@ from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
 from utils.mongoDb import Mongo
+from utils.userManager import UserManager
 
 from utils.language import Language
 from utils.category import Category
@@ -192,14 +195,16 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-            Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
+            if window.userRole == 'Admin':
+                Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
 
             self.nameModifiedCategory = newName
 
         if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
 
-            Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
+            if window.userRole == 'Admin':
+                Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
         index = Category.getIndexByName(self.nameModifiedCategory)
@@ -293,7 +298,9 @@ class SpaceCategory(QLabel):
 
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
-        Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+
+        if window.userRole == 'Admin':
+            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
 
@@ -320,7 +327,9 @@ class SpaceCategory(QLabel):
 
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
-        Mongo.delMongoCategory(categoryName)
+
+        if window.userRole == 'Admin':
+            Mongo.delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
         updateButtonsPosition(window.categoryManager, True)
@@ -334,7 +343,7 @@ class SpaceCategory(QLabel):
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 
-                        if categoryName == oldName:
+                        if categoryName == oldName and window.userRole == 'Admin':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
 
         if self.doubleButtons.__len__() <= 1:
@@ -388,7 +397,11 @@ class Space(QLabel):
                 self.categorySelector.addItem(category.capitalize())
 
         self.editCategories = QPushButton("⚙️", parent)
-        self.editCategories.setGeometry(320, 26, 26, 26)
+
+        if window.userRole == 'Offline' or window.userRole == 'Admin':
+            self.editCategories.setGeometry(320, 26, 26, 26)
+        else:
+            self.editCategories.setGeometry(0, 0, 0, 0)
 
         self.updateSpaceColor()
 
@@ -454,7 +467,8 @@ class Space(QLabel):
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
 
-        Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
+        if window.userRole == 'Admin':
+            Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -771,6 +785,8 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def initVariables(self):
+        self.userRole = 'Guest'
+
         # Window config
         self.setWindowTitle(Language.get("window_title"))
         self.setFixedSize(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -785,17 +801,19 @@ class MainWindow(QMainWindow):
 
     def initUI(self, parent):
         # Main buttons
-        self.languageChanger = LanguageChanger(self, parent)
-
         self.goHome = QPushButton(Language.get("go_back"), parent)
         self.goHome.setGeometry(1300, 10, 100, 50)
         self.goHome.hide()
 
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
-        self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
-
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
-        self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+        
+        if self.userRole == 'Offline' or self.userRole == 'Admin':
+            self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
+            self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+        else:
+            self.addStoreButton.setGeometry(0, 0, 0, 0)
+            self.editCategories.setGeometry(0, 0, 0, 0)
 
         # Header Form
         self.headerFormBackground = QLabel("", parent)
@@ -825,6 +843,8 @@ class MainWindow(QMainWindow):
         self.createStoreButton = QPushButton(Language.get("create_store"), parent)
         self.createStoreButton.setGeometry(1000, WINDOW_HEIGHT - 62, 100, 50)
         self.createStoreButton.hide()
+
+        self.languageChanger = LanguageChanger(self, parent)
 
         Store.showAllStoreIcons()
 
@@ -930,7 +950,8 @@ class MainWindow(QMainWindow):
         if storeName == "":
             storeName = Language.get("store") + str(STORES.__len__() + 1)
 
-        Store.createMongoStore(storeName)
+        if window.userRole == 'Admin':
+            Store.createMongoStore(storeName)
 
         Shelf.hideAllForms()
         Store.createStore(storeName, self.widget)
@@ -1002,15 +1023,155 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.editCategories.raise_()
 
+    def changeUserRole(self, role):
+        self.userRole = role
+
+        if self.userRole == 'Offline' or self.userRole == 'Admin':
+            self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
+            self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+        else:
+            self.addStoreButton.setGeometry(0, 0, 0, 0)
+            self.editCategories.setGeometry(0, 0, 0, 0)
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    if window.userRole == 'Offline' or window.userRole == 'Admin':
+                        space.editCategories.setGeometry(320, 26, 26, 26)
+                    else:
+                        space.editCategories.setGeometry(0, 0, 0, 0)
+
+class LogInWindow(QMainWindow):
+    def __init__(self, mainApp):
+        super().__init__()
+
+        self.initVariables(mainApp)
+        self.initUI(self.widget)
+        self.initEvents()
+
+        self.setCentralWidget(self.scroll)
+
+    def initVariables(self, mainApp):
+        self.logged = ""
+        self.mainApp = mainApp
+
+        self.setWindowTitle(Language.get("log_in"))
+        self.setFixedSize(265, 330)
+
+        self.scroll = QScrollArea()
+        self.widget = QWidget()
+        self.widget.resize(265 - 5, 330 - 5)
+        self.scroll.setWidget(self.widget)
+    
+    def initUI(self, parent):
+        self.languageChanger = LanguageChanger(self, parent)
+        self.languageChanger.setGeometry(25, 25, 210, 25)
+
+        self.userLabel = QLabel(Language.get("user_name"), parent)
+        self.userLabel.setGeometry(26, 75, 100, 25)
+
+        self.passwordLabel = QLabel(Language.get("password"), parent)
+        self.passwordLabel.setGeometry(26, 125, 100, 25)
+        
+        self.userQLineEdit = QLineEdit(parent)
+        self.userQLineEdit.setGeometry(100, 75, 135, 25)
+
+        self.passwordQLineEdit = QLineEdit(parent)
+        self.passwordQLineEdit.setGeometry(100, 125, 135, 25)
+        self.passwordQLineEdit.setEchoMode(QLineEdit.Password)
+
+        self.logInButton = QPushButton(Language.get("log_in"), parent)
+        self.logInButton.setGeometry(25, 175, 210, 25)
+
+        self.registerButton = QPushButton(Language.get("register"), parent)
+        self.registerButton.setGeometry(25, 225, 210, 25)
+
+        self.accessOfflineButton = QPushButton(Language.get("access_offline"), parent)
+        self.accessOfflineButton.setGeometry(25, 275, 210, 25)
+
+    def initEvents(self):
+        self.logInButton.clicked.connect(self.checkLogging)
+        self.registerButton.clicked.connect(self.register)
+        self.accessOfflineButton.clicked.connect(self.accessOffline)
+
+    def checkLogging(self):
+        authenticated = UserManager.authenticate(self.userQLineEdit.text(), self.passwordQLineEdit.text())
+
+        if authenticated == 'NoInternet':
+            self.accessOffline()
+        elif authenticated != None:
+            self.loggedSuccessful(self.userQLineEdit.text())
+        else:
+            self.loggedUnsuccessful()
+        
+    def register(self):
+        registred = UserManager.register(self.userQLineEdit.text(), self.passwordQLineEdit.text())
+
+        if registred == 'NoInternet':
+            self.accessOffline()
+        elif registred == 'Duplicated':
+            QMessageBox.warning(None, "Error: Duplicated", "The user already exists")
+        elif registred != None:
+            self.loggedSuccessful(self.userQLineEdit.text())
+    
+    def loggedUnsuccessful(self):
+        QMessageBox.warning(None, "Login Failed", "Incorrect username or password.")
+
+    def accessOffline(self):
+        if UserManager.username != 'Guest' or UserManager.username != 'Offline':
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
+
+        self.close()
+
+        window.changeUserRole('Offline')
+        window.languageChanger.changeLang(self.languageChanger.language)
+        window.languageChanger.setCurrentText(self.languageChanger.language)
+        window.languageChanger.update()
+
+        window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+        window.reOpenHome()
+        window.show()
+        
+    def loggedSuccessful(self, username):
+        [_, role] = UserManager.findUser(username)
+        UserManager.setUser(username, role)
+
+        window.changeUserRole(role)
+
+        if UserManager.username == 'Guest' and UserManager.username == 'Offline':
+            QMessageBox.information(None, "You don't have internet connection", "There was an issue with the network")
+        else:
+            QMessageBox.information(None, "Login successful", "Login successful")
+
+        self.close()
+
+        getMongoInfo()
+
+        window.languageChanger.update()
+        window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+        window.reOpenHome()
+        window.show()
+
+
 def getMongoInfo():
     storeIndex = 0
     mongoCategories = 0
 
-    for category in Mongo.CATEGORIES_COLLECTION.find({}):
-        Category.addCategory(category['name'], category['color'])
+    try:
+        for category in Mongo.CATEGORIES_COLLECTION.find({}):
+            Category.addCategory(category['name'], category['color'])
 
-        createCategoryIn(window.categoryManager, category['name'], window.widget, True)
-        mongoCategories += 1
+            createCategoryIn(window.categoryManager, category['name'], window.widget, True)
+            mongoCategories += 1
+    except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+        errorNetwork = QMessageBox()
+        errorNetwork.setText("Categories not found\nThere was an issue with the network")
+        errorNetwork.setIcon(QMessageBox.Warning)
+        errorNetwork.setStandardButtons(QMessageBox.Ok)
+        errorNetwork.exec_()
+
+        mongoCategories = 0
 
     if mongoCategories <= 0:
         message = QMessageBox()
@@ -1031,49 +1192,49 @@ def getMongoInfo():
         
     setEmptyCategory(window.categoryManager)
 
-    for store in Mongo.STORES_COLLECTION.find({}):
-        spacesInfo = []
+    try:
+        for store in Mongo.STORES_COLLECTION.find({}):
+            spacesInfo = []
 
-        for index, shelf_id in enumerate(store['storeShelves']):
-            shelf = Mongo.SHELVES_COLLECTION.find_one({ "_id": shelf_id })
-            mongoSpaces = Mongo.SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
+            for index, shelf_id in enumerate(store['storeShelves']):
+                shelf = Mongo.SHELVES_COLLECTION.find_one({ "_id": shelf_id })
+                mongoSpaces = Mongo.SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
+                
+                Shelf.createShelf(window.widget)
+
+                SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__() / store['storeFloors'])
+                SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
+                SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
+                SHELVES_FORMS[index].hideForm()
+
+                spacesInfo.append(mongoSpaces)
             
-            Shelf.createShelf(window.widget)
+            saveShelfInfo()
+            
+            Store.createStore(store['name'], window.widget, store['image'])
 
-            SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__() / store['storeFloors'])
-            SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
-            SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
-            SHELVES_FORMS[index].hideForm()
+            STORES[storeIndex].goBackStore.hide()
 
-            spacesInfo.append(mongoSpaces)
-        
-        saveShelfInfo()
-        
-        Store.createStore(store['name'], window.widget, store['image'])
+            for shelfIndex in range(store['storeShelves'].__len__()):
+                for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
+                    SHELVES[storeIndex][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
 
-        STORES[storeIndex].goBackStore.hide()
-
-        for shelfIndex in range(store['storeShelves'].__len__()):
-            for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
-                SHELVES[storeIndex][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
-
-                if mongoCategories > 0:
-                    category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
-                    SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
-                    SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
-                    SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
-        
-        storeIndex =+ 1
+                    if mongoCategories > 0:
+                        category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
+                        SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
+                        SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
+                        SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+            
+            storeIndex =+ 1
+    except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+        QMessageBox.warning(None, "Network error", "There was an issue with the network")
 
 window = MainWindow()
 
 class main():
-    getMongoInfo()
-
-    window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
-    window.reOpenHome()
-    window.show()
-
+    logInWindow = LogInWindow(window)
+    logInWindow.show()
+    
     sys.exit(app.exec_())
 
     Mongo.closeMongoConnection()

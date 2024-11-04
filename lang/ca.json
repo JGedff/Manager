@@ -26,5 +26,10 @@
     "add_product": "+ Afegir producte",
     "no_product": "Sense producte",
     "name": "Nom",
-    "category_has_product": "Aquesta categoría tindrà productes?"
+    "category_has_product": "Aquesta categoría tindrà productes?",
+    "log_in": "Inici de sessió",
+    "register": "Registrarse",
+    "user_name": "Nom d'usuari:",
+    "password": "Contrasenya:",
+    "access_offline": "Accedir sense connexió"
 }
