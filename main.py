@@ -5,10 +5,9 @@ from datetime import datetime
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
-from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -804,19 +803,12 @@ class MainWindow(QMainWindow):
     def initUI(self, parent):
         # Main buttons
         self.goHome = QPushButton(Language.get("go_back"), parent)
-        self.goHome.setGeometry(1300, 10, 100, 50)
+        self.goHome.setGeometry(1260, 10, 140, 50)
         self.goHome.hide()
 
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
         
-        if self.userRole == 'Offline' or self.userRole == 'Admin':
-            self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
-            self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
-        else:
-            self.addStoreButton.setGeometry(0, 0, 0, 0)
-            self.editCategories.setGeometry(0, 0, 0, 0)
-
         # Header Form
         self.headerFormBackground = QLabel("", parent)
         self.headerFormBackground.setGeometry(0, 0, WINDOW_WIDTH, 75)
@@ -847,6 +839,16 @@ class MainWindow(QMainWindow):
         self.createStoreButton.hide()
 
         self.languageChanger = LanguageChanger(self, parent)
+        self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
+
+        self.addStoreButton.setFont(FONT_TEXT)
+
+        self.goHome.setFont(FONT_SMALL_TEXT)
+        self.editCategories.setFont(FONT_SMALL_TEXT)
+
+        self.goHome.setStyleSheet("background-color: white; border: 1px solid #CACACA")
+        self.addStoreButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
+        self.editCategories.setStyleSheet("background-color: #FFE397; border: 1px solid #CDB87D")
 
         Store.showAllStoreIcons()
 
@@ -865,7 +867,7 @@ class MainWindow(QMainWindow):
     # Scroll functions
     def updateVerticalHeaderPosition(self, value):
         self.goHome.move(self.goHome.pos().x(), value + 10)
-        self.editCategories.move(self.editCategories.pos().x(), value + 610)
+        self.editCategories.move(self.editCategories.pos().x(), value + (WINDOW_HEIGHT - 115))
         self.storeNameInput.move(self.storeNameInput.pos().x(), value + 20)
         self.storeNameLabel.move(self.storeNameLabel.pos().x(), value + 20)
         self.headerFormBackground.move(self.headerFormBackground.pos().x(), value)
@@ -905,7 +907,7 @@ class MainWindow(QMainWindow):
             self.widget.resize(width + 125, self.widget.height())
 
     def resizeMain(self):
-        if STORES.__len__() < 26:
+        if STORES.__len__() < 25:
             self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         else:
             self.widget.resize(WINDOW_WIDTH - 20, STORES[STORES.__len__() - 1].storeIcon.pos().y() + 290)
@@ -949,20 +951,23 @@ class MainWindow(QMainWindow):
 
         storeName = self.storeNameInput.text().strip()
 
-        if storeName == "":
-            storeName = Language.get("store") + str(STORES.__len__() + 1)
+        if storeName.__len__() <= 15 and storeName.__len__() > 0:
+            if storeName == "":
+                storeName = Language.get("store") + str(STORES.__len__() + 1)
 
-        if window.userRole == 'Admin':
-            Store.createMongoStore(storeName)
+            if window.userRole == 'Admin':
+                Store.createMongoStore(storeName)
 
-        Shelf.hideAllForms()
-        Store.createStore(storeName, self.widget)
+            Shelf.hideAllForms()
+            Store.createStore(storeName, self.widget)
 
-        self.storeNameInput.setText("")
-        self.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+            self.storeNameInput.setText("")
+            self.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
 
-        self.reOpenHome()
-        self.goHome.raise_()
+            self.reOpenHome()
+            self.goHome.raise_()
+        else:
+            QMessageBox(None, "Name too long", "The store name must be between 1 and 15 digits long")
     
     def configCategories(self):
         Store.hideAllStoreIcons()
@@ -1029,8 +1034,8 @@ class MainWindow(QMainWindow):
         self.userRole = role
 
         if self.userRole == 'Offline' or self.userRole == 'Admin':
-            self.addStoreButton.setGeometry(WINDOW_WIDTH - 135, WINDOW_HEIGHT - 75, 110, 50)
-            self.editCategories.setGeometry(WINDOW_WIDTH - 135, 610, 110, 30)
+            self.addStoreButton.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
+            self.editCategories.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
         else:
             self.addStoreButton.setGeometry(0, 0, 0, 0)
             self.editCategories.setGeometry(0, 0, 0, 0)
@@ -1110,47 +1115,35 @@ class LogInWindow(QMainWindow):
 
         self.accessOfflineButton = QPushButton(Language.get("access_offline"), parent)
         self.accessOfflineButton.setGeometry(15, 555, 150, 30)
-
-        titleFont = QFont()
-        titleFont.setPointSize(24)
-
-        bigTextFont = QFont()
-        bigTextFont.setPointSize(16)
-
-        textFont = QFont()
-        textFont.setPointSize(14)
-
-        smallTextFont = QFont()
-        smallTextFont.setPointSize(12)
         
-        self.logInTitle.setFont(titleFont)
+        self.logInTitle.setFont(FONT_TITLE)
         self.logInTitle.setStyleSheet("font-weight: bold")
         self.logInTitle.setAlignment(Qt.AlignCenter)
 
-        self.registerTitle.setFont(titleFont)
+        self.registerTitle.setFont(FONT_TITLE)
         self.registerTitle.setStyleSheet("font-weight: bold")
         self.registerTitle.setAlignment(Qt.AlignCenter)
 
-        self.logInButton.setFont(bigTextFont)
+        self.logInButton.setFont(FONT_BIG_TEXT)
         self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
 
-        self.userLabel.setFont(textFont)
-        self.passwordLabel.setFont(textFont)
-        self.repeatPasswordLabel.setFont(textFont)
+        self.userLabel.setFont(FONT_TEXT)
+        self.passwordLabel.setFont(FONT_TEXT)
+        self.repeatPasswordLabel.setFont(FONT_TEXT)
 
-        self.registerButton.setFont(smallTextFont)
+        self.registerButton.setFont(FONT_SMALL_TEXT)
         self.registerButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
 
-        self.accessOfflineButton.setFont(smallTextFont)
+        self.accessOfflineButton.setFont(FONT_SMALL_TEXT)
         self.accessOfflineButton.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
 
-        self.userQLineEdit.setFont(smallTextFont)
+        self.userQLineEdit.setFont(FONT_SMALL_TEXT)
         self.userQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
 
-        self.passwordQLineEdit.setFont(smallTextFont)
+        self.passwordQLineEdit.setFont(FONT_SMALL_TEXT)
         self.passwordQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
 
-        self.repeatPasswordQLineEdit.setFont(smallTextFont)
+        self.repeatPasswordQLineEdit.setFont(FONT_SMALL_TEXT)
         self.repeatPasswordQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
 
     def initEvents(self):

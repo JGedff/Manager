@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
+from constants import FONT_SMALL_TEXT
+
 class ImageButton(QPushButton):
     def __init__(self, text, icon_path, parent = None):
         super().__init__(parent)
@@ -21,6 +23,7 @@ class ImageButton(QPushButton):
 
         # Create and set the text label
         self.text_label = QLabel(text, self)
+        self.text_label.setFont(FONT_SMALL_TEXT)
         self.text_label.setAlignment(Qt.AlignCenter)
 
         # Add the icon and text to the layout
