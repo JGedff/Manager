@@ -1234,6 +1234,17 @@ class LogInWindow(QMainWindow):
         self.close()
 
         window.changeUserRole('Offline')
+
+        Category.addCategory('Empty', 'white')
+        Category.addCategory('Unreachable', 'red')
+        Category.addCategory('Fill', 'green')
+
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+
+        updateButtonsPosition(window.categoryManager, True)
+
         window.languageChanger.changeLang(self.languageChanger.language)
         window.languageChanger.setCurrentText(self.languageChanger.language)
         window.languageChanger.update()
