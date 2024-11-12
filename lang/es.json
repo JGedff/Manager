@@ -6,7 +6,7 @@
     "add_shelf": "+ Añadir estantería",
     "create_store": "+ Crear almacén",
     "go_back": "← Volver atrás",
-    "edit_categories": "Editar categorias ⚙️",
+    "edit_categories": "⚙️ Editar categorias",
     "shelf_question_1": "¿Cuantos espacios tiene la estantería?:",
     "shelf_question_2": "¿Se pueden poner productos en ambos lados de la estantería?",
     "shelf_question_4": "¿Cuantos pisos tiene la estantería?",
@@ -35,5 +35,6 @@
     "enter_password": "Escribe tu contraseña:",
     "repeat_password": "🔐Vuelve a escribir tu contraseña:",
     "access_offline": "Sin conexión",
-    "forgot_password": "¿Olvidaste tu contraseña?"
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "change_image": "Cambia la imagen"
 }

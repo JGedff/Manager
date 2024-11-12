@@ -1,10 +1,13 @@
+import os
 import sys
 import time
+import shutil
 from datetime import datetime
 
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
+from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT
@@ -614,12 +617,27 @@ class ShelfInfo():
 class Store():
     @staticmethod
     def createMongoStore(name, image = DEFAULT_IMAGE):
+        image_path = image
+
+        if image != DEFAULT_IMAGE:
+            # Copy the uploaded image to the save directory
+            save_dir = "img"
+            os.makedirs(save_dir, exist_ok=True)  # Create the directory if it doesn't exist
+
+            file_name = os.path.basename(image)
+            save_path = os.path.join(save_dir, file_name)
+            image_path = save_path
+
+            shutil.copy(image, save_path)
+
         shelvesInfo = []
         mongo_id = 0
 
         storeFloors = getMaxFloor()
-        id_empty_category = Mongo.getMongoCategoryByName(getEmptyCategoryName())
-        id_unreachable_category = Mongo.getMongoCategoryByName(getUnreachableCategoryName())
+        emptyCategory = getEmptyCategoryName()
+        unreachableCategory = getEmptyCategoryName()
+        id_empty_category = Mongo.getMongoCategoryByName(emptyCategory, emptyCategory)
+        id_unreachable_category = Mongo.getMongoCategoryByName(unreachableCategory, unreachableCategory)
 
         for i in SHELVES_FORMS:
             spacesInfo = []
@@ -645,7 +663,7 @@ class Store():
                 "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             })
             
-        Mongo.addStoreToMongo(shelvesInfo, name, image)
+        Mongo.addStoreToMongo(shelvesInfo, name, image_path)
         
     @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):
@@ -787,6 +805,7 @@ class MainWindow(QMainWindow):
 
     def initVariables(self):
         self.userRole = 'Guest'
+        self.image = DEFAULT_IMAGE
 
         # Window config
         self.setWindowTitle(Language.get("window_title"))
@@ -841,6 +860,14 @@ class MainWindow(QMainWindow):
         self.languageChanger = LanguageChanger(self, parent)
         self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
 
+        pixmap = QPixmap(DEFAULT_IMAGE)
+        self.seeImage = QLabel("", parent)
+        self.seeImage.setPixmap(pixmap.scaled(self.seeImage.size(), Qt.KeepAspectRatio))
+        self.seeImage.hide()
+
+        self.storeImage = QPushButton(Language.get("change_image"), parent)
+        self.storeImage.hide()
+
         self.addStoreButton.setFont(FONT_TEXT)
 
         self.goHome.setFont(FONT_SMALL_TEXT)
@@ -859,6 +886,7 @@ class MainWindow(QMainWindow):
         self.addShelfButton.clicked.connect(self.createShelf)
         self.createStoreButton.clicked.connect(self.saveStoreInfo)
         self.editCategories.clicked.connect(self.configCategories)
+        self.storeImage.clicked.connect(self.uploadImage)
 
         # Do scroll
         self.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
@@ -951,15 +979,15 @@ class MainWindow(QMainWindow):
 
         storeName = self.storeNameInput.text().strip()
 
-        if storeName.__len__() <= 15 and storeName.__len__() > 0:
+        if storeName.__len__() <= 15:
             if storeName == "":
                 storeName = Language.get("store") + str(STORES.__len__() + 1)
 
             if window.userRole == 'Admin':
-                Store.createMongoStore(storeName)
+                Store.createMongoStore(storeName, self.image)
 
             Shelf.hideAllForms()
-            Store.createStore(storeName, self.widget)
+            Store.createStore(storeName, self.widget, self.image)
 
             self.storeNameInput.setText("")
             self.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
@@ -967,7 +995,7 @@ class MainWindow(QMainWindow):
             self.reOpenHome()
             self.goHome.raise_()
         else:
-            QMessageBox(None, "Name too long", "The store name must be between 1 and 15 digits long")
+            QMessageBox.warning(None, "Name too long", "The store name must be maximum 15 digits long")
     
     def configCategories(self):
         Store.hideAllStoreIcons()
@@ -975,6 +1003,16 @@ class MainWindow(QMainWindow):
         self.categoryManager.showUI()
 
         self.hideMainButtons()
+
+    def uploadImage(self):
+        # Open a file dialog to select an image file
+        file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
+        
+        # Check if a file was selected
+        if file_path:
+            self.image = file_path
+            pixmap = QPixmap(file_path)
+            self.seeImage.setPixmap(pixmap.scaled(self.seeImage.size(), Qt.KeepAspectRatio))
 
     # Show objects
     def showAddStoreForm(self):
@@ -984,6 +1022,8 @@ class MainWindow(QMainWindow):
         self.storeNameInput.show()
         self.storeNameLabel.show()
         self.addShelfButton.show()
+        self.storeImage.show()
+        self.seeImage.show()
 
     def showMainButtons(self):
         self.languageChanger.show()
@@ -998,6 +1038,8 @@ class MainWindow(QMainWindow):
         self.storeNameInput.hide()
         self.storeNameLabel.hide()
         self.addShelfButton.hide()
+        self.storeImage.hide()
+        self.seeImage.hide()
         self.goHome.hide()
 
     def hideAllButtons(self):
@@ -1023,6 +1065,8 @@ class MainWindow(QMainWindow):
         self.headerFormBackground.raise_()
         self.storeNameInput.raise_()
         self.storeNameLabel.raise_()
+        self.storeImage.raise_()
+        self.seeImage.raise_()
         self.goHome.raise_()
     
     def raiseMainButtons(self):
@@ -1281,20 +1325,12 @@ def getMongoInfo():
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
         UserManager.setUser('Guest', 'Offline')
 
-        errorNetwork = QMessageBox()
-        errorNetwork.setText("Categories not found\nThere was an issue with the network")
-        errorNetwork.setIcon(QMessageBox.Warning)
-        errorNetwork.setStandardButtons(QMessageBox.Ok)
-        errorNetwork.exec_()
+        QMessageBox.warning(None, "Categories not found", "There was an issue with the network")
 
         mongoCategories = 0
 
     if mongoCategories <= 0:
-        message = QMessageBox()
-        message.setText("You don't have any category in the database.\nYou'll use the default categories.")
-        message.setIcon(QMessageBox.Warning)
-        message.setStandardButtons(QMessageBox.Ok)
-        message.exec_()
+        QMessageBox.warning(None, "You don't have any category in the database", "You'll use the default categories")
 
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')

@@ -6,7 +6,7 @@
     "add_shelf": "+ Add shelf",
     "create_store": "+ Create store",
     "go_back": "← Go back",
-    "edit_categories": "Edit categories ⚙️",
+    "edit_categories": "⚙️ Edit categories",
     "shelf_question_1": "How many spaces does the shelf have?:",
     "shelf_question_2": "Can you put products in both sides of the shelf?:",
     "shelf_question_4": "How many floors does the shelf have?:",
@@ -35,5 +35,6 @@
     "enter_password": "Enter your password",
     "repeat_password": "🔐Rewrite your password:",
     "access_offline": "Offilne",
-    "forgot_password": "Forgot your password?"
+    "forgot_password": "Forgot your password?",
+    "change_image": "Change the image"
 }

@@ -6,7 +6,7 @@
     "add_shelf": "+ Afegir prestatgeries",
     "create_store": "Crear magatzem",
     "go_back": "← Tornar enrere",
-    "edit_categories": "Editar categories ⚙️",
+    "edit_categories": "⚙️ Editar categories",
     "shelf_question_1": "Quants espais té la prestatgeria?:",
     "shelf_question_2": "Es poden posar productes als dos costats de la prestatgeria?",
     "shelf_question_4": "Quants pisos té la prestatgeria?",
@@ -35,5 +35,6 @@
     "enter_password": "Escriu la teva contrasenya",
     "repeat_password": "🔐Torna a escriure la teva contrasenya:",
     "access_offline": "Sense connexió",
-    "forgot_password": "Has oblidat la teva contrasenya?"
+    "forgot_password": "Has oblidat la teva contrasenya?",
+    "change_image": "Canvia la imatge"
 }
