@@ -7,10 +7,13 @@ from datetime import datetime
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout
 
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
-from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT
+from PyQt5.QtWidgets import QLabel, QPushButton
+
+from utils.functions.shelfFunctions import updateShelfPosition
+
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -21,10 +24,11 @@ from utils.userManager import UserManager
 
 from utils.language import Language
 from utils.category import Category
+from utils.inputBool import InputBool
+from utils.inputNumber import InputNumber
 from utils.imageButton import ImageButton
 from utils.doubleButton import DoubleButton
 
-from components.shelf import Shelf
 from components.languageChanger import LanguageChanger
 
 app = QApplication(sys.argv)
@@ -792,6 +796,115 @@ class Store():
     def configCategories(self):
         self.goBackStore.hide()
 
+class Shelf(QLabel):
+    @staticmethod
+    def createShelf(parent):
+        length = SHELVES_FORMS.__len__()
+
+        if length > 0:
+            newShelf = Shelf(Language.get("shelf") + str(length + 1), SHELVES_FORMS[length - 1].pos().x(), SHELVES_FORMS[length - 1].pos().y() + 200, parent)
+        else:
+            newShelf = Shelf(Language.get("shelf") + str(length + 1), 400, 300, parent)
+        
+        newShelf.showForm()
+
+        SHELVES_FORMS.append(newShelf)
+
+    @staticmethod
+    def hideAllForms():
+        for shelf in SHELVES_FORMS:
+            shelf.hideForm()
+
+    @staticmethod
+    def showAllForms():    
+        for i in SHELVES_FORMS:
+            i.showForm()
+
+    def __init__(self, name, posx, posy, parent = None):
+        super().__init__(parent)
+        
+        self.setGeometry(posx, posy, WINDOW_WIDTH, WINDOW_HEIGHT)
+
+        self.initVariables()
+        self.initUI(name)
+        self.hideForm()
+    
+    def initVariables(self):
+        self.double_shelf = False
+        self.spaces = 1
+        self.floors = 1
+
+    def initUI(self, name):
+        # Config shelf
+        self.shelfLabel = QLabel(name, self)
+        self.shelfLabel.setGeometry(0, 10, 150, 35)
+
+        self.inputSpacesLabel = QLabel(Language.get("shelf_question_1"), self)
+        self.inputSpacesLabel.setGeometry(0, 55, 500, 35)
+
+        self.inputSpaces = InputNumber(1, True, self)
+        self.inputSpaces.setGeometry(480, 35, 175, 65)
+
+        self.doubleShelfLabel = QLabel(Language.get("shelf_question_2"), self)
+        self.doubleShelfLabel.setGeometry(0, 95, 500, 35)
+
+        self.doubleShelfInput = InputBool(Language.get("yes"), Language.get("no"), self)
+        self.doubleShelfInput.setGeometry(480, 80, 175, 65)
+
+        self.shelfFloorsLabel = QLabel(Language.get("shelf_question_4"), self)
+        self.shelfFloorsLabel.setGeometry(0, 135, 500, 35)
+
+        self.shelfFloorsInput = InputNumber(1, True, self)
+        self.shelfFloorsInput.setGeometry(480, 123, 175, 65)
+
+        # Option to delete shelf if there is more than one shelf
+        if SHELVES_FORMS.__len__() + 1 > 1:
+            self.delShelfButton = QPushButton("❌", self)
+            self.delShelfButton.setFont(FONT_SMALLEST_CHAR)
+            self.delShelfButton.setGeometry(150, 15, 50, 25)
+            self.delShelfButton.setStyleSheet("background-color: #FFD1D1; border: 1px solid #AFAFAF")
+
+            self.delShelfButton.clicked.connect(self.delShelf)
+
+            self.separator = QLabel(self)
+            self.separator.setGeometry(0, 0, 650, 3)
+            self.separator.setStyleSheet("background-color: black")
+
+        # Style
+        self.shelfLabel.setFont(FONT_TEXT)
+
+        self.inputSpacesLabel.setFont(FONT_SMALL_TEXT)
+        self.doubleShelfLabel.setFont(FONT_SMALL_TEXT)
+        self.shelfFloorsLabel.setFont(FONT_SMALL_TEXT)
+
+    def hideForm(self):
+        self.hide()
+
+    def delShelf(self):
+        shelfToDelete = 0
+        
+        for index, shelf in enumerate(SHELVES_FORMS):
+            try:
+                if self.sender() == shelf.delShelfButton:
+                    shelfToDelete = index
+                    break
+            except AttributeError:
+                continue
+        
+        SHELVES_FORMS[shelfToDelete].hide()
+        del SHELVES_FORMS[shelfToDelete]
+
+        updateShelfPosition()
+        window.resizeHeightScroll()
+
+    def showForm(self):
+        self.show()
+
+    def saveInfo(self):
+        self.spaces = self.inputSpaces.getNum()
+        self.floors = self.shelfFloorsInput.getNum()
+        self.double_shelf = self.doubleShelfInput.getValue()
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -827,6 +940,9 @@ class MainWindow(QMainWindow):
 
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
+
+        self.languageChanger = LanguageChanger(self, parent)
+        self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
         
         # Header Form
         self.headerFormBackground = QLabel("", parent)
@@ -835,13 +951,18 @@ class MainWindow(QMainWindow):
         self.headerFormBackground.hide()
 
         self.storeNameLabel = QLabel(Language.get("name_store"), parent)
-        self.storeNameLabel.setGeometry(400, 20, 100, 35)
+        self.storeNameLabel.setGeometry(400, 20, 200, 35)
         self.storeNameLabel.hide()
         
         self.storeNameInput = QLineEdit(parent)
-        self.storeNameInput.setGeometry(800, 20, 300, 35)
+        self.storeNameInput.setGeometry(690, 10, 355, 50)
         self.storeNameInput.setPlaceholderText(Language.get("store") + str(1))
         self.storeNameInput.hide()
+
+        # Body form
+        self.formStoreIcon = ImageButton(Language.get("change_image"), DEFAULT_IMAGE, parent)
+        self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+        self.formStoreIcon.hide()
 
         # Footer form
         self.footerFormBackground = QLabel("", parent)
@@ -850,32 +971,30 @@ class MainWindow(QMainWindow):
         self.footerFormBackground.hide()
 
         self.addShelfButton = QPushButton(Language.get("add_shelf"), parent)
-        self.addShelfButton.setGeometry(830, WINDOW_HEIGHT - 62, 100, 50)
+        self.addShelfButton.setGeometry(400, WINDOW_HEIGHT - 62, 200, 50)
         self.addShelfButton.hide()
 
         self.createStoreButton = QPushButton(Language.get("create_store"), parent)
-        self.createStoreButton.setGeometry(1000, WINDOW_HEIGHT - 62, 100, 50)
+        self.createStoreButton.setGeometry(845, WINDOW_HEIGHT - 62, 200, 50)
         self.createStoreButton.hide()
 
-        self.languageChanger = LanguageChanger(self, parent)
-        self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
-
-        pixmap = QPixmap(DEFAULT_IMAGE)
-        self.seeImage = QLabel("", parent)
-        self.seeImage.setPixmap(pixmap.scaled(self.seeImage.size(), Qt.KeepAspectRatio))
-        self.seeImage.hide()
-
-        self.storeImage = QPushButton(Language.get("change_image"), parent)
-        self.storeImage.hide()
+        # Style
+        self.createStoreButton.setFont(FONT_BIG_TEXT)
 
         self.addStoreButton.setFont(FONT_TEXT)
+        self.storeNameLabel.setFont(FONT_TEXT)
+        self.addShelfButton.setFont(FONT_TEXT)
 
         self.goHome.setFont(FONT_SMALL_TEXT)
         self.editCategories.setFont(FONT_SMALL_TEXT)
+        self.storeNameInput.setFont(FONT_SMALL_TEXT)
 
         self.goHome.setStyleSheet("background-color: white; border: 1px solid #CACACA")
+        self.storeNameInput.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
         self.addStoreButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
         self.editCategories.setStyleSheet("background-color: #FFE397; border: 1px solid #CDB87D")
+        self.addShelfButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
+        self.createStoreButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
 
         Store.showAllStoreIcons()
 
@@ -886,7 +1005,7 @@ class MainWindow(QMainWindow):
         self.addShelfButton.clicked.connect(self.createShelf)
         self.createStoreButton.clicked.connect(self.saveStoreInfo)
         self.editCategories.clicked.connect(self.configCategories)
-        self.storeImage.clicked.connect(self.uploadImage)
+        self.formStoreIcon.clicked.connect(self.uploadImage)
 
         # Do scroll
         self.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
@@ -896,7 +1015,7 @@ class MainWindow(QMainWindow):
     def updateVerticalHeaderPosition(self, value):
         self.goHome.move(self.goHome.pos().x(), value + 10)
         self.editCategories.move(self.editCategories.pos().x(), value + (WINDOW_HEIGHT - 115))
-        self.storeNameInput.move(self.storeNameInput.pos().x(), value + 20)
+        self.storeNameInput.move(self.storeNameInput.pos().x(), value + 10)
         self.storeNameLabel.move(self.storeNameLabel.pos().x(), value + 20)
         self.headerFormBackground.move(self.headerFormBackground.pos().x(), value)
         self.addStoreButton.move(self.addStoreButton.pos().x(), value + (WINDOW_HEIGHT - 75))
@@ -913,8 +1032,8 @@ class MainWindow(QMainWindow):
     # Resize scroll functions
     def resizeHeightScroll(self, height = 0):
         if height == 0:
-            if SHELVES_FORMS.__len__() > 0 and SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 250 > WINDOW_HEIGHT:
-                self.widget.resize(WINDOW_WIDTH - 20, SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 250)
+            if SHELVES_FORMS.__len__() > 0 and SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 300 > WINDOW_HEIGHT:
+                self.widget.resize(WINDOW_WIDTH - 20, SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 300)
             else:
                 self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
@@ -1011,8 +1130,7 @@ class MainWindow(QMainWindow):
         # Check if a file was selected
         if file_path:
             self.image = file_path
-            pixmap = QPixmap(file_path)
-            self.seeImage.setPixmap(pixmap.scaled(self.seeImage.size(), Qt.KeepAspectRatio))
+            self.formStoreIcon.setPixmap(file_path)
 
     # Show objects
     def showAddStoreForm(self):
@@ -1022,8 +1140,7 @@ class MainWindow(QMainWindow):
         self.storeNameInput.show()
         self.storeNameLabel.show()
         self.addShelfButton.show()
-        self.storeImage.show()
-        self.seeImage.show()
+        self.formStoreIcon.show()
 
     def showMainButtons(self):
         self.languageChanger.show()
@@ -1038,8 +1155,7 @@ class MainWindow(QMainWindow):
         self.storeNameInput.hide()
         self.storeNameLabel.hide()
         self.addShelfButton.hide()
-        self.storeImage.hide()
-        self.seeImage.hide()
+        self.formStoreIcon.hide()
         self.goHome.hide()
 
     def hideAllButtons(self):
@@ -1065,8 +1181,6 @@ class MainWindow(QMainWindow):
         self.headerFormBackground.raise_()
         self.storeNameInput.raise_()
         self.storeNameLabel.raise_()
-        self.storeImage.raise_()
-        self.seeImage.raise_()
         self.goHome.raise_()
     
     def raiseMainButtons(self):

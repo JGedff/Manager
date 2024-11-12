@@ -8,7 +8,7 @@ def saveShelfInfo():
 
 def updateShelfPosition():
     x = 400
-    y = 100
+    y = 300
 
     for index, shelf in enumerate(SHELVES_FORMS):
         # Updates the position of the shelf
@@ -17,4 +17,4 @@ def updateShelfPosition():
         # Updates the name of the shelf
         shelf.shelfLabel.setText(Language.get("shelf") + str(index + 1))
 
-        y += 150
+        y += 200

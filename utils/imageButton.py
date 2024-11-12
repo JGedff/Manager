@@ -15,11 +15,11 @@ class ImageButton(QPushButton):
         layout = QVBoxLayout(self)
 
         # Create and set the icon image
-        icon_label = QLabel(self)
+        self.icon_label = QLabel(self)
         pixmap = QPixmap(icon_path)
-        icon_label.setPixmap(pixmap)
-        icon_label.setScaledContents(True)
-        icon_label.setAlignment(Qt.AlignCenter)
+        self.icon_label.setPixmap(pixmap)
+        self.icon_label.setScaledContents(True)
+        self.icon_label.setAlignment(Qt.AlignCenter)
 
         # Create and set the text label
         self.text_label = QLabel(text, self)
@@ -27,10 +27,17 @@ class ImageButton(QPushButton):
         self.text_label.setAlignment(Qt.AlignCenter)
 
         # Add the icon and text to the layout
-        layout.addWidget(icon_label)
+        layout.addWidget(self.icon_label)
         layout.addWidget(self.text_label)
 
         layout.setSpacing(5)
 
     def text(self):
         return self.text_label.text()
+
+    def setText(self, text):
+        return self.text_label.setText(text)
+    
+    def setPixmap(self, icon):
+        pixmap = QPixmap(icon)
+        self.icon_label.setPixmap(pixmap)
