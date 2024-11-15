@@ -36,5 +36,6 @@
     "repeat_password": "🔐Torna a escriure la teva contrasenya:",
     "access_offline": "Sense connexió",
     "forgot_password": "Has oblidat la teva contrasenya?",
-    "change_image": "Canvia la imatge"
+    "change_image": "Canvia la imatge",
+    "default_image": "Posa la imatge per defecte"
 }

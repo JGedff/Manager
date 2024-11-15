@@ -36,5 +36,6 @@
     "repeat_password": "🔐Rewrite your password:",
     "access_offline": "Offilne",
     "forgot_password": "Forgot your password?",
-    "change_image": "Change the image"
+    "change_image": "Change the image",
+    "default_image": "Set default image"
 }

@@ -964,6 +964,10 @@ class MainWindow(QMainWindow):
         self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
         self.formStoreIcon.hide()
 
+        self.setDefaultIcon = ImageButton(Language.get("default_image"), DEFAULT_IMAGE, parent, True)
+        self.setDefaultIcon.setGeometry(int(WINDOW_WIDTH / 2) + 25, 115, 225, 150)
+        self.setDefaultIcon.hide()
+
         # Footer form
         self.footerFormBackground = QLabel("", parent)
         self.footerFormBackground.setGeometry(0, WINDOW_HEIGHT - 75, WINDOW_WIDTH, 75)
@@ -1006,6 +1010,7 @@ class MainWindow(QMainWindow):
         self.createStoreButton.clicked.connect(self.saveStoreInfo)
         self.editCategories.clicked.connect(self.configCategories)
         self.formStoreIcon.clicked.connect(self.uploadImage)
+        self.setDefaultIcon.clicked.connect(self.setDefaultStoreIcon)
 
         # Do scroll
         self.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
@@ -1130,7 +1135,20 @@ class MainWindow(QMainWindow):
         # Check if a file was selected
         if file_path:
             self.image = file_path
-            self.formStoreIcon.setPixmap(file_path)
+            self.formStoreIcon.setPixmap(self.image)
+
+            if self.image != DEFAULT_IMAGE:
+                self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 150, 115, 150, 150)
+                self.setDefaultIcon.show()
+            else:
+                self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+                self.setDefaultIcon.hide()
+
+    def setDefaultStoreIcon(self):
+        self.image = DEFAULT_IMAGE
+        self.formStoreIcon.setPixmap(self.image)
+        self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+        self.setDefaultIcon.hide()
 
     # Show objects
     def showAddStoreForm(self):
@@ -1141,6 +1159,13 @@ class MainWindow(QMainWindow):
         self.storeNameLabel.show()
         self.addShelfButton.show()
         self.formStoreIcon.show()
+
+        if self.image != DEFAULT_IMAGE:
+            self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 175, 115, 150, 150)
+            self.setDefaultIcon.show()
+        else:
+            self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+            self.setDefaultIcon.hide()
 
     def showMainButtons(self):
         self.languageChanger.show()
@@ -1155,6 +1180,7 @@ class MainWindow(QMainWindow):
         self.storeNameInput.hide()
         self.storeNameLabel.hide()
         self.addShelfButton.hide()
+        self.setDefaultIcon.hide()
         self.formStoreIcon.hide()
         self.goHome.hide()
 

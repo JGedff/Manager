@@ -36,5 +36,6 @@
     "repeat_password": "🔐Vuelve a escribir tu contraseña:",
     "access_offline": "Sin conexión",
     "forgot_password": "¿Olvidaste tu contraseña?",
-    "change_image": "Cambia la imagen"
+    "change_image": "Cambia la imagen",
+    "default_image": "Pon la imagen por defecto"
 }

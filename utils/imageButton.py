@@ -5,18 +5,22 @@ from PyQt5.QtCore import Qt
 from constants import FONT_SMALL_TEXT
 
 class ImageButton(QPushButton):
-    def __init__(self, text, icon_path, parent = None):
+    def __init__(self, text, icon_path, parent = None, resetButton = False):
         super().__init__(parent)
 
+        self.initVariables(resetButton)
         self.initUI(text, icon_path)
+
+    def initVariables(self, resetButton):
+        self.resetButton = resetButton
 
     def initUI(self, text, icon_path):
         # Create a layout for the button to hold icon and text
-        layout = QVBoxLayout(self)
+        self.myLayout = QVBoxLayout(self)
 
         # Create and set the icon image
-        self.icon_label = QLabel(self)
         pixmap = QPixmap(icon_path)
+        self.icon_label = QLabel(self)
         self.icon_label.setPixmap(pixmap)
         self.icon_label.setScaledContents(True)
         self.icon_label.setAlignment(Qt.AlignCenter)
@@ -27,17 +31,18 @@ class ImageButton(QPushButton):
         self.text_label.setAlignment(Qt.AlignCenter)
 
         # Add the icon and text to the layout
-        layout.addWidget(self.icon_label)
-        layout.addWidget(self.text_label)
+        self.myLayout.addWidget(self.icon_label)
+        self.myLayout.addWidget(self.text_label)
 
-        layout.setSpacing(5)
+        self.myLayout.setAlignment(Qt.AlignCenter)
+        self.myLayout.setSpacing(5)
 
     def text(self):
         return self.text_label.text()
 
     def setText(self, text):
-        return self.text_label.setText(text)
-    
+        self.text_label.setText(text)
+
     def setPixmap(self, icon):
         pixmap = QPixmap(icon)
         self.icon_label.setPixmap(pixmap)
