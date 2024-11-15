@@ -36,6 +36,12 @@ class ImageButton(QPushButton):
 
         self.myLayout.setAlignment(Qt.AlignCenter)
         self.myLayout.setSpacing(5)
+        self.setStyleSheet("""
+            QPushButton {
+                background-color: white;
+                border: 1px solid #CACACA;
+            }
+        """)
 
     def text(self):
         return self.text_label.text()

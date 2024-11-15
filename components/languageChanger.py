@@ -26,7 +26,7 @@ class LanguageChanger(QLabel):
         self.changer.setGeometry(15, WINDOW_HEIGHT - 50, 100, 25)
         self.changer.setStyleSheet("""
             QComboBox {
-                border: 1px solid black;
+                border: 1px solid #AFAFAF;
                 padding-left: 5px;
             }
         """)

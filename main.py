@@ -74,10 +74,12 @@ class SpaceCategory(QLabel):
         self.categoryName.setGeometry(175, 25, 125, 25)
         self.categoryName.hide()
         
+        # Edit existing category
         self.categoryColorLabel = QLabel(Language.get("category_color"), parent)
         self.categoryColorLabel.setGeometry(25, 75, 125, 25)
         self.categoryColorLabel.hide()
 
+        # Edit existing category
         self.categoryColor = QPushButton(Language.get("select_color"), parent)
         self.categoryColor.setGeometry(175, 75, 125, 25)
         self.categoryColor.hide()
@@ -90,32 +92,46 @@ class SpaceCategory(QLabel):
         posy = 25
 
         for category in CATEGORY_NAMES:
-            newDoubleButton = DoubleButton(posx, posy, category.capitalize(), "🗑️", self.editCategory, self.deleteCategory, parent)
-            posy += 50
+            newDoubleButton = DoubleButton(category.capitalize(), "❌", self.editCategory, self.deleteCategory, parent)
+            newDoubleButton.setGeometry(posx - 12, posy - 12, 250, 69)
+
+            posy += 69
 
             self.doubleButtons.append(newDoubleButton)
 
         self.addCategory = QPushButton(Language.get("add_category"), parent)
-        self.addCategory.setGeometry(posx, posy, 200, 25)
+        self.addCategory.setGeometry(posx + 13, posy + 13, 200, 25)
         self.addCategory.hide()
 
         self.addCategoryName = QLineEdit(parent)
-        self.addCategoryName.setGeometry(posx, posy - 100, 200, 25)
+        self.addCategoryName.setGeometry(posx + 13, posy - 100, 250, 39)
         self.addCategoryName.setPlaceholderText(Language.get("name"))
         self.addCategoryName.hide()
 
         self.newCategoryColorButton = QPushButton(Language.get("select_color"), parent)
-        self.newCategoryColorButton.setGeometry(posx + 225, posy - 50, 125, 25)
+        self.newCategoryColorButton.setGeometry(posx + 238, posy - 175, 125, 39)
         self.newCategoryColorButton.hide()
 
         self.cancelButtonAddCategory = QPushButton(Language.get("cancel"), parent)
-        self.cancelButtonAddCategory.setGeometry(posx, posy - 50, 100, 25)
+        self.cancelButtonAddCategory.setGeometry(posx + 13, posy, 100, 25)
         self.cancelButtonAddCategory.hide()
 
         self.createCategoryButton = QPushButton(Language.get("create"), parent)
-        self.createCategoryButton.setGeometry(posx + 425, posy - 50, 100, 25)
+        self.createCategoryButton.setGeometry(posx + 438, posy, 100, 25)
         self.createCategoryButton.setDisabled(True)
         self.createCategoryButton.hide()
+
+        self.addCategory.setFont(FONT_SMALL_TEXT)
+        self.addCategoryName.setFont(FONT_SMALL_TEXT)
+        self.createCategoryButton.setFont(FONT_SMALL_TEXT)
+        self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
+        self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
+        
+        self.addCategoryName.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
+        self.addCategory.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
+        self.cancelButtonAddCategory.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
+        self.createCategoryButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
+        self.newCategoryColorButton.setStyleSheet("background-color: white; border: 1px solid #CACACA;")
 
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
@@ -194,9 +210,9 @@ class SpaceCategory(QLabel):
         self.addCategory.hide()
 
         if self.shortcut:
+            self.cancelAddCategory()
             window.goHome.show()
 
-    
     def saveInfo(self):
         newName = self.categoryName.text().capitalize()
 
@@ -243,9 +259,9 @@ class SpaceCategory(QLabel):
 
         self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
         self.addCategoryName.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
-        self.createCategoryButton.move(self.addCategory.pos().x() + 400, self.addCategory.pos().y() - 50)
-        self.newCategoryColorButton.move(self.addCategory.pos().x() + 225, self.addCategory.pos().y() - 50)
-        self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 50)
+        self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 42)
+        self.createCategoryButton.move(self.addCategory.pos().x() + 275, self.addCategory.pos().y() - 42)
+        self.newCategoryColorButton.move(self.addCategory.pos().x() + 275, self.addCategory.pos().y() - 100)
 
         self.addCategory.setDisabled(True)
 
@@ -274,7 +290,7 @@ class SpaceCategory(QLabel):
         self.addCategoryName.setText("")
         self.addCategory.setDisabled(False)
         self.createCategoryButton.setDisabled(True)
-        self.newCategoryColorButton.setStyleSheet("background-color: white")
+        self.newCategoryColorButton.setStyleSheet("background-color: white; border: 1px solid #CACACA;")
 
         if self.creatingCategory:
             self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
@@ -292,7 +308,7 @@ class SpaceCategory(QLabel):
         color = QColorDialog.getColor()
         
         if color.isValid():
-            self.newCategoryColorButton.setStyleSheet("background-color: " + color.name())
+            self.newCategoryColorButton.setStyleSheet("background-color: " + color.name() + ";border: 1px solid #CACACA;")
             self.newCategoryColor = color.name()
         
         if self.newCategoryColor != "" and self.newCategoryName != "":
@@ -316,7 +332,7 @@ class SpaceCategory(QLabel):
             for shelf in store:
                 for space in shelf.spaces:
                     createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
-        
+
         self.showUI()
         self.cancelAddCategory()
 
@@ -862,7 +878,7 @@ class Shelf(QLabel):
             self.delShelfButton = QPushButton("❌", self)
             self.delShelfButton.setFont(FONT_SMALLEST_CHAR)
             self.delShelfButton.setGeometry(150, 15, 50, 25)
-            self.delShelfButton.setStyleSheet("background-color: #FFD1D1; border: 1px solid #AFAFAF")
+            self.delShelfButton.setStyleSheet("background-color: #FFD1D1; border: 1px solid #FFA1A1")
 
             self.delShelfButton.clicked.connect(self.delShelf)
 
@@ -998,7 +1014,7 @@ class MainWindow(QMainWindow):
         self.addStoreButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
         self.editCategories.setStyleSheet("background-color: #FFE397; border: 1px solid #CDB87D")
         self.addShelfButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
-        self.createStoreButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+        self.createStoreButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
 
         Store.showAllStoreIcons()
 
@@ -1309,7 +1325,7 @@ class LogInWindow(QMainWindow):
         self.registerTitle.setAlignment(Qt.AlignCenter)
 
         self.logInButton.setFont(FONT_BIG_TEXT)
-        self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+        self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
 
         self.userLabel.setFont(FONT_TEXT)
         self.passwordLabel.setFont(FONT_TEXT)
@@ -1362,7 +1378,7 @@ class LogInWindow(QMainWindow):
             self.logInButton.setText(Language.get("log_in"))
             self.registerButton.setText(Language.get("register"))
 
-            self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+            self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
             self.registerButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
         else:
             self.logInTitle.hide()
@@ -1376,7 +1392,7 @@ class LogInWindow(QMainWindow):
             self.logInButton.setText(Language.get("register"))
             self.registerButton.setText(Language.get("log_in"))
 
-            self.registerButton.setStyleSheet("background-color: #59CC4E; color: white; border: 0px")
+            self.registerButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
             self.logInButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
         
     def register(self):

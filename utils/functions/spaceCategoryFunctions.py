@@ -6,21 +6,25 @@ from constants import CATEGORY_NAMES, CATEGORY_COLORS
 def createCategoryIn(space, categoryName, parent, shortcut = False):
     if not shortcut:
         # Create a button to acces the config of the category
-        newDoubleButton = DoubleButton(25, 50 * CATEGORY_NAMES.__len__() - 25, categoryName, "🗑️", space.category.editCategory, space.category.deleteCategory, parent)
+        newDoubleButton = DoubleButton(categoryName, "❌", space.category.editCategory, space.category.deleteCategory, parent)
+        newDoubleButton.setGeometry(13, 50 * CATEGORY_NAMES.__len__() - 25, 450, 69)
+
         space.category.doubleButtons.append(newDoubleButton)
 
         # Updates the position of the form to create a new category
-        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        space.category.addCategory.move(38, 50 * CATEGORY_NAMES.__len__() + 38)
 
         # Add the new category to the comboBox
         space.categorySelector.addItem(categoryName)
     else:
         # Create a button to acces the config of the category
-        newDoubleButton = DoubleButton(25, 50 * CATEGORY_NAMES.__len__() - 25, categoryName, "🗑️", space.editCategory, space.deleteCategory, parent)
+        newDoubleButton = DoubleButton(categoryName, "❌", space.editCategory, space.deleteCategory, parent)
+        newDoubleButton.setGeometry(13, 50 * CATEGORY_NAMES.__len__() - 25, 450, 69)
+
         space.doubleButtons.append(newDoubleButton)
 
         # Updates the position of the form to create a new category
-        space.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        space.addCategory.move(38, 50 * CATEGORY_NAMES.__len__() + 38)
 
 def updateNameCategory(space, color, actualName, newName, shortcut = False):
     if not shortcut:
@@ -81,27 +85,27 @@ def deleteCategoryFrom(space, indexButtonPressed, categoryName, shortcut = False
             #space.categorySelector.setCurrentText(space.category.name)
 
         # Moves the form to add a new category
-        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        space.category.addCategory.move(38, 50 * CATEGORY_NAMES.__len__() + 38)
     else:
         # Hide the buttons before removing them
         space.doubleButtons[indexButtonPressed].hide()
         space.doubleButtons.pop(indexButtonPressed)
 
         # Moves the form to add a new category
-        space.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        space.addCategory.move(38, 50 * CATEGORY_NAMES.__len__() + 38)
 
 def updateButtonsPosition(space, shortcut = False):
     posx = 13
-    posy = 13
+    posy = 24
 
     if not shortcut:
         for index, _ in enumerate(CATEGORY_NAMES):
-            space.category.doubleButtons[index].setGeometry(posx, posy, 450, 50)
+            space.category.doubleButtons[index].setGeometry(posx, posy, 450, 69)
 
             posy += 50
     else:
         for index, _ in enumerate(CATEGORY_NAMES):
-            space.doubleButtons[index].setGeometry(posx, posy, 450, 50)
+            space.doubleButtons[index].setGeometry(posx, posy, 450, 69)
 
             posy += 50
 
