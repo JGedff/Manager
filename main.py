@@ -93,7 +93,7 @@ class SpaceCategory(QLabel):
 
         for category in CATEGORY_NAMES:
             newDoubleButton = DoubleButton(category.capitalize(), "❌", self.editCategory, self.deleteCategory, parent)
-            newDoubleButton.setGeometry(posx - 12, posy - 12, 250, 69)
+            newDoubleButton.setGeometry(posx - 12, posy - 12, 450, 69)
 
             posy += 69
 
@@ -109,7 +109,7 @@ class SpaceCategory(QLabel):
         self.addCategoryName.hide()
 
         self.newCategoryColorButton = QPushButton(Language.get("select_color"), parent)
-        self.newCategoryColorButton.setGeometry(posx + 238, posy - 175, 125, 39)
+        self.newCategoryColorButton.setGeometry(posx + 238, posy - 175, 138, 39)
         self.newCategoryColorButton.hide()
 
         self.cancelButtonAddCategory = QPushButton(Language.get("cancel"), parent)
@@ -163,8 +163,11 @@ class SpaceCategory(QLabel):
             button.show()
             button.raise_()
 
-        self.addCategory.show()
-        self.addCategory.raise_()
+        if self.doubleButtons.__len__() < 37:
+            self.addCategory.show()
+            self.addCategory.raise_()
+        else:
+            self.addCategory.hide()
 
     def selectColor(self):
         color = QColorDialog.getColor()
@@ -327,20 +330,31 @@ class SpaceCategory(QLabel):
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
+        updateButtonsPosition(window.categoryManager, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
                     createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
+                    updateButtonsPosition(space)
 
         self.showUI()
         self.cancelAddCategory()
 
-        self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
-        self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() + 50)
-        self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() + 50)
-        self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() + 50)
-        self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() + 50)
+        posx = self.addCategory.pos().x()
+        posy = self.addCategory.pos().y()
+
+        if posy + 100 >= WINDOW_HEIGHT:
+            posx += 450
+            posy = 24
+        else:
+            posy += 100
+
+        self.addCategory.move(posx, posy)
+        self.addCategoryName.move(posx, posy - 50)
+        self.createCategoryButton.move(posx + 100, posy + 50)
+        self.newCategoryColorButton.move(posx + 100, posy - 50)
+        self.cancelButtonAddCategory.move(posx, posy + 50)
     
     def deleteCategory(self):
         indexButtonPressed = 0
@@ -389,6 +403,7 @@ class Space(QLabel):
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
+        updateButtonsPosition(self)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -449,12 +464,13 @@ class Space(QLabel):
         self.labelCategory.show()
         self.categorySelector.show()
         self.editCategories.show()
-        self.updateScrollToDefault()
+        
+        window.resizeHeightScroll()
             
     def openConfigCategories(self):
         Store.configCategory(self.storeIndex)
 
-        self.updateScroll()
+        window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
         self.configBox.hide()
         self.labelCategory.hide()
@@ -463,15 +479,8 @@ class Space(QLabel):
 
         self.openSpaceConfig.show()
         self.category.showUI()
-    
-    def updateScroll(self):
-        if self.category.doubleButtons[self.category.doubleButtons.__len__() - 1].pos().y() >= 500:
-            window.resizeHeightScroll(self.category.doubleButtons[self.category.doubleButtons.__len__() - 1].pos().y() + 200)
-        else:
-            self.updateScrollToDefault()
 
     def stopConfigSpace(self):
-        self.updateScrollToDefault()
         self.updateSpaceColor()
 
         self.category.cancelAddCategory()
@@ -524,9 +533,6 @@ class Space(QLabel):
         self.openSpaceConfig.hide()
 
         self.box.raise_()
-
-    def updateScrollToDefault(self):
-        window.resizeHeightScroll()
 
 class ShelfInfo():
     @staticmethod
@@ -1429,13 +1435,84 @@ class LogInWindow(QMainWindow):
         window.changeUserRole('Offline')
 
         Category.addCategory('Empty', 'white')
+        Category.addCategory('ampty', '#FFFFF')
+        Category.addCategory('smpty', '#FFFFC')
+        Category.addCategory('cmpty', '#FFFCF')
+        Category.addCategory('vmpty', '#FFCFF')
+        Category.addCategory('bmpty', '#FCFFF')
+        Category.addCategory('nmpty', '#CFFFF')
+        Category.addCategory('mmpty', '#CFFFC')
+        Category.addCategory('kmpty', '#CFFCF')
+        Category.addCategory('lmpty', '#CFCFF')
+        Category.addCategory('ompty', '#CCFFF')
+        Category.addCategory('impty', '#CCFFC')
+        Category.addCategory('umpty', '#CCFCF')
+        Category.addCategory('ympty', '#CCCFF')
+        Category.addCategory('1', '#CCCFF')
+        Category.addCategory('2', '#CCCFF')
+        Category.addCategory('3', '#CCCFF')
+        Category.addCategory('4', '#CCCFF')
+        Category.addCategory('5', '#CCCFF')
+        Category.addCategory('6', '#CCCFF')
+        Category.addCategory('7', '#CCCFF')
+        Category.addCategory('8', '#CCCFF')
+        Category.addCategory('9', '#CCCFF')
+        Category.addCategory('0', '#CCCFF')
+        Category.addCategory('10', '#CCCFF')
+        Category.addCategory('11', '#CCCFF')
+        Category.addCategory('12', '#CCCFF')
+        Category.addCategory('13', '#CCCFF')
+        Category.addCategory('14', '#CCCFF')
+        Category.addCategory('15', '#CCCFF')
+        Category.addCategory('16', '#CCCFF')
+        Category.addCategory('17', '#CCCFF')
+        Category.addCategory('18', '#CCCFF')
+        Category.addCategory('19', '#CCCFF')
+        Category.addCategory('20', '#CCCFF')
+        Category.addCategory('21', '#CCCFF')
+        Category.addCategory('22', '#CCCFF')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
 
         createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'ampty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'smpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'cmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'vmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'bmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'nmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'mmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'kmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'lmpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'ompty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'impty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'umpty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'ympty', window.widget, True)
         createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
         createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
-
+        createCategoryIn(window.categoryManager, '1', window.widget, True)
+        createCategoryIn(window.categoryManager, '2', window.widget, True)
+        createCategoryIn(window.categoryManager, '3', window.widget, True)
+        createCategoryIn(window.categoryManager, '4', window.widget, True)
+        createCategoryIn(window.categoryManager, '5', window.widget, True)
+        createCategoryIn(window.categoryManager, '6', window.widget, True)
+        createCategoryIn(window.categoryManager, '7', window.widget, True)
+        createCategoryIn(window.categoryManager, '8', window.widget, True)
+        createCategoryIn(window.categoryManager, '9', window.widget, True)
+        createCategoryIn(window.categoryManager, '0', window.widget, True)
+        createCategoryIn(window.categoryManager, '10', window.widget, True)
+        createCategoryIn(window.categoryManager, '11', window.widget, True)
+        createCategoryIn(window.categoryManager, '12', window.widget, True)
+        createCategoryIn(window.categoryManager, '13', window.widget, True)
+        createCategoryIn(window.categoryManager, '14', window.widget, True)
+        createCategoryIn(window.categoryManager, '15', window.widget, True)
+        createCategoryIn(window.categoryManager, '16', window.widget, True)
+        createCategoryIn(window.categoryManager, '17', window.widget, True)
+        createCategoryIn(window.categoryManager, '18', window.widget, True)
+        createCategoryIn(window.categoryManager, '19', window.widget, True)
+        createCategoryIn(window.categoryManager, '20', window.widget, True)
+        createCategoryIn(window.categoryManager, '21', window.widget, True)
+        createCategoryIn(window.categoryManager, '22', window.widget, True)
         updateButtonsPosition(window.categoryManager, True)
 
         window.languageChanger.changeLang(self.languageChanger.language)
@@ -1478,6 +1555,8 @@ def getMongoInfo():
 
             createCategoryIn(window.categoryManager, category['name'], window.widget, True)
             mongoCategories += 1
+        
+        updateButtonsPosition(window.categoryManager, True)
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
         UserManager.setUser('Guest', 'Offline')
 
@@ -1495,7 +1574,6 @@ def getMongoInfo():
         createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
         createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
         createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
-
         updateButtonsPosition(window.categoryManager, True)
         
     setEmptyCategory(window.categoryManager)
