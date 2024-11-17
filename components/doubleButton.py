@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QPushButton, QWidget
 from PyQt5.QtCore import QRect, QPoint
 
+from styles import DEFAULT_BUTTON, REST_BUTTON
 from constants import FONT_SMALL_TEXT
 
 class DoubleButton(QLabel):
@@ -24,8 +25,8 @@ class DoubleButton(QLabel):
         self.button1.setFont(FONT_SMALL_TEXT)
         self.button2.setFont(FONT_SMALL_TEXT)
 
-        self.button1.setStyleSheet("background-color: white; border: 1px solid #CACACA")
-        self.button2.setStyleSheet("background-color: #FFD1D1; border: 1px solid #FFA1A1")
+        self.button1.setStyleSheet(DEFAULT_BUTTON)
+        self.button2.setStyleSheet(REST_BUTTON)
 
     def initEvents(self, functionButton1, functionButton2):
         self.button1.clicked.connect(functionButton1)

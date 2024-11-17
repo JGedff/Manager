@@ -3,6 +3,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 from constants import FONT_SMALL_TEXT
+from styles import IMAGE_BUTTON
 
 class ImageButton(QPushButton):
     def __init__(self, text, icon_path, parent = None, resetButton = False):
@@ -36,12 +37,7 @@ class ImageButton(QPushButton):
 
         self.myLayout.setAlignment(Qt.AlignCenter)
         self.myLayout.setSpacing(5)
-        self.setStyleSheet("""
-            QPushButton {
-                background-color: white;
-                border: 1px solid #CACACA;
-            }
-        """)
+        self.setStyleSheet(IMAGE_BUTTON)
 
     def text(self):
         return self.text_label.text()

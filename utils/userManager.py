@@ -1,8 +1,8 @@
 from pymongo.errors import DuplicateKeyError, ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout, WriteError, InvalidDocument
+from pymongo import MongoClient
 
 from PyQt5.QtWidgets import QMessageBox
 
-from pymongo import MongoClient
 from utils.encrypt import Encrypt
 
 class UserManager:

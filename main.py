@@ -9,11 +9,8 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Netwo
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 
-from PyQt5.QtWidgets import QLabel, QPushButton
-
-from utils.functions.shelfFunctions import updateShelfPosition
-
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT
+from styles import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -24,11 +21,11 @@ from utils.userManager import UserManager
 
 from utils.language import Language
 from utils.category import Category
-from utils.inputBool import InputBool
-from utils.inputNumber import InputNumber
-from utils.imageButton import ImageButton
-from utils.doubleButton import DoubleButton
 
+from components.inputBool import InputBool
+from components.inputNumber import InputNumber
+from components.imageButton import ImageButton
+from components.doubleButton import DoubleButton
 from components.languageChanger import LanguageChanger
 
 app = QApplication(sys.argv)
@@ -137,14 +134,14 @@ class SpaceCategory(QLabel):
         self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
         self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
 
-        self.categoryName.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
-        self.showSpace.setStyleSheet("background-color: white; border: 1px solid #CACACA")
-        self.addCategoryName.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
-        self.addCategory.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
-        self.newCategoryColorButton.setStyleSheet("background-color: white; border: 1px solid #CACACA;")
-        self.cancelButtonAddCategory.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
-        self.saveCategory.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
-        self.createCategoryButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
+        self.categoryName.setStyleSheet(INPUT_TEXT)
+        self.showSpace.setStyleSheet(DEFAULT_BUTTON)
+        self.addCategoryName.setStyleSheet(INPUT_TEXT)
+        self.addCategory.setStyleSheet(BLUE_BUTTON)
+        self.newCategoryColorButton.setStyleSheet(DEFAULT_BUTTON)
+        self.cancelButtonAddCategory.setStyleSheet(OFF_BUTTON)
+        self.saveCategory.setStyleSheet(IMPORTANT_ACTION_BUTTON)
+        self.createCategoryButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
@@ -306,7 +303,7 @@ class SpaceCategory(QLabel):
         self.addCategoryName.setText("")
         self.addCategory.setDisabled(False)
         self.createCategoryButton.setDisabled(True)
-        self.newCategoryColorButton.setStyleSheet("background-color: white; border: 1px solid #CACACA;")
+        self.newCategoryColorButton.setStyleSheet(DEFAULT_BUTTON)
 
         if self.creatingCategory:
             self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
@@ -441,7 +438,7 @@ class Space(QLabel):
         self.labelCategory.setGeometry(152, 75, 100, 25)
 
         self.categorySelector = QComboBox(parent)
-        self.categorySelector.setGeometry(250, 76, 125, 25)
+        self.categorySelector.setGeometry(250, 74, 125, 30)
         self.categorySelector.addItem(self.category.name)
 
         self.editCategories = QPushButton("⚙️", parent)
@@ -472,14 +469,9 @@ class Space(QLabel):
         self.box.setFont(FONT_SMALLEST_CHAR)
         self.configBox.setFont(FONT_SMALLEST_CHAR)
 
-        self.openSpaceConfig.setStyleSheet("background-color: white; border: 1px solid #CACACA")
-        self.editCategories.setStyleSheet("background-color: white; border: 1px solid #CACACA")
-        self.categorySelector.setStyleSheet("""
-            QComboBox {
-                border: 1px solid #AFAFAF;
-                padding-left: 5px;
-            }
-        """)
+        self.openSpaceConfig.setStyleSheet(DEFAULT_BUTTON)
+        self.editCategories.setStyleSheet(EDIT_BUTTON)
+        self.categorySelector.setStyleSheet(COMBO_BOX)
 
         self.updateSpaceColor()
 
@@ -809,7 +801,7 @@ class Store():
         self.storeIcon.setGeometry(posx, posy, 150, 150)
 
         self.changeFloorButton = QComboBox(parent)
-        self.changeFloorButton.setGeometry(25, 10, 125, 25)
+        self.changeFloorButton.setGeometry(25, 10, 125, 30)
 
         for index in range(self.floor):
             self.changeFloorButton.addItem(Language.get("floor") + str(index + 1))
@@ -817,13 +809,8 @@ class Store():
         self.goBackStore.setFont(FONT_SMALL_TEXT)
         self.changeFloorButton.setFont(FONT_SMALL_TEXT)
 
-        self.goBackStore.setStyleSheet("background-color: white; border: 1px solid #CACACA")
-        self.changeFloorButton.setStyleSheet("""
-            QComboBox {
-                border: 1px solid #AFAFAF;
-                padding-left: 5px;
-            }
-        """)
+        self.goBackStore.setStyleSheet(DEFAULT_BUTTON)
+        self.changeFloorButton.setStyleSheet(COMBO_BOX)
 
     def initEvents(self):
         self.storeIcon.clicked.connect(self.openStore)
@@ -929,7 +916,7 @@ class Shelf(QLabel):
         self.doubleShelfLabel.setGeometry(0, 95, 500, 35)
 
         self.doubleShelfInput = InputBool(Language.get("yes"), Language.get("no"), self)
-        self.doubleShelfInput.setGeometry(480, 80, 175, 65)
+        self.doubleShelfInput.setGeometry(480, 92, 175, 34)
 
         self.shelfFloorsLabel = QLabel(Language.get("shelf_question_4"), self)
         self.shelfFloorsLabel.setGeometry(0, 135, 500, 35)
@@ -942,13 +929,13 @@ class Shelf(QLabel):
             self.delShelfButton = QPushButton("❌", self)
             self.delShelfButton.setFont(FONT_SMALLEST_CHAR)
             self.delShelfButton.setGeometry(150, 15, 50, 25)
-            self.delShelfButton.setStyleSheet("background-color: #FFD1D1; border: 1px solid #FFA1A1")
+            self.delShelfButton.setStyleSheet(REST_BUTTON)
 
             self.delShelfButton.clicked.connect(self.delShelf)
 
             self.separator = QLabel(self)
             self.separator.setGeometry(0, 0, 650, 3)
-            self.separator.setStyleSheet("background-color: black")
+            self.separator.setStyleSheet(BACKGROUND_BLACK)
 
         # Style
         self.shelfLabel.setFont(FONT_TEXT)
@@ -1027,7 +1014,7 @@ class MainWindow(QMainWindow):
         # Header Form
         self.headerFormBackground = QLabel("", parent)
         self.headerFormBackground.setGeometry(0, 0, WINDOW_WIDTH, 75)
-        self.headerFormBackground.setStyleSheet("background-color: #dddddd;")
+        self.headerFormBackground.setStyleSheet(BACKGROUND_GREY)
         self.headerFormBackground.hide()
 
         self.storeNameLabel = QLabel(Language.get("name_store"), parent)
@@ -1051,7 +1038,7 @@ class MainWindow(QMainWindow):
         # Footer form
         self.footerFormBackground = QLabel("", parent)
         self.footerFormBackground.setGeometry(0, WINDOW_HEIGHT - 75, WINDOW_WIDTH, 75)
-        self.footerFormBackground.setStyleSheet("background-color: #dddddd;")
+        self.footerFormBackground.setStyleSheet(BACKGROUND_GREY)
         self.footerFormBackground.hide()
 
         self.addShelfButton = QPushButton(Language.get("add_shelf"), parent)
@@ -1073,12 +1060,12 @@ class MainWindow(QMainWindow):
         self.editCategories.setFont(FONT_SMALL_TEXT)
         self.storeNameInput.setFont(FONT_SMALL_TEXT)
 
-        self.goHome.setStyleSheet("background-color: white; border: 1px solid #CACACA")
-        self.storeNameInput.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
-        self.addStoreButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
-        self.editCategories.setStyleSheet("background-color: #FFE397; border: 1px solid #CDB87D")
-        self.addShelfButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
-        self.createStoreButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
+        self.goHome.setStyleSheet(DEFAULT_BUTTON)
+        self.storeNameInput.setStyleSheet(INPUT_TEXT)
+        self.addStoreButton.setStyleSheet(BLUE_BUTTON)
+        self.editCategories.setStyleSheet(EDIT_BUTTON)
+        self.addShelfButton.setStyleSheet(BLUE_BUTTON)
+        self.createStoreButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
         Store.showAllStoreIcons()
 
@@ -1382,35 +1369,33 @@ class LogInWindow(QMainWindow):
         self.accessOfflineButton = QPushButton(Language.get("access_offline"), parent)
         self.accessOfflineButton.setGeometry(15, 555, 150, 30)
         
-        self.logInTitle.setFont(FONT_TITLE)
-        self.logInTitle.setStyleSheet("font-weight: bold")
+        self.logInTitle.setFont(FONT_BOLD_TITLE)
         self.logInTitle.setAlignment(Qt.AlignCenter)
 
-        self.registerTitle.setFont(FONT_TITLE)
-        self.registerTitle.setStyleSheet("font-weight: bold")
+        self.registerTitle.setFont(FONT_BOLD_TITLE)
         self.registerTitle.setAlignment(Qt.AlignCenter)
 
         self.logInButton.setFont(FONT_BIG_TEXT)
-        self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
+        self.logInButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
         self.userLabel.setFont(FONT_TEXT)
         self.passwordLabel.setFont(FONT_TEXT)
         self.repeatPasswordLabel.setFont(FONT_TEXT)
 
         self.registerButton.setFont(FONT_SMALL_TEXT)
-        self.registerButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
+        self.registerButton.setStyleSheet(REGISTER_BUTTON)
 
         self.accessOfflineButton.setFont(FONT_SMALL_TEXT)
-        self.accessOfflineButton.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
+        self.accessOfflineButton.setStyleSheet(OFF_BUTTON)
 
         self.userQLineEdit.setFont(FONT_SMALL_TEXT)
-        self.userQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
+        self.userQLineEdit.setStyleSheet(INPUT_TEXT)
 
         self.passwordQLineEdit.setFont(FONT_SMALL_TEXT)
-        self.passwordQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
+        self.passwordQLineEdit.setStyleSheet(INPUT_TEXT)
 
         self.repeatPasswordQLineEdit.setFont(FONT_SMALL_TEXT)
-        self.repeatPasswordQLineEdit.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
+        self.repeatPasswordQLineEdit.setStyleSheet(INPUT_TEXT)
 
     def initEvents(self):
         self.logInButton.clicked.connect(self.checkLogging)
@@ -1444,8 +1429,8 @@ class LogInWindow(QMainWindow):
             self.logInButton.setText(Language.get("log_in"))
             self.registerButton.setText(Language.get("register"))
 
-            self.logInButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
-            self.registerButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
+            self.logInButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
+            self.registerButton.setStyleSheet(REGISTER_BUTTON)
         else:
             self.logInTitle.hide()
 
@@ -1458,8 +1443,8 @@ class LogInWindow(QMainWindow):
             self.logInButton.setText(Language.get("register"))
             self.registerButton.setText(Language.get("log_in"))
 
-            self.registerButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
-            self.logInButton.setStyleSheet("background-color: white; color: blue; border: 1px solid #AFAFAF")
+            self.registerButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
+            self.logInButton.setStyleSheet(REGISTER_BUTTON)
         
     def register(self):
         if self.passwordQLineEdit.text().__len__() < 8 or self.repeatPasswordQLineEdit.text().strip().__len__() < 8:

@@ -1,8 +1,9 @@
 from PyQt5.QtWidgets import QLabel, QComboBox
 
-from utils.language import Language
-
+from styles import COMBO_BOX
 from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES, FONT_SMALL_TEXT
+
+from utils.language import Language
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
@@ -24,12 +25,7 @@ class LanguageChanger(QLabel):
 
         self.changer.setFont(FONT_SMALL_TEXT)
         self.changer.setGeometry(15, WINDOW_HEIGHT - 50, 100, 25)
-        self.changer.setStyleSheet("""
-            QComboBox {
-                border: 1px solid #AFAFAF;
-                padding-left: 5px;
-            }
-        """)
+        self.changer.setStyleSheet(COMBO_BOX)
     
     def initEvents(self):
         self.changer.currentTextChanged.connect(self.changeLang)

@@ -1,7 +1,8 @@
-from utils.category import Category
-from utils.doubleButton import DoubleButton
-
 from constants import CATEGORY_NAMES, CATEGORY_COLORS, WINDOW_HEIGHT
+
+from utils.category import Category
+
+from components.doubleButton import DoubleButton
 
 def createCategoryIn(space, categoryName, parent, shortcut = False):
     if not shortcut:
