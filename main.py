@@ -63,7 +63,7 @@ class SpaceCategory(QLabel):
 
     def initUI(self, parent):
         self.showSpace = QPushButton(Language.get("go_back"), parent)
-        self.showSpace.setGeometry(1300, 15, 100, 50)
+        self.showSpace.setGeometry(1260, 10, 140, 50)
         self.showSpace.hide()
 
         self.categoryNameLabel = QLabel(Language.get("category_name"), parent)
@@ -121,12 +121,15 @@ class SpaceCategory(QLabel):
         self.createCategoryButton.setDisabled(True)
         self.createCategoryButton.hide()
 
+        self.showSpace.setFont(FONT_SMALL_TEXT)
         self.addCategory.setFont(FONT_SMALL_TEXT)
         self.addCategoryName.setFont(FONT_SMALL_TEXT)
         self.createCategoryButton.setFont(FONT_SMALL_TEXT)
         self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
         self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
+
         
+        self.showSpace.setStyleSheet("background-color: white; border: 1px solid #CACACA")
         self.addCategoryName.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
         self.addCategory.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
         self.cancelButtonAddCategory.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
@@ -394,7 +397,7 @@ class Space(QLabel):
         self.setGeometry(posx, posy, 75, 75)
 
         self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
-        self.initUI(parent, times5Space)
+        self.initUI(shelfIndex, parent, times5Space)
         self.initEvents()
         
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
@@ -408,41 +411,65 @@ class Space(QLabel):
         if actualFloor > floors:
             setUnreachableCategory(self.category)
 
-    def initUI(self, parent, times5Space):
+    def initUI(self, shelfIndex, parent, times5Space):
         nameSpace = str(times5Space * 5) if times5Space > 0 else ""
+        numberSpace = str(shelfIndex + 1)
         
-        self.box = QPushButton(nameSpace, parent)
+        self.shelfNumber = QLabel(Language.get("shelf") + str(shelfIndex + 1), parent)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(self.shelfNumber.width() / 2), 25, 100, 25)
 
-        if self.long:
-            self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 151)
-        else:
-            self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 76)
+        self.box = QPushButton(nameSpace, parent)
+        self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 151)
+
+        self.configBox = QPushButton(numberSpace, parent)
+        self.configBox.setGeometry(26, 75, 76, 76)
 
         self.openSpaceConfig = QPushButton(Language.get("go_back"), parent)
-        self.openSpaceConfig.setGeometry(1300, 15, 100, 50)
+        self.openSpaceConfig.setGeometry(1260, 10, 140, 50)
         
-        self.configBox = QPushButton(parent)
-        self.configBox.setGeometry(26, 26, 76, 76)
-
         self.labelCategory = QLabel(Language.get("category"), parent)
-        self.labelCategory.setGeometry(152, 26, 50, 25)
+        self.labelCategory.setGeometry(152, 75, 100, 25)
 
         self.categorySelector = QComboBox(parent)
-        self.categorySelector.setGeometry(210, 26, 100, 25)
+        self.categorySelector.setGeometry(250, 76, 125, 25)
         self.categorySelector.addItem(self.category.name)
+
+        self.editCategories = QPushButton("⚙️", parent)
+
+        if self.long:
+            self.box.setFixedHeight(151)
+            self.configBox.setFixedHeight(151)
+        else:
+            self.box.setFixedHeight(76)
+            self.configBox.setFixedHeight(76)
 
         for category in CATEGORY_NAMES:
             if category != self.category.name:
                 self.categorySelector.addItem(category.capitalize())
 
-        self.editCategories = QPushButton("⚙️", parent)
-
         if window.userRole == 'Offline' or window.userRole == 'Admin':
-            self.editCategories.setGeometry(320, 26, 26, 26)
+            self.editCategories.setGeometry(390, 71, 35, 35)
         else:
             self.editCategories.setGeometry(0, 0, 0, 0)
 
+        self.shelfNumber.setFont(FONT_TEXT)
+        
+        self.labelCategory.setFont(FONT_SMALL_TEXT)
+        self.editCategories.setFont(FONT_SMALL_TEXT)
+        self.openSpaceConfig.setFont(FONT_SMALL_TEXT)
+        self.categorySelector.setFont(FONT_SMALL_TEXT)
+        
         self.box.setFont(FONT_SMALLEST_CHAR)
+        self.configBox.setFont(FONT_SMALLEST_CHAR)
+
+        self.openSpaceConfig.setStyleSheet("background-color: white; border: 1px solid #CACACA")
+        self.editCategories.setStyleSheet("background-color: white; border: 1px solid #CACACA")
+        self.categorySelector.setStyleSheet("""
+            QComboBox {
+                border: 1px solid #AFAFAF;
+                padding-left: 5px;
+            }
+        """)
 
         self.updateSpaceColor()
 
@@ -462,6 +489,7 @@ class Space(QLabel):
         Store.hideAllStores()
         Store.configSpace(self.storeIndex)
 
+        self.shelfNumber.show()
         self.configBox.show()
         self.labelCategory.show()
         self.categorySelector.show()
@@ -474,10 +502,11 @@ class Space(QLabel):
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
+        self.shelfNumber.hide()
         self.configBox.hide()
         self.labelCategory.hide()
-        self.categorySelector.hide()
         self.editCategories.hide()
+        self.categorySelector.hide()
 
         self.openSpaceConfig.show()
         self.category.showUI()
@@ -490,7 +519,7 @@ class Space(QLabel):
         ShelfInfo.hideAllSpaces()
         Store.stopConfigCategory(self.storeIndex)
 
-        self.configBox.show()
+        self.shelfNumber.show()
         self.configBox.show()
         self.labelCategory.show()
         self.editCategories.show()
@@ -516,11 +545,12 @@ class Space(QLabel):
 
     def hideSpace(self):
         self.box.hide()
+        self.shelfNumber.hide()
         self.configBox.hide()
-        self.categorySelector.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
         self.openSpaceConfig.hide()
+        self.categorySelector.hide()
         self.category.hideUI()
 
     def showSpace(self):
@@ -528,11 +558,12 @@ class Space(QLabel):
 
         self.box.show()
 
+        self.shelfNumber.hide()
         self.configBox.hide()
-        self.categorySelector.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
         self.openSpaceConfig.hide()
+        self.categorySelector.hide()
 
         self.box.raise_()
 
@@ -1271,6 +1302,8 @@ class MainWindow(QMainWindow):
                     else:
                         space.editCategories.setGeometry(0, 0, 0, 0)
 
+window = MainWindow()
+
 class LogInWindow(QMainWindow):
     def __init__(self, mainApp):
         super().__init__()
@@ -1559,8 +1592,6 @@ def getMongoInfo():
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
         UserManager.setUser('Guest', 'Offline')
         QMessageBox.warning(None, "Network error", "There was an issue with the network")
-
-window = MainWindow()
 
 class main():
     logInWindow = LogInWindow(window)
