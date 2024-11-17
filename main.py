@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QLabel, QPushButton
 
 from utils.functions.shelfFunctions import updateShelfPosition
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_TITLE, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -66,26 +66,25 @@ class SpaceCategory(QLabel):
         self.showSpace.setGeometry(1260, 10, 140, 50)
         self.showSpace.hide()
 
+        # Edit existing category
         self.categoryNameLabel = QLabel(Language.get("category_name"), parent)
-        self.categoryNameLabel.setGeometry(25, 25, 125, 25)
+        self.categoryNameLabel.setGeometry(50, 60, 175, 25)
         self.categoryNameLabel.hide()
 
         self.categoryName = QLineEdit(parent)
-        self.categoryName.setGeometry(175, 25, 125, 25)
+        self.categoryName.setGeometry(250, 50, 250, 39)
         self.categoryName.hide()
         
-        # Edit existing category
         self.categoryColorLabel = QLabel(Language.get("category_color"), parent)
-        self.categoryColorLabel.setGeometry(25, 75, 125, 25)
+        self.categoryColorLabel.setGeometry(50, 110, 175, 25)
         self.categoryColorLabel.hide()
 
-        # Edit existing category
         self.categoryColor = QPushButton(Language.get("select_color"), parent)
-        self.categoryColor.setGeometry(175, 75, 125, 25)
+        self.categoryColor.setGeometry(250, 100, 138, 39)
         self.categoryColor.hide()
 
         self.saveCategory = QPushButton(Language.get("save"), parent)
-        self.saveCategory.setGeometry(175, 125, 125, 25)
+        self.saveCategory.setGeometry(250, 150, 125, 39)
         self.saveCategory.hide()
 
         posx = 25
@@ -99,6 +98,7 @@ class SpaceCategory(QLabel):
 
             self.doubleButtons.append(newDoubleButton)
 
+        # Adding a new category
         self.addCategory = QPushButton(Language.get("add_category"), parent)
         self.addCategory.setGeometry(posx + 13, posy + 13, 200, 25)
         self.addCategory.hide()
@@ -121,20 +121,30 @@ class SpaceCategory(QLabel):
         self.createCategoryButton.setDisabled(True)
         self.createCategoryButton.hide()
 
+        self.categoryNameLabel.setAlignment(Qt.AlignRight)
+        self.categoryColorLabel.setAlignment(Qt.AlignRight)
+
+        self.saveCategory.setFont(FONT_SMALL_BOLD_TEXT)
+
         self.showSpace.setFont(FONT_SMALL_TEXT)
         self.addCategory.setFont(FONT_SMALL_TEXT)
+        self.categoryName.setFont(FONT_SMALL_TEXT)
+        self.categoryColor.setFont(FONT_SMALL_TEXT)
         self.addCategoryName.setFont(FONT_SMALL_TEXT)
+        self.categoryNameLabel.setFont(FONT_SMALL_TEXT)
+        self.categoryColorLabel.setFont(FONT_SMALL_TEXT)
         self.createCategoryButton.setFont(FONT_SMALL_TEXT)
         self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
         self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
 
-        
+        self.categoryName.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
         self.showSpace.setStyleSheet("background-color: white; border: 1px solid #CACACA")
         self.addCategoryName.setStyleSheet("border: 1px solid #CACACA; padding-left: 5px")
         self.addCategory.setStyleSheet("background-color: #A4F9FF; border: 1px solid #88C6CB")
-        self.cancelButtonAddCategory.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
-        self.createCategoryButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
         self.newCategoryColorButton.setStyleSheet("background-color: white; border: 1px solid #CACACA;")
+        self.cancelButtonAddCategory.setStyleSheet("background-color: #DADADA; border: 1px solid #AFAFAF")
+        self.saveCategory.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
+        self.createCategoryButton.setStyleSheet("background-color: #59CC4E; color: white; border: 1px solid #7AA376")
 
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
@@ -176,7 +186,7 @@ class SpaceCategory(QLabel):
         color = QColorDialog.getColor()
         
         if color.isValid():
-            self.categoryColor.setStyleSheet("background-color: " + color.name())
+            self.categoryColor.setStyleSheet("background-color: " + color.name() + "; border: 1px solid #CACACA")
             self.newColor = color.name()
     
     def editCategory(self):
@@ -190,7 +200,7 @@ class SpaceCategory(QLabel):
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
 
-        self.categoryColor.setStyleSheet("background-color: " + color)
+        self.categoryColor.setStyleSheet("background-color: " + color + "; border: 1px solid #CACACA")
 
         self.categoryNameLabel.show()
         self.categoryColorLabel.show()
