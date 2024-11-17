@@ -27,11 +27,11 @@ class InputBool(QLabel):
 
         self.trueButton.setFixedHeight(25)
         self.trueButton.setFont(FONT_SMALLEST_CHAR)
-        self.trueButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #AFAFAF; border-right: 0px")
+        self.trueButton.setStyleSheet("background-color: white; border: 1px solid #AFAFAF")
 
         self.falseButton.setFixedHeight(25)
         self.falseButton.setFont(FONT_SMALLEST_CHAR)
-        self.falseButton.setStyleSheet("background-color: white; border: 1px solid #AFAFAF")
+        self.falseButton.setStyleSheet("background-color: #A4F9FF; border: 1px solid #AFAFAF; border-right: 0px")
 
         # Add the icon and text to the layout
         layout.addWidget(self.trueButton)

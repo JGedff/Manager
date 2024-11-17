@@ -442,6 +442,8 @@ class Space(QLabel):
         else:
             self.editCategories.setGeometry(0, 0, 0, 0)
 
+        self.box.setFont(FONT_SMALLEST_CHAR)
+
         self.updateSpaceColor()
 
     def updateSpaceColor(self):
@@ -591,8 +593,10 @@ class ShelfInfo():
 
     def initUI(self, posx, posy, parent):
         self.shelfNumber = QLabel(Language.get("shelf") + str(self.actualNumber) + ":", parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), posy - 25, 100, 25)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), posy, 100, 25)
         self.shelfNumber.hide()
+
+        posy += 35
 
         for actualFloor in range(self.storeFloors):
             times5 = 0
@@ -632,6 +636,8 @@ class ShelfInfo():
                     else:
                         times5 += 1
                         self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
+
+        self.shelfNumber.setFont(FONT_TEXT)
 
     def initEvents(self):
         updateShelfPosition()
@@ -746,7 +752,7 @@ class Store():
         storeShelves = []
 
         for index, i in enumerate(SHELVES_FORMS):
-            storeShelves.append(ShelfInfo(25, 50 + (185 * index), i.floors, i.spaces, i.double_shelf, self.floor, (index + 1), STORES.__len__(), parent))
+            storeShelves.append(ShelfInfo(25, 50 + (225 * index), i.floors, i.spaces, i.double_shelf, self.floor, (index + 1), STORES.__len__(), parent))
         
         SHELVES.append(storeShelves)
         SHELVES_FORMS.clear()
@@ -756,16 +762,27 @@ class Store():
 
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
-        self.goBackStore.setGeometry(1300, 15, 100, 50)
+        self.goBackStore.setGeometry(1260, 10, 140, 50)
 
         self.storeIcon = ImageButton(name, image, parent)
         self.storeIcon.setGeometry(posx, posy, 150, 150)
 
         self.changeFloorButton = QComboBox(parent)
-        self.changeFloorButton.setGeometry(25, 15, 125, 25)
+        self.changeFloorButton.setGeometry(25, 10, 125, 25)
 
         for index in range(self.floor):
             self.changeFloorButton.addItem(Language.get("floor") + str(index + 1))
+
+        self.goBackStore.setFont(FONT_SMALL_TEXT)
+        self.changeFloorButton.setFont(FONT_SMALL_TEXT)
+
+        self.goBackStore.setStyleSheet("background-color: white; border: 1px solid #CACACA")
+        self.changeFloorButton.setStyleSheet("""
+            QComboBox {
+                border: 1px solid #AFAFAF;
+                padding-left: 5px;
+            }
+        """)
 
     def initEvents(self):
         self.storeIcon.clicked.connect(self.openStore)
@@ -784,7 +801,7 @@ class Store():
         self.goBackStore.hide()
 
         window.hideMainButtons()
-        window.resizeHeightScroll(amountShelves * 185 - 100)
+        window.resizeHeightScroll(amountShelves * 225 - 100)
         window.resizeWidthScroll(amountSpaces * 75 + 25)
 
         self.changeFloorButton.show()
@@ -1435,84 +1452,12 @@ class LogInWindow(QMainWindow):
         window.changeUserRole('Offline')
 
         Category.addCategory('Empty', 'white')
-        Category.addCategory('ampty', '#FFFFF')
-        Category.addCategory('smpty', '#FFFFC')
-        Category.addCategory('cmpty', '#FFFCF')
-        Category.addCategory('vmpty', '#FFCFF')
-        Category.addCategory('bmpty', '#FCFFF')
-        Category.addCategory('nmpty', '#CFFFF')
-        Category.addCategory('mmpty', '#CFFFC')
-        Category.addCategory('kmpty', '#CFFCF')
-        Category.addCategory('lmpty', '#CFCFF')
-        Category.addCategory('ompty', '#CCFFF')
-        Category.addCategory('impty', '#CCFFC')
-        Category.addCategory('umpty', '#CCFCF')
-        Category.addCategory('ympty', '#CCCFF')
-        Category.addCategory('1', '#CCCFF')
-        Category.addCategory('2', '#CCCFF')
-        Category.addCategory('3', '#CCCFF')
-        Category.addCategory('4', '#CCCFF')
-        Category.addCategory('5', '#CCCFF')
-        Category.addCategory('6', '#CCCFF')
-        Category.addCategory('7', '#CCCFF')
-        Category.addCategory('8', '#CCCFF')
-        Category.addCategory('9', '#CCCFF')
-        Category.addCategory('0', '#CCCFF')
-        Category.addCategory('10', '#CCCFF')
-        Category.addCategory('11', '#CCCFF')
-        Category.addCategory('12', '#CCCFF')
-        Category.addCategory('13', '#CCCFF')
-        Category.addCategory('14', '#CCCFF')
-        Category.addCategory('15', '#CCCFF')
-        Category.addCategory('16', '#CCCFF')
-        Category.addCategory('17', '#CCCFF')
-        Category.addCategory('18', '#CCCFF')
-        Category.addCategory('19', '#CCCFF')
-        Category.addCategory('20', '#CCCFF')
-        Category.addCategory('21', '#CCCFF')
-        Category.addCategory('22', '#CCCFF')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
 
         createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'ampty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'smpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'cmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'vmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'bmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'nmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'mmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'kmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'lmpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'ompty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'impty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'umpty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'ympty', window.widget, True)
         createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
         createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
-        createCategoryIn(window.categoryManager, '1', window.widget, True)
-        createCategoryIn(window.categoryManager, '2', window.widget, True)
-        createCategoryIn(window.categoryManager, '3', window.widget, True)
-        createCategoryIn(window.categoryManager, '4', window.widget, True)
-        createCategoryIn(window.categoryManager, '5', window.widget, True)
-        createCategoryIn(window.categoryManager, '6', window.widget, True)
-        createCategoryIn(window.categoryManager, '7', window.widget, True)
-        createCategoryIn(window.categoryManager, '8', window.widget, True)
-        createCategoryIn(window.categoryManager, '9', window.widget, True)
-        createCategoryIn(window.categoryManager, '0', window.widget, True)
-        createCategoryIn(window.categoryManager, '10', window.widget, True)
-        createCategoryIn(window.categoryManager, '11', window.widget, True)
-        createCategoryIn(window.categoryManager, '12', window.widget, True)
-        createCategoryIn(window.categoryManager, '13', window.widget, True)
-        createCategoryIn(window.categoryManager, '14', window.widget, True)
-        createCategoryIn(window.categoryManager, '15', window.widget, True)
-        createCategoryIn(window.categoryManager, '16', window.widget, True)
-        createCategoryIn(window.categoryManager, '17', window.widget, True)
-        createCategoryIn(window.categoryManager, '18', window.widget, True)
-        createCategoryIn(window.categoryManager, '19', window.widget, True)
-        createCategoryIn(window.categoryManager, '20', window.widget, True)
-        createCategoryIn(window.categoryManager, '21', window.widget, True)
-        createCategoryIn(window.categoryManager, '22', window.widget, True)
         updateButtonsPosition(window.categoryManager, True)
 
         window.languageChanger.changeLang(self.languageChanger.language)
@@ -1543,7 +1488,6 @@ class LogInWindow(QMainWindow):
         window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
         window.reOpenHome()
         window.show()
-
 
 def getMongoInfo():
     storeIndex = 0
