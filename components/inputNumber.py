@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 
-from styles import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
+from styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
+
 from constants import FONT_SMALLEST_CHAR
 
 from utils.functions.checkFunctions import checkIsNum

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QComboBox
 
-from styles import COMBO_BOX
+from styles.styleSheets import COMBO_BOX
+
 from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES, FONT_SMALL_TEXT
 
 from utils.language import Language

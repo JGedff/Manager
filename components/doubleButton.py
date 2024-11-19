@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QLabel, QPushButton, QWidget
 from PyQt5.QtCore import QRect, QPoint
 
-from styles import DEFAULT_BUTTON, REST_BUTTON
+from styles.styleSheets import DEFAULT_BUTTON, REST_BUTTON
+
 from constants import FONT_SMALL_TEXT
 
 class DoubleButton(QLabel):

@@ -9,7 +9,9 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Netwo
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 
-from styles import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from styles.colorFunctions import getStyleSheet
+
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 
 from utils.functions.globalFunctions import getMaxFloor
@@ -134,14 +136,15 @@ class SpaceCategory(QLabel):
         self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
         self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
 
+        self.addCategory.setStyleSheet(BLUE_BUTTON)
         self.categoryName.setStyleSheet(INPUT_TEXT)
         self.showSpace.setStyleSheet(DEFAULT_BUTTON)
         self.addCategoryName.setStyleSheet(INPUT_TEXT)
-        self.addCategory.setStyleSheet(BLUE_BUTTON)
-        self.newCategoryColorButton.setStyleSheet(DEFAULT_BUTTON)
         self.cancelButtonAddCategory.setStyleSheet(OFF_BUTTON)
         self.saveCategory.setStyleSheet(IMPORTANT_ACTION_BUTTON)
+        self.categoryColor.setStyleSheet(getStyleSheet("#FFFFFF"))
         self.createCategoryButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
+        self.newCategoryColorButton.setStyleSheet(getStyleSheet("#FFFFFF"))
 
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
@@ -183,7 +186,7 @@ class SpaceCategory(QLabel):
         color = QColorDialog.getColor()
         
         if color.isValid():
-            self.categoryColor.setStyleSheet("background-color: " + color.name() + "; border: 1px solid #CACACA")
+            self.categoryColor.setStyleSheet(getStyleSheet(color.name()))
             self.newColor = color.name()
     
     def editCategory(self):
@@ -197,7 +200,7 @@ class SpaceCategory(QLabel):
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
 
-        self.categoryColor.setStyleSheet("background-color: " + color + "; border: 1px solid #CACACA")
+        self.categoryColor.setStyleSheet(getStyleSheet(color))
 
         self.categoryNameLabel.show()
         self.categoryColorLabel.show()
@@ -303,7 +306,7 @@ class SpaceCategory(QLabel):
         self.addCategoryName.setText("")
         self.addCategory.setDisabled(False)
         self.createCategoryButton.setDisabled(True)
-        self.newCategoryColorButton.setStyleSheet(DEFAULT_BUTTON)
+        self.newCategoryColorButton.setStyleSheet(getStyleSheet("#FFFFFF"))
 
         if self.creatingCategory:
             self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
@@ -321,7 +324,7 @@ class SpaceCategory(QLabel):
         color = QColorDialog.getColor()
         
         if color.isValid():
-            self.newCategoryColorButton.setStyleSheet("background-color: " + color.name() + ";border: 1px solid #CACACA;")
+            self.newCategoryColorButton.setStyleSheet(getStyleSheet(color.name()))
             self.newCategoryColor = color.name()
         
         if self.newCategoryColor != "" and self.newCategoryName != "":
@@ -476,8 +479,8 @@ class Space(QLabel):
         self.updateSpaceColor()
 
     def updateSpaceColor(self):
-        self.box.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
-        self.configBox.setStyleSheet("background-color: " + self.category.color + "; border: 1px solid black")
+        self.box.setStyleSheet(getStyleSheet(self.category.color))
+        self.configBox.setStyleSheet(getStyleSheet(self.category.color))
 
     def initEvents(self):
         self.box.clicked.connect(self.configSpace)

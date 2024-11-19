@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
 
-from styles import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
+from styles.styleSheets import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
+
 from constants import FONT_SMALLEST_CHAR
 
 from utils.functions.globalFunctions import useLessFunction
