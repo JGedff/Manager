@@ -5,6 +5,7 @@ class Encrypt:
         salt = bcrypt.gensalt()
 
         textHashed = bcrypt.hashpw(text.encode(), salt)
+
         return textHashed
     
     def check(hashedText, text):
