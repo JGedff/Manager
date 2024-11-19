@@ -1,16 +1,16 @@
-from app.constants import SHELVES_FORMS, WINDOW_HEIGHT, WINDOW_WIDTH
+from app.constants import WINDOW_HEIGHT, WINDOW_WIDTH
 
 from app.utils.language import Language
 
-def saveShelfInfo():
-    for shelf in SHELVES_FORMS:
+def saveShelfInfo(arrayShelfs):
+    for shelf in arrayShelfs:
         shelf.saveInfo()
 
-def updateShelfPosition():
+def updateShelfPosition(arrayShelfs):
     x = 400
     y = 300
 
-    for index, shelf in enumerate(SHELVES_FORMS):
+    for index, shelf in enumerate(arrayShelfs):
         # Updates the position of the shelf
         shelf.setGeometry(x, y, WINDOW_WIDTH, WINDOW_HEIGHT)
 

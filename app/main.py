@@ -10,9 +10,10 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushB
 from PyQt5.QtCore import Qt
 
 from app.styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from app.styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 from app.styles.colorFunctions import getStyleSheet
 
-from app.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
+from app.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
 from app.utils.functions.globalFunctions import getMaxFloor
 from app.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -676,7 +677,7 @@ class ShelfInfo():
         self.shelfNumber.setFont(FONT_TEXT)
 
     def initEvents(self):
-        updateShelfPosition()
+        updateShelfPosition(SHELVES_FORMS)
         window.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalInfoPosition)
 
     def updateHorizontalInfoPosition(self, value):
@@ -964,7 +965,7 @@ class Shelf(QLabel):
         SHELVES_FORMS[shelfToDelete].hide()
         del SHELVES_FORMS[shelfToDelete]
 
-        updateShelfPosition()
+        updateShelfPosition(SHELVES_FORMS)
         window.resizeHeightScroll()
 
     def showForm(self):
@@ -1169,7 +1170,7 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def saveStoreInfo(self):
-        saveShelfInfo()
+        saveShelfInfo(SHELVES_FORMS)
 
         storeName = self.storeNameInput.text().strip()
 
@@ -1570,7 +1571,7 @@ def getMongoInfo():
 
                 spacesInfo.append(mongoSpaces)
             
-            saveShelfInfo()
+            saveShelfInfo(SHELVES_FORMS)
             
             Store.createStore(store['name'], window.widget, store['image'])
 
@@ -1595,7 +1596,7 @@ class main():
     logInWindow = LogInWindow(window)
     logInWindow.show()
     
-    sys.exit(app.exec_())
+    # sys.exit(app.exec_()) This line is commented, so the tests can run correctly
 
     Mongo.closeMongoConnection()
 

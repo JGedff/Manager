@@ -3,8 +3,7 @@ from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
 from app.styles.styleSheets import IMAGE_BUTTON
-
-from app.constants import FONT_SMALL_TEXT
+from app.styles.fonts import FONT_SMALL_TEXT
 
 class ImageButton(QPushButton):
     def __init__(self, text, icon_path, parent = None, resetButton = False):

@@ -1,0 +1,20 @@
+from PyQt5.QtGui import QFont
+
+FONT_BOLD_TITLE = QFont()
+FONT_BOLD_TITLE.setPointSize(24)
+
+FONT_BIG_TEXT = QFont()
+FONT_BIG_TEXT.setPointSize(16)
+
+FONT_TEXT = QFont()
+FONT_TEXT.setPointSize(14)
+
+FONT_SMALL_TEXT = QFont()
+FONT_SMALL_TEXT.setPointSize(12)
+
+FONT_SMALL_BOLD_TEXT = QFont()
+FONT_SMALL_BOLD_TEXT.setBold(True)
+FONT_SMALL_BOLD_TEXT.setPointSize(12)
+
+FONT_SMALLEST_CHAR = QFont()
+FONT_SMALLEST_CHAR.setPointSize(11)
