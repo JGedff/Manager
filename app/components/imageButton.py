@@ -6,14 +6,10 @@ from app.styles.styleSheets import IMAGE_BUTTON
 from app.styles.fonts import FONT_SMALL_TEXT
 
 class ImageButton(QPushButton):
-    def __init__(self, text, icon_path, parent = None, resetButton = False):
+    def __init__(self, text, icon_path, parent = None):
         super().__init__(parent)
 
-        self.initVariables(resetButton)
         self.initUI(text, icon_path)
-
-    def initVariables(self, resetButton):
-        self.resetButton = resetButton
 
     def initUI(self, text, icon_path):
         # Create a layout for the button to hold icon and text

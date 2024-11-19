@@ -2,9 +2,10 @@ import pytest
 
 from PyQt5.QtCore import Qt
 
-from app.components.doubleButton import DoubleButton
+from tests.functions.test_globalVariables import ARRAY_NUMBERS
+from tests.functions.test_globalFunctions import add1, add20
 
-from app.utils.functions.globalFunctions import useLessFunction
+from app.components.doubleButton import DoubleButton
 
 #### CREATE NEEDED OBJECTS ####
 
@@ -13,14 +14,6 @@ def doubleButton(qtbot):
     doubleButton = DoubleButton("button1", "button2", add1, add20)
     qtbot.addWidget(doubleButton)
     return doubleButton
-
-ARRAY_NUMBERS = []
-
-def add1():
-    ARRAY_NUMBERS.append(1)
-
-def add20():
-    ARRAY_NUMBERS.append(20)
 
 #### TESTS ####
 

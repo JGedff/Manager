@@ -1035,7 +1035,7 @@ class MainWindow(QMainWindow):
         self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
         self.formStoreIcon.hide()
 
-        self.setDefaultIcon = ImageButton(Language.get("default_image"), DEFAULT_IMAGE, parent, True)
+        self.setDefaultIcon = ImageButton(Language.get("default_image"), DEFAULT_IMAGE, parent)
         self.setDefaultIcon.setGeometry(int(WINDOW_WIDTH / 2) + 25, 115, 225, 150)
         self.setDefaultIcon.hide()
 
