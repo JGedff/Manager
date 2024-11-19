@@ -157,7 +157,6 @@ class Mongo:
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
-
     @classmethod
     def addMongoCategory(cls, name, color):
         try:
