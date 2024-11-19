@@ -5,7 +5,7 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Opera
 
 from PyQt5.QtWidgets import QMessageBox
 
-from utils.userManager import UserManager
+from app.utils.userManager import UserManager
 
 class Mongo:
     MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")

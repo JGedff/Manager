@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 
-from styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
+from app.styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
 
-from constants import FONT_SMALLEST_CHAR
+from app.constants import FONT_SMALLEST_CHAR
 
-from utils.functions.checkFunctions import checkIsNum
+from app.utils.functions.checkFunctions import checkIsNum
 
 class InputNumber(QLabel):
     def __init__(self, defaultNumber = 0, writeNumber = False, parent = None):

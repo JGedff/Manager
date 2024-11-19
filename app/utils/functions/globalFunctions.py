@@ -1,12 +1,10 @@
-from constants import SHELVES_FORMS
-
 def useLessFunction():
     pass
 
-def getMaxFloor():
+def getMaxFloor(arrayShelves):
     maxFloor = 1
 
-    for shelf in SHELVES_FORMS:
+    for shelf in arrayShelves:
         if maxFloor < shelf.floors:
             maxFloor = shelf.floors
     

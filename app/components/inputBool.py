@@ -1,10 +1,10 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
 
-from styles.styleSheets import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
+from app.styles.styleSheets import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
 
-from constants import FONT_SMALLEST_CHAR
+from app.constants import FONT_SMALLEST_CHAR
 
-from utils.functions.globalFunctions import useLessFunction
+from app.utils.functions.globalFunctions import useLessFunction
 
 class InputBool(QLabel):
     def __init__(self, trueString, falseString, parent = None, actionTrue = useLessFunction, actionFalse = useLessFunction):

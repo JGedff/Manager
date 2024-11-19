@@ -9,26 +9,26 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Netwo
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 
-from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
-from styles.colorFunctions import getStyleSheet
+from app.styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from app.styles.colorFunctions import getStyleSheet
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
+from app.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 
-from utils.functions.globalFunctions import getMaxFloor
-from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
+from app.utils.functions.globalFunctions import getMaxFloor
+from app.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
+from app.utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
 
-from utils.mongoDb import Mongo
-from utils.userManager import UserManager
+from app.utils.mongoDb import Mongo
+from app.utils.userManager import UserManager
 
-from utils.language import Language
-from utils.category import Category
+from app.utils.language import Language
+from app.utils.category import Category
 
-from components.inputBool import InputBool
-from components.inputNumber import InputNumber
-from components.imageButton import ImageButton
-from components.doubleButton import DoubleButton
-from components.languageChanger import LanguageChanger
+from app.components.inputBool import InputBool
+from app.components.inputNumber import InputNumber
+from app.components.imageButton import ImageButton
+from app.components.doubleButton import DoubleButton
+from app.components.languageChanger import LanguageChanger
 
 app = QApplication(sys.argv)
 
@@ -701,7 +701,7 @@ class Store():
         shelvesInfo = []
         mongo_id = 0
 
-        storeFloors = getMaxFloor()
+        storeFloors = getMaxFloor(SHELVES_FORMS)
         emptyCategory = getEmptyCategoryName()
         unreachableCategory = getEmptyCategoryName()
         id_empty_category = Mongo.getMongoCategoryByName(emptyCategory, emptyCategory)
@@ -784,7 +784,7 @@ class Store():
     
     def setupStore(self, parent):
         self.indexShelves = SHELVES.__len__()
-        self.floor = getMaxFloor()
+        self.floor = getMaxFloor(SHELVES_FORMS)
         storeShelves = []
 
         for index, i in enumerate(SHELVES_FORMS):

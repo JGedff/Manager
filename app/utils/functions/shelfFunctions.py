@@ -1,6 +1,6 @@
-from constants import SHELVES_FORMS, WINDOW_HEIGHT, WINDOW_WIDTH
+from app.constants import SHELVES_FORMS, WINDOW_HEIGHT, WINDOW_WIDTH
 
-from utils.language import Language
+from app.utils.language import Language
 
 def saveShelfInfo():
     for shelf in SHELVES_FORMS:

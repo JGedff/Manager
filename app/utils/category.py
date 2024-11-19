@@ -1,4 +1,4 @@
-from constants import CATEGORY_NAMES, CATEGORY_COLORS
+from app.constants import CATEGORY_NAMES, CATEGORY_COLORS
 
 class Category():
     def changeCategoryColor(index, color):
