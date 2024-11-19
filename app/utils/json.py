@@ -1,18 +1,19 @@
 import json
 
 class JsonManager():
+    @staticmethod
     def getJson(path):
         with open(path, 'r', encoding="utf-8") as file:
             return json.load(file)
 
+    @staticmethod
     def getLanguage(lang = "English"):
         match lang:
             case "English":
-                with open("lang/en.json", 'r', encoding="utf-8") as file:
-                    return json.load(file)
+                return JsonManager.getJson('lang/en.json')
             case "Español":
-                with open("lang/es.json", 'r', encoding="utf-8") as file:
-                    return json.load(file)
+                return JsonManager.getJson('lang/es.json')
             case "Català":
-                with open("lang/ca.json", 'r', encoding="utf-8") as file:
-                    return json.load(file)
+                return JsonManager.getJson('lang/ca.json')
+
+        return JsonManager.getJson('lang/en.json')
