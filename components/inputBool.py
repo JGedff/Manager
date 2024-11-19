@@ -1,5 +1,9 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
 
+from styles.styleSheets import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
+
+from constants import FONT_SMALLEST_CHAR
+
 from utils.functions.globalFunctions import useLessFunction
 
 class InputBool(QLabel):
@@ -20,10 +24,16 @@ class InputBool(QLabel):
         layout = QHBoxLayout(self)
 
         self.trueButton = QPushButton(trueString, self)
-        self.trueButton.setStyleSheet("background-color: #ebebeb")
 
         self.falseButton = QPushButton(falseString, self)
-        self.falseButton.setStyleSheet("background-color: #4fd9ff")
+
+        self.trueButton.setFixedHeight(25)
+        self.trueButton.setFont(FONT_SMALLEST_CHAR)
+        self.trueButton.setStyleSheet(FALSE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+
+        self.falseButton.setFixedHeight(25)
+        self.falseButton.setFont(FONT_SMALLEST_CHAR)
+        self.falseButton.setStyleSheet(TRUE_BUTTON)
 
         # Add the icon and text to the layout
         layout.addWidget(self.trueButton)
@@ -37,14 +47,20 @@ class InputBool(QLabel):
     
     def buttonTrueClicked(self):
         self.value = True
-        self.trueButton.setStyleSheet("background-color: #4fd9ff")
-        self.falseButton.setStyleSheet("background-color: #ebebeb")
+
+        self.trueButton.setStyleSheet(TRUE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+        
+        self.falseButton.setStyleSheet(FALSE_BUTTON)
+
         self.actionTrue()
 
     def buttonFalseClicked(self):
         self.value = False
-        self.falseButton.setStyleSheet("background-color: #4fd9ff")
-        self.trueButton.setStyleSheet("background-color: #ebebeb")
+
+        self.falseButton.setStyleSheet(TRUE_BUTTON)
+
+        self.trueButton.setStyleSheet(FALSE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+
         self.actionFalse()
 
     def getValue(self):

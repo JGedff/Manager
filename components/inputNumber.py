@@ -1,5 +1,9 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 
+from styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
+
+from constants import FONT_SMALLEST_CHAR
+
 from utils.functions.checkFunctions import checkIsNum
 
 class InputNumber(QLabel):
@@ -28,6 +32,20 @@ class InputNumber(QLabel):
         layout.addWidget(self.addNumber)
         layout.addWidget(self.inputNum)
         layout.addWidget(self.restNumber)
+
+        self.inputNum.setFixedHeight(50)
+        self.inputNum.setFont(FONT_SMALLEST_CHAR)
+        self.inputNum.setStyleSheet(INPUT_NUMBER + NO_RIGHT_BORDER_BUTTON_INPUT)
+
+        self.addNumber.setFixedWidth(50)
+        self.addNumber.setFixedHeight(50)
+        self.addNumber.setFont(FONT_SMALLEST_CHAR)
+        self.addNumber.setStyleSheet(ADD_BUTTON + NO_RIGHT_BORDER_BUTTON)
+
+        self.restNumber.setFixedWidth(50)
+        self.restNumber.setFixedHeight(50)
+        self.restNumber.setFont(FONT_SMALLEST_CHAR)
+        self.restNumber.setStyleSheet(REST_BUTTON)
 
         layout.setSpacing(0)
     

@@ -1,26 +1,22 @@
-from utils.category import Category
-from utils.doubleButton import DoubleButton
+from constants import CATEGORY_NAMES, CATEGORY_COLORS, WINDOW_HEIGHT
 
-from constants import CATEGORY_NAMES, CATEGORY_COLORS
+from utils.category import Category
+
+from components.doubleButton import DoubleButton
 
 def createCategoryIn(space, categoryName, parent, shortcut = False):
     if not shortcut:
         # Create a button to acces the config of the category
-        newDoubleButton = DoubleButton(25, 50 * CATEGORY_NAMES.__len__() - 25, categoryName, "🗑️", space.category.editCategory, space.category.deleteCategory, parent)
+        newDoubleButton = DoubleButton(categoryName, "❌", space.category.editCategory, space.category.deleteCategory, parent)
+        newDoubleButton.setGeometry(0, 0, 450, 69)
+
         space.category.doubleButtons.append(newDoubleButton)
-
-        # Updates the position of the form to create a new category
-        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
-
-        # Add the new category to the comboBox
-        space.categorySelector.addItem(categoryName)
     else:
         # Create a button to acces the config of the category
-        newDoubleButton = DoubleButton(25, 50 * CATEGORY_NAMES.__len__() - 25, categoryName, "🗑️", space.editCategory, space.deleteCategory, parent)
-        space.doubleButtons.append(newDoubleButton)
+        newDoubleButton = DoubleButton(categoryName, "❌", space.editCategory, space.deleteCategory, parent)
+        newDoubleButton.setGeometry(0, 0, 450, 69)
 
-        # Updates the position of the form to create a new category
-        space.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
+        space.doubleButtons.append(newDoubleButton)
 
 def updateNameCategory(space, color, actualName, newName, shortcut = False):
     if not shortcut:
@@ -78,32 +74,55 @@ def deleteCategoryFrom(space, indexButtonPressed, categoryName, shortcut = False
                 space.category.name = space.category.doubleButtons[indexButtonPressed].button1.text()
             
             space.category.color = Category.getColorByName(space.category.name)
-            #space.categorySelector.setCurrentText(space.category.name)
-
-        # Moves the form to add a new category
-        space.category.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
     else:
         # Hide the buttons before removing them
         space.doubleButtons[indexButtonPressed].hide()
         space.doubleButtons.pop(indexButtonPressed)
 
-        # Moves the form to add a new category
-        space.addCategory.move(25, 50 * CATEGORY_NAMES.__len__() + 25)
-
 def updateButtonsPosition(space, shortcut = False):
     posx = 13
-    posy = 13
+    posy = 24
 
     if not shortcut:
         for index, _ in enumerate(CATEGORY_NAMES):
-            space.category.doubleButtons[index].setGeometry(posx, posy, 450, 50)
+            space.category.doubleButtons[index].setGeometry(posx, posy, 450, 69)
 
-            posy += 50
+            if posy + 100 >= WINDOW_HEIGHT:
+                posx += 400
+                posy = 24
+            else:
+                posy += 50
+
+        if posy + 150 >= WINDOW_HEIGHT:
+            posx += 400
+            posy = 24
+
+        space.category.addCategory.move(posx + 25, posy + 13)
+
+        if space.category.doubleButtons.__len__() >= 37:
+            space.category.addCategory.hide()
+        else:
+            space.category.addCategory.show()
     else:
         for index, _ in enumerate(CATEGORY_NAMES):
-            space.doubleButtons[index].setGeometry(posx, posy, 450, 50)
+            space.doubleButtons[index].setGeometry(posx, posy, 450, 69)
 
-            posy += 50
+            if posy + 100 >= WINDOW_HEIGHT:
+                posx += 400
+                posy = 24
+            else:
+                posy += 50
+
+        if posy + 150 >= WINDOW_HEIGHT:
+            posx += 400
+            posy = 24
+
+        space.addCategory.move(posx + 25, posy + 13)
+
+        if space.doubleButtons.__len__() >= 37:
+            space.addCategory.hide()
+        else:
+            space.addCategory.show()
 
 def setEmptyCategory(category):
     if CATEGORY_NAMES.__len__() > 0:

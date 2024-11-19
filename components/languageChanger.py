@@ -1,8 +1,10 @@
 from PyQt5.QtWidgets import QLabel, QComboBox
 
-from utils.language import Language
+from styles.styleSheets import COMBO_BOX
 
-from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
+from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES, FONT_SMALL_TEXT
+
+from utils.language import Language
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
@@ -21,7 +23,10 @@ class LanguageChanger(QLabel):
         self.changer.addItem("English")
         self.changer.addItem("Español")
         self.changer.addItem("Català")
+
+        self.changer.setFont(FONT_SMALL_TEXT)
         self.changer.setGeometry(15, WINDOW_HEIGHT - 50, 100, 25)
+        self.changer.setStyleSheet(COMBO_BOX)
     
     def initEvents(self):
         self.changer.currentTextChanged.connect(self.changeLang)
@@ -34,9 +39,11 @@ class LanguageChanger(QLabel):
 
     def updateUI(self):
         try:
-            self.WINDOW.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__()))
+            self.WINDOW.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
             self.WINDOW.createStoreButton.setText(Language.get("create_store"))
             self.WINDOW.editCategories.setText(Language.get("edit_categories"))
+            self.WINDOW.setDefaultIcon.setText(Language.get("default_image"))
+            self.WINDOW.formStoreIcon.setText(Language.get("change_image"))
             self.WINDOW.storeNameLabel.setText(Language.get("name_store"))
             self.WINDOW.addStoreButton.setText(Language.get("add_store"))
             self.WINDOW.addShelfButton.setText(Language.get("add_shelf"))
@@ -94,11 +101,23 @@ class LanguageChanger(QLabel):
             
             self.WINDOW.reOpenHome()
         except:
+            self.WINDOW.setWindowTitle(Language.get("log_in"))
+            self.WINDOW.logInTitle.setText(Language.get("log_in"))
             self.WINDOW.userLabel.setText(Language.get("user_name"))
             self.WINDOW.passwordLabel.setText(Language.get("password"))
-            self.WINDOW.logInButton.setText(Language.get("log_in"))
-            self.WINDOW.registerButton.setText(Language.get("register"))
+            self.WINDOW.registerTitle.setText(Language.get("register"))
             self.WINDOW.accessOfflineButton.setText(Language.get("access_offline"))
+            self.WINDOW.repeatPasswordLabel.setText(Language.get("repeat_password"))
+            self.WINDOW.userQLineEdit.setPlaceholderText(Language.get("enter_user_name"))
+            self.WINDOW.passwordQLineEdit.setPlaceholderText(Language.get("enter_password"))
+            self.WINDOW.repeatPasswordQLineEdit.setPlaceholderText(Language.get("enter_password"))
+
+            if self.WINDOW.logIn:
+                self.WINDOW.logInButton.setText(Language.get("log_in"))
+                self.WINDOW.registerButton.setText(Language.get("register"))
+            else:
+                self.WINDOW.logInButton.setText(Language.get("register"))
+                self.WINDOW.registerButton.setText(Language.get("log_in"))
     
     def hide(self):
         self.changer.hide()
