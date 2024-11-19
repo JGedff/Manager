@@ -10,21 +10,18 @@ from app.utils.functions.globalFunctions import useLessFunction, getMaxFloor
 def shelf1(qtbot):
     shelf_object = Shelf("", 0, 0)
     qtbot.addWidget(shelf_object)
-    shelf_object.show()
     return shelf_object
 
 @pytest.fixture
 def shelf2(qtbot):
     shelf_object = Shelf("", 0, 0)
     qtbot.addWidget(shelf_object)
-    shelf_object.show()
     return shelf_object
 
 @pytest.fixture
 def shelf3(qtbot):
     shelf_object = Shelf("", 0, 0)
     qtbot.addWidget(shelf_object)
-    shelf_object.show()
     return shelf_object
 
 #### TESTS ####

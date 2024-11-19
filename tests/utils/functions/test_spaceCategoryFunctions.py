@@ -11,14 +11,12 @@ from app.utils.functions.spaceCategoryFunctions import createCategoryIn, updateN
 def spaceCategoryMain(qtbot):
     space_category = SpaceCategory()
     qtbot.addWidget(space_category)
-    space_category.show()
     return space_category
 
 @pytest.fixture
 def space1(qtbot):
     space = Space(0, 0, 1, 1, 1, 1, 1, 1)
     qtbot.addWidget(space)
-    space.show()
     return space
 
 #### TESTS ####

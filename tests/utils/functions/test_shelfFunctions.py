@@ -10,14 +10,12 @@ from app.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPositio
 def shelf4(qtbot):
     shelf_object = Shelf("", 0, 0)
     qtbot.addWidget(shelf_object)
-    shelf_object.show()
     return shelf_object
 
 @pytest.fixture
 def shelf5(qtbot):
     shelf_object = Shelf("", 0, 0)
     qtbot.addWidget(shelf_object)
-    shelf_object.show()
     return shelf_object
 
 #### TESTS ####
