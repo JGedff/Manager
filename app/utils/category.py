@@ -19,11 +19,15 @@ class Category():
         for index, cat in enumerate(CATEGORY_NAMES):
             if cat.lower() == name.lower():
                 return index
+            
+        return -1
 
     def getColorByName(name):
         for index, cat in enumerate(CATEGORY_NAMES):
             if cat.lower() == name.lower():
                 return CATEGORY_COLORS[index]
+        
+        return "#000000"
 
     def getNameByIndex(index):
         return CATEGORY_NAMES[index]
