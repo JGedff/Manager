@@ -8,6 +8,9 @@ class Language():
     def changeTo(cls, language):
         cls.lang = language
         cls.info = JsonManager.getLanguage(language)
+
+        if language != "Español" and language != "Català":
+            cls.lang = "English"
     
     @classmethod
     def get(cls, string):
