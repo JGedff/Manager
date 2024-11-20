@@ -21,6 +21,23 @@ class Mongo:
     def closeMongoConnection():
         Mongo.MONGO_CLIENT.close()
 
+    @staticmethod
+    def connectionIsOpen():
+        try:
+            Mongo.MONGO_CLIENT.admin.command('ping')
+            return True
+        except Exception:
+            return False
+        
+    @staticmethod
+    def reconnect():
+        Mongo.MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+        Mongo.DB = Mongo.MONGO_CLIENT['manager']
+        Mongo.STORES_COLLECTION = Mongo.DB['stores']
+        Mongo.SPACES_COLLECTION = Mongo.DB['spaces']
+        Mongo.SHELVES_COLLECTION = Mongo.DB['shelfs']
+        Mongo.CATEGORIES_COLLECTION = Mongo.DB['categorys']
+
     @classmethod
     def addShelvesToMongo(cls, arrayInfo = []):
         arrayToInsert = []

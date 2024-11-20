@@ -1451,7 +1451,9 @@ class LogInWindow(QMainWindow):
             self.logInButton.setStyleSheet(REGISTER_BUTTON)
         
     def register(self):
-        if self.passwordQLineEdit.text().__len__() < 8 or self.repeatPasswordQLineEdit.text().strip().__len__() < 8:
+        if self.userQLineEdit.text().__len__() < 4:
+            QMessageBox.warning(None, "Username too short", "The username must be at least 5 characters long")
+        elif self.passwordQLineEdit.text().__len__() < 8 or self.repeatPasswordQLineEdit.text().strip().__len__() < 8:
             QMessageBox.warning(None, "Weak password", "The passwords must be 8 digits long")
         elif self.passwordQLineEdit.text() != self.repeatPasswordQLineEdit.text():
             QMessageBox.warning(None, "Diferent passwords", "The passwords must be the same")
@@ -1466,7 +1468,7 @@ class LogInWindow(QMainWindow):
                 self.loggedSuccessful(self.userQLineEdit.text())
     
     def loggedUnsuccessful(self):
-        QMessageBox.warning(None, "Login Failed", "Incorrect username or password.")
+        QMessageBox.warning(None, "Login Failed", "Incorrect username or password")
 
     def openOfflineVersion(self):
         UserManager.setUser('Guest', 'Offline')
@@ -1514,7 +1516,7 @@ class LogInWindow(QMainWindow):
 
         self.close()
 
-        getMongoInfo()
+        # getMongoInfo() This line was commented so it does not load categories or stores that could change the tests
 
         window.languageChanger.update()
         window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
@@ -1598,7 +1600,7 @@ class main():
     
     # sys.exit(app.exec_()) This line is commented, so the tests can run correctly
 
-    Mongo.closeMongoConnection()
+    # Mongo.closeMongoConnection() This line is commented, so mongodb connections can work properly while testing
 
 if __name__ == "__main__":
     main()

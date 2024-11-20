@@ -1,4 +1,4 @@
-from tests.functions.test_constantsForTest import ARRAY_NUMBERS
+from tests.functions.constantsForTest import ARRAY_NUMBERS
 
 #### GLOBAL FUNCTIONS FOR TESTING ####
 

@@ -2,8 +2,8 @@ import pytest
 
 from PyQt5.QtCore import Qt
 
-from tests.functions.test_constantsForTest import ARRAY_NUMBERS
-from tests.functions.test_functionsForTest import add1, add20
+from tests.functions.constantsForTest import ARRAY_NUMBERS
+from tests.functions.functionsForTest import add1, add20
 
 from app.components.inputBool import InputBool
 

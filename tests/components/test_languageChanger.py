@@ -2,7 +2,7 @@ import pytest
 
 from PyQt5.QtCore import Qt
 
-from tests.functions.test_constantsForTest import LOGIN_WINDOW, MAIN_WINDOW
+from tests.functions.constantsForTest import WINDOWS
 
 from app.components.languageChanger import LanguageChanger
 
@@ -10,13 +10,13 @@ from app.components.languageChanger import LanguageChanger
 
 @pytest.fixture
 def mainLanguageChanger(qtbot):
-    qComboBox = LanguageChanger(MAIN_WINDOW, MAIN_WINDOW.widget)
+    qComboBox = LanguageChanger(WINDOWS.mainWindow, WINDOWS.mainWindow.widget)
     qtbot.addWidget(qComboBox)
     return qComboBox
 
 @pytest.fixture
 def logInLanguageChanger(qtbot):
-    qComboBox = LanguageChanger(LOGIN_WINDOW, LOGIN_WINDOW.widget)
+    qComboBox = LanguageChanger(WINDOWS.loginWindow, WINDOWS.loginWindow.widget)
     qtbot.addWidget(qComboBox)
     return qComboBox
 
@@ -24,32 +24,32 @@ def logInLanguageChanger(qtbot):
 
 def test_changeMain(mainLanguageChanger):
     assert mainLanguageChanger.language == "English"
-    assert MAIN_WINDOW.window().windowTitle() == "Manager"
+    assert WINDOWS.mainWindow.window().windowTitle() == "Manager"
 
     mainLanguageChanger.changeLang("Español")
 
     assert mainLanguageChanger.language == "Español"
-    assert MAIN_WINDOW.window().windowTitle() == "Gestor"
+    assert WINDOWS.mainWindow.window().windowTitle() == "Gestor"
 
     mainLanguageChanger.changeLang("Català")
 
     assert mainLanguageChanger.language == "Català"
-    assert MAIN_WINDOW.window().windowTitle() == "Gestor"
+    assert WINDOWS.mainWindow.window().windowTitle() == "Gestor"
 
     mainLanguageChanger.changeLang("English")
 
 def test_changeLangLogIn(logInLanguageChanger):
     assert logInLanguageChanger.language == "English"
-    assert LOGIN_WINDOW.window().windowTitle() == "Log in"
+    assert WINDOWS.loginWindow.window().windowTitle() == "Log in"
 
     logInLanguageChanger.changeLang("Español")
 
     assert logInLanguageChanger.language == "Español"
-    assert LOGIN_WINDOW.window().windowTitle() == "Iniciar sesión"
+    assert WINDOWS.loginWindow.window().windowTitle() == "Iniciar sesión"
 
     logInLanguageChanger.changeLang("Català")
 
     assert logInLanguageChanger.language == "Català"
-    assert LOGIN_WINDOW.window().windowTitle() == "Iniciar sessió"
+    assert WINDOWS.loginWindow.window().windowTitle() == "Iniciar sessió"
 
     logInLanguageChanger.changeLang("English")

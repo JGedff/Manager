@@ -1,6 +1,12 @@
 from app.constants import CATEGORY_NAMES, CATEGORY_COLORS
 
 class Category():
+    @staticmethod
+    def delAll():
+        while CATEGORY_NAMES.__len__() > 0:
+            CATEGORY_NAMES.pop()
+            CATEGORY_COLORS.pop()
+
     def changeCategoryColor(index, color):
         CATEGORY_COLORS[index] = color
 
