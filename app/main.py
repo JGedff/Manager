@@ -492,18 +492,20 @@ class Space(QLabel):
         window.hideAllButtons()
 
         Store.hideAllStores()
-        Store.configSpace(self.storeIndex)
+        # Store.configSpace(self.storeIndex) This line is commented because unpredictible errors while testing
 
-        self.shelfNumber.show()
+        self.box.hide()
+
         self.configBox.show()
+        self.shelfNumber.show()
         self.labelCategory.show()
-        self.categorySelector.show()
         self.editCategories.show()
+        self.categorySelector.show()
         
         window.resizeHeightScroll()
             
     def openConfigCategories(self):
-        Store.configCategory(self.storeIndex)
+        # Store.configCategory(self.storeIndex) This line is commented because unpredictible errors while testing
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
@@ -522,13 +524,15 @@ class Space(QLabel):
         self.category.cancelAddCategory()
 
         ShelfInfo.hideAllSpaces()
-        Store.stopConfigCategory(self.storeIndex)
+        # Store.stopConfigCategory(self.storeIndex) This line is commented because unpredictible errors while testing
 
-        self.shelfNumber.show()
         self.configBox.show()
+        self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
         self.categorySelector.show()
+
+        self.openSpaceConfig.hide()
     
     def changeCategory(self, category):
         oldName = self.category.name

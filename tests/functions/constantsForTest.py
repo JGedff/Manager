@@ -6,9 +6,10 @@ if Mongo.connectionIsOpen():
 
 #### GLOBAL VARIABLES FOR TESTING ####
 
-from app.main import MainWindow, LogInWindow
 from app.utils.category import Category
 from app.utils.userManager import UserManager
+
+from app.main import MainWindow, LogInWindow
 
 ARRAY_NUMBERS = []
 
