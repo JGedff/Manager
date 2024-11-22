@@ -17,7 +17,7 @@ from app.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DE
 
 from app.utils.functions.globalFunctions import getMaxFloor
 from app.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from app.utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName, getUnreachableCategoryName
+from app.utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName
 
 from app.utils.mongoDb import Mongo
 from app.utils.userManager import UserManager
@@ -95,7 +95,6 @@ class SpaceCategory(QLabel):
             newDoubleButton.setGeometry(posx - 12, posy - 12, 450, 69)
 
             posy += 69
-
             self.doubleButtons.append(newDoubleButton)
 
         # Adding a new category

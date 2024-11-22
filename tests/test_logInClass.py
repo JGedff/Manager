@@ -14,7 +14,6 @@ from app.utils.mongoDb import Mongo
 def login_window(qtbot):
     window = WINDOWS.loginWindow
     qtbot.addWidget(window)
-    window.show()
     return window
 
 #### TESTS ####
@@ -65,7 +64,7 @@ def test_logInSuccessful(qtbot, login_window, monkeypatch):
     qtbot.mouseClick(inputUser, Qt.LeftButton)
     qtbot.keyClicks(inputUser, "jmmarmi")
     qtbot.mouseClick(inputPassword, Qt.LeftButton)
-    qtbot.keyClicks(inputPassword, "1234")
+    qtbot.keyClicks(inputPassword, "12345678")
     qtbot.mouseClick(logInButton, Qt.LeftButton)
 
     assert captured_title == "Login successful"
