@@ -736,7 +736,7 @@ class Store():
             })
             
         Mongo.addStoreToMongo(shelvesInfo, name, image_path)
-        
+
     @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):
         posx = 25
