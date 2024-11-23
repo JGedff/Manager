@@ -4,11 +4,6 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QColorDialog
 
-from tests.functions.constantsForTest import WINDOWS
-
-from app.styles.styleSheets import IMPORTANT_ACTION_BUTTON, REGISTER_BUTTON
-from app.utils.mongoDb import Mongo
-
 from app.utils.functions.spaceCategoryFunctions import createCategoryIn, updateNameCategory, deleteCategoryFrom
 from app.styles.colorFunctions import getStyleSheet
 from app.utils.category import Category
