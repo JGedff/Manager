@@ -8,8 +8,9 @@ if Mongo.connectionIsOpen():
 
 from app.utils.category import Category
 from app.utils.userManager import UserManager
+from app.constants import STORES, SPACES, SHELVES, SHELVES_FORMS
 
-from app.main import MainWindow, LogInWindow
+from app.main import MainWindow, LogInWindow, Shelf
 
 ARRAY_NUMBERS = []
 
@@ -30,5 +31,15 @@ class WINDOWS():
 
         cls.mainWindow = MainWindow()
         cls.loginWindow = LogInWindow(cls.mainWindow)
+    
+    @staticmethod
+    def resetGlobalVariables():
+        STORES.clear()
+        SPACES.clear()
+        SHELVES.clear()
+        SHELVES_FORMS.clear()
+
+        Shelf.createShelf(None)
+        Shelf.createShelf(None)
 
 WINDOWS.start()

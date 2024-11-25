@@ -1165,7 +1165,9 @@ class MainWindow(QMainWindow):
 
         self.goHome.show()
         self.goHome.raise_()
+        self.addStoreButton.hide()
         self.editCategories.hide()
+        self.languageChanger.hide()
 
     def createShelf(self):
         Shelf.createShelf(self.widget)
