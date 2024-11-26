@@ -25,7 +25,7 @@ jobs:
         run: python ./buildScript.py
 
       - name: Commit and push changes
-        uses: stefanzweifel/git-auto-commit-action@c5.0.1
+        uses: stefanzweifel/git-auto-commit-action@v5.0.1
         with:
           commit_message: Refactor
           branch: main
