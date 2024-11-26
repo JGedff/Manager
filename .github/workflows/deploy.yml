@@ -1,0 +1,35 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - refactor
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v4
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build app
+        run: python ./buildScript.py
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@c5.0.1
+        with:
+          commit_message: Refactor
+          branch: main
+          file_pattern: 'build/*'
+          commit_user_name: Jordi Marmi [GitHub Actions]
+          commit_user_email: jordimarmi1@gmail.com
+          commit_author: JGedff
