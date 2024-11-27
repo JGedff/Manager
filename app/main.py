@@ -1602,7 +1602,7 @@ def getMongoInfo():
 class main():
     logInWindow = LogInWindow(window)
     logInWindow.show()
-    
+
     # sys.exit(app.exec_()) This line is commented, so the tests can run correctly
 
     # Mongo.closeMongoConnection() This line is commented, so mongodb connections can work properly while testing
