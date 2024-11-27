@@ -2,9 +2,9 @@ import pytest
 
 from PyQt5.QtCore import Qt
 
-from app.constants import SHELVES_FORMS
+from app_tests.constants import SHELVES_FORMS
 
-from app.main import Shelf
+from app_tests.main import Shelf
 
 #### CREATE NEEDED OBJECTS ####
 

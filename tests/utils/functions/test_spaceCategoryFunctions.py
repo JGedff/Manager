@@ -1,9 +1,9 @@
 import pytest
 
-from app.main import SpaceCategory, Space
+from app_tests.main import SpaceCategory, Space
 
-from app.utils.category import Category
-from app.utils.functions.spaceCategoryFunctions import createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, setUnreachableCategory, setCategoryByName, getEmptyCategoryName, getUnreachableCategoryName
+from app_tests.utils.category import Category
+from app_tests.utils.functions.spaceCategoryFunctions import createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, setUnreachableCategory, setCategoryByName, getEmptyCategoryName, getUnreachableCategoryName
 
 #### CREATE NEEDED OBJECTS ####
 

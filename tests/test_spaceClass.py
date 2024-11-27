@@ -2,10 +2,10 @@ import pytest
 
 from PyQt5.QtCore import Qt
 
-from app.styles.colorFunctions import getStyleSheet
-from app.utils.category import Category
+from app_tests.styles.colorFunctions import getStyleSheet
+from app_tests.utils.category import Category
 
-from app.main import Space
+from app_tests.main import Space
 
 #### CREATE NEEDED OBJECTS ####
 

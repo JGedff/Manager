@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from tests.functions.constantsForTest import ARRAY_NUMBERS
 from tests.functions.functionsForTest import add1, add20
 
-from app.components.inputBool import InputBool
+from app_tests.components.inputBool import InputBool
 
 #### CREATE NEEDED OBJECTS ####
 

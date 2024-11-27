@@ -4,10 +4,10 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 from PyQt5.QtWidgets import QColorDialog
 
-from app.utils.functions.spaceCategoryFunctions import createCategoryIn, updateNameCategory, deleteCategoryFrom
-from app.styles.colorFunctions import getStyleSheet
-from app.utils.category import Category
-from app.main import SpaceCategory
+from app_tests.utils.functions.spaceCategoryFunctions import createCategoryIn, updateNameCategory, deleteCategoryFrom
+from app_tests.styles.colorFunctions import getStyleSheet
+from app_tests.utils.category import Category
+from app_tests.main import SpaceCategory
 
 #### CREATE NEEDED OBJECTS ####
 

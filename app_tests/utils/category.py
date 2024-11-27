@@ -1,4 +1,4 @@
-from app.constants import CATEGORY_NAMES, CATEGORY_COLORS
+from app_tests.constants import CATEGORY_NAMES, CATEGORY_COLORS
 
 class Category():
     @staticmethod

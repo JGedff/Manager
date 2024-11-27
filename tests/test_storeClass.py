@@ -1,10 +1,10 @@
 from PyQt5.QtCore import Qt
 
-from app.constants import STORES, SHELVES, SHELVES_FORMS
+from app_tests.constants import STORES, SHELVES, SHELVES_FORMS
 
-from app.utils.category import Category
+from app_tests.utils.category import Category
 
-from app.main import Store, Shelf
+from app_tests.main import Store, Shelf
 
 #### TESTS ####
 

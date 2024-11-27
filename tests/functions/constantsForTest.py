@@ -1,16 +1,16 @@
 #### CLOSE MONGO CONNECTION SO ALL TESTS WORK PROPERLY ####
-from app.utils.mongoDb import Mongo
+from app_tests.utils.mongoDb import Mongo
 
 if Mongo.connectionIsOpen():
     Mongo.closeMongoConnection()
 
 #### GLOBAL VARIABLES FOR TESTING ####
 
-from app.utils.category import Category
-from app.utils.userManager import UserManager
-from app.constants import STORES, SPACES, SHELVES, SHELVES_FORMS
+from app_tests.utils.category import Category
+from app_tests.utils.userManager import UserManager
+from app_tests.constants import STORES, SPACES, SHELVES, SHELVES_FORMS
 
-from app.main import MainWindow, LogInWindow, Shelf
+from app_tests.main import MainWindow, LogInWindow, Shelf
 
 ARRAY_NUMBERS = []
 

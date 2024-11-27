@@ -1,6 +1,6 @@
 from test_json import ENJSON, ESJSON, CAJSON
 
-from app.utils.language import Language
+from app_tests.utils.language import Language
 
 def test_changeTo():
     assert Language.lang == "English"

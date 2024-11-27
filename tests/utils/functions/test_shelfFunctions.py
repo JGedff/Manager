@@ -1,8 +1,8 @@
 import pytest
 
-from app.main import Shelf
+from app_tests.main import Shelf
 
-from app.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
+from app_tests.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
 
 #### CREATE NEEDED OBJECTS ####
 

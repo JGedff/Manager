@@ -1,4 +1,4 @@
-from app.utils.json import JsonManager
+from app_tests.utils.json import JsonManager
 
 CAJSON = {
     "window_title": "Gestor",

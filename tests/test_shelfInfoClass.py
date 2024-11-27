@@ -1,4 +1,4 @@
-from app.main import ShelfInfo
+from app_tests.main import ShelfInfo
 
 #### TESTS ####
 

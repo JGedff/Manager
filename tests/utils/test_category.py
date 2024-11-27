@@ -1,8 +1,8 @@
 import pytest
 
-from app.constants import CATEGORY_COLORS, CATEGORY_NAMES
+from app_tests.constants import CATEGORY_COLORS, CATEGORY_NAMES
 
-from app.utils.category import Category
+from app_tests.utils.category import Category
 
 def test_changeCategoryColor():
     assert CATEGORY_COLORS[0] == "#976431"

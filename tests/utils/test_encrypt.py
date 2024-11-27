@@ -1,4 +1,4 @@
-from app.utils.encrypt import Encrypt
+from app_tests.utils.encrypt import Encrypt
 
 def test_hash():
     string = "TEST"

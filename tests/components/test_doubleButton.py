@@ -5,8 +5,8 @@ from PyQt5.QtCore import Qt
 from tests.functions.constantsForTest import ARRAY_NUMBERS
 from tests.functions.functionsForTest import add1, add20
 
-from app.utils.mongoDb import Mongo
-from app.components.doubleButton import DoubleButton
+from app_tests.utils.mongoDb import Mongo
+from app_tests.components.doubleButton import DoubleButton
 
 #### CREATE NEEDED OBJECTS ####
 

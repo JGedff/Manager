@@ -1,4 +1,4 @@
-from app.styles.colorFunctions import get_contrast_color, darken_color, getStyleSheet
+from app_tests.styles.colorFunctions import get_contrast_color, darken_color, getStyleSheet
 
 def test_get_contrast_color():
     assert get_contrast_color("#FFFFFF") == "#000000"

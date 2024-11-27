@@ -4,7 +4,7 @@ from PyQt5.QtCore import Qt
 
 from tests.functions.constantsForTest import WINDOWS
 
-from app.components.languageChanger import LanguageChanger
+from app_tests.components.languageChanger import LanguageChanger
 
 #### CREATE NEEDED OBJECTS ####
 

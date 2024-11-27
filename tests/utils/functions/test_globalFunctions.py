@@ -1,8 +1,8 @@
 import pytest
 
-from app.main import Shelf
+from app_tests.main import Shelf
 
-from app.utils.functions.globalFunctions import useLessFunction, getMaxFloor
+from app_tests.utils.functions.globalFunctions import useLessFunction, getMaxFloor
 
 #### CREATE NEEDED OBJECTS ####
 

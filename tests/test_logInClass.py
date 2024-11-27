@@ -5,8 +5,8 @@ from PyQt5.QtWidgets import QMessageBox
 
 from tests.functions.constantsForTest import WINDOWS
 
-from app.styles.styleSheets import IMPORTANT_ACTION_BUTTON, REGISTER_BUTTON
-from app.utils.mongoDb import Mongo
+from app_tests.styles.styleSheets import IMPORTANT_ACTION_BUTTON, REGISTER_BUTTON
+from app_tests.utils.mongoDb import Mongo
 
 #### CREATE NEEDED OBJECTS ####
 

@@ -5,9 +5,9 @@ from PyQt5.QtWidgets import QFileDialog
 
 from tests.functions.constantsForTest import WINDOWS
 
-from app.utils.mongoDb import Mongo
+from app_tests.utils.mongoDb import Mongo
 
-from app.constants import DEFAULT_IMAGE, SHELVES_FORMS, STORES
+from app_tests.constants import DEFAULT_IMAGE, SHELVES_FORMS, STORES
 
 #### CREATE NEEDED OBJECTS ####
 

@@ -2,7 +2,7 @@ import pytest
 
 from PyQt5.QtCore import Qt
 
-from app.components.inputNumber import InputNumber
+from app_tests.components.inputNumber import InputNumber
 
 #### CREATE NEEDED OBJECTS ####
 
