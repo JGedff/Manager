@@ -16,18 +16,18 @@ jobs:
       - name: Get repository
         uses: actions/checkout@v4
 
-      - name: Setup python
-        uses: actions/setup-python@v5
+      - name: Setup node
+        uses: actions/setup-node@v4
         with:
-          python-version: '3.12'
+          node-version: 20
 
       - name: Build app
-        run: python ./buildScript.py
+        run: npm run build
 
       - name: Commit and push changes
         uses: stefanzweifel/git-auto-commit-action@v5.0.1
         with:
-          commit_message: Refactor
+          commit_message: Refactor build
           branch: main
           file_pattern: 'build/*'
           commit_user_name: Jordi Marmi [GitHub Actions]
