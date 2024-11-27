@@ -1,6 +1,7 @@
 name: Deploy
 
 on:
+  pull_request:
   push:
     branches:
       - refactor
@@ -15,6 +16,8 @@ jobs:
     steps:
       - name: Get repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup node
         uses: actions/setup-node@v4
