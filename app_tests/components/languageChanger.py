@@ -8,16 +8,17 @@ from app_tests.constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
 from app_tests.utils.language import Language
 
 class LanguageChanger(QLabel):
-    def __init__(self, window, parent):
+    def __init__(self, window, parent, mainWindow = False):
         super().__init__(parent)
 
-        self.initVariables(window)
+        self.initVariables(window, mainWindow)
         self.initUI(parent)
         self.initEvents()
 
-    def initVariables(self, window):
+    def initVariables(self, window, mainWindow):
         self.language = 'English'
         self.WINDOW = window
+        self.mainWindow = mainWindow
 
     def initUI(self,parent):
         self.changer = QComboBox(parent)
@@ -39,7 +40,7 @@ class LanguageChanger(QLabel):
         self.language = language
 
     def updateUI(self):
-        try:
+        if self.mainWindow:
             self.WINDOW.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
             self.WINDOW.createStoreButton.setText(Language.get("create_store"))
             self.WINDOW.editCategories.setText(Language.get("edit_categories"))
@@ -66,8 +67,8 @@ class LanguageChanger(QLabel):
             for shelfIndex, shelf in enumerate(SHELVES_FORMS):
                 shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
                 shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
-                shelf.doubleShelfInput.trueButton.setText(Language.get("yes"))
-                shelf.doubleShelfInput.falseButton.setText(Language.get("no"))
+                shelf.doubleShelfInput.setTrueText(Language.get("yes"))
+                shelf.doubleShelfInput.setFalseText(Language.get("no"))
                 shelf.shelfFloorsLabel.setText(Language.get("shelf_question_4"))
                 shelf.shelfLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
 
@@ -101,7 +102,7 @@ class LanguageChanger(QLabel):
                         space.category.addCategoryName.setPlaceholderText(Language.get("name"))
             
             self.WINDOW.reOpenHome()
-        except:
+        else:
             self.WINDOW.setWindowTitle(Language.get("log_in"))
             self.WINDOW.logInTitle.setText(Language.get("log_in"))
             self.WINDOW.userLabel.setText(Language.get("user_name"))

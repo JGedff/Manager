@@ -78,3 +78,6 @@ class DoubleButton(QLabel):
 
         self.button1.move(QPoint(x + self.button1.x(), y + self.button1.y()))
         self.button2.move(QPoint(x + self.button2.x(), y + self.button2.y()))
+
+    def getSender(self):
+        return self.button1.sender()

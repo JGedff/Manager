@@ -30,15 +30,15 @@ def test_createCategoryIn(spaceCategoryMain, space1):
         space1.category.doubleButtons[0]
     assert str(exc_info2.value) == "list index out of range"
 
-    createCategoryIn(spaceCategoryMain, "TEST", None, True)
-    createCategoryIn(space1, "TEST", None)
+    createCategoryIn(spaceCategoryMain, "TEST", None)
+    createCategoryIn(space1.category, "TEST", None)
 
     assert spaceCategoryMain.doubleButtons[0].textButton1() == "TEST"
     assert space1.category.doubleButtons[0].textButton1() == "TEST"
 
 def test_updateNameCategory(spaceCategoryMain, space1):
-    createCategoryIn(spaceCategoryMain, "TEST", None, True)
-    createCategoryIn(space1, "TEST", None)
+    createCategoryIn(spaceCategoryMain, "TEST", None)
+    createCategoryIn(space1.category, "TEST", None)
 
     updateNameCategory(spaceCategoryMain, "#FFFFFF", "TEST", "YES", True)
     updateNameCategory(space1, "#FFFFFF", "TEST", "YES")
@@ -47,8 +47,8 @@ def test_updateNameCategory(spaceCategoryMain, space1):
     assert space1.category.doubleButtons[0].textButton1() == "YES"
 
 def test_deleteCategoryFrom(spaceCategoryMain, space1):
-    createCategoryIn(spaceCategoryMain, "TEST", None, True)
-    createCategoryIn(space1, "TEST", None)
+    createCategoryIn(spaceCategoryMain, "TEST", None)
+    createCategoryIn(space1.category, "TEST", None)
 
     with pytest.raises(IndexError) as exc_info1:
         deleteCategoryFrom(spaceCategoryMain, 1, "TEST", True)
@@ -73,11 +73,11 @@ def test_updateButtonsPosition(spaceCategoryMain, space1):
     Category.addCategory("TEST", "#FFFFFF")
     Category.addCategory("SECOND", "#EA3DFB")
 
-    createCategoryIn(spaceCategoryMain, "TEST", None, True)
-    createCategoryIn(space1, "TEST", None)
+    createCategoryIn(spaceCategoryMain, "TEST", None)
+    createCategoryIn(space1.category, "TEST", None)
 
-    createCategoryIn(spaceCategoryMain, "SECOND", None, True)
-    createCategoryIn(space1, "SECOND", None)
+    createCategoryIn(spaceCategoryMain, "SECOND", None)
+    createCategoryIn(space1.category, "SECOND", None)
 
     assert spaceCategoryMain.doubleButtons[0].geometry().x() == 0
     assert spaceCategoryMain.doubleButtons[0].geometry().y() == 0
@@ -89,8 +89,8 @@ def test_updateButtonsPosition(spaceCategoryMain, space1):
     assert space1.category.doubleButtons[1].geometry().x() == 0
     assert space1.category.doubleButtons[1].geometry().y() == 0
 
-    updateButtonsPosition(spaceCategoryMain, True)
-    updateButtonsPosition(space1)
+    updateButtonsPosition(spaceCategoryMain)
+    updateButtonsPosition(space1.category)
 
     assert spaceCategoryMain.doubleButtons[0].geometry().x() != 0
     assert spaceCategoryMain.doubleButtons[0].geometry().y() != 0

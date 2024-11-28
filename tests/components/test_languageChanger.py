@@ -10,7 +10,7 @@ from app_tests.components.languageChanger import LanguageChanger
 
 @pytest.fixture
 def mainLanguageChanger(qtbot):
-    qComboBox = LanguageChanger(WINDOWS.mainWindow, WINDOWS.mainWindow.widget)
+    qComboBox = LanguageChanger(WINDOWS.mainWindow, WINDOWS.mainWindow.widget, True)
     qtbot.addWidget(qComboBox)
     return qComboBox
 

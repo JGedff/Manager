@@ -21,7 +21,7 @@ def space_category(qtbot):
 
 def test_showHideUI(space_category):
     Category.addCategory("NEW CATEGORY", "#0F0F0F")
-    createCategoryIn(space_category, "NEW CATEGORY", None, True)
+    createCategoryIn(space_category, "NEW CATEGORY", None)
 
     assert space_category.doubleButtons.__len__() == 1
 

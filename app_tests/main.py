@@ -195,8 +195,7 @@ class SpaceCategory(QLabel):
         self.showSpace.show()
         self.cancelAddCategory()
             
-        # self.doubleButtons[0].button1.sender() will be used as the receptor of events
-        self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
+        self.nameModifiedCategory = self.doubleButtons[0].getSender().text()
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
 
@@ -342,14 +341,14 @@ class SpaceCategory(QLabel):
         if window.userRole == 'Admin':
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
-        createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
-        updateButtonsPosition(window.categoryManager, True)
+        createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent)
+        updateButtonsPosition(window.categoryManager)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
-                    updateButtonsPosition(space)
+                    createCategoryIn(space.category, self.newCategoryName.capitalize(), self.mainParent)
+                    updateButtonsPosition(space.category)
 
         self.showUI()
         self.cancelAddCategory()
@@ -383,7 +382,7 @@ class SpaceCategory(QLabel):
             Mongo.delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
-        updateButtonsPosition(window.categoryManager, True)
+        updateButtonsPosition(window.categoryManager)
 
         for store in SHELVES:
             for shelf in store:
@@ -392,7 +391,7 @@ class SpaceCategory(QLabel):
                         oldName = space.category.name
 
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
-                        updateButtonsPosition(space)
+                        updateButtonsPosition(space.category)
 
                         if categoryName == oldName and window.userRole == 'Admin':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
@@ -416,7 +415,8 @@ class Space(QLabel):
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
-        updateButtonsPosition(self)
+        
+        updateButtonsPosition(self.category)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -1015,7 +1015,7 @@ class MainWindow(QMainWindow):
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
 
-        self.languageChanger = LanguageChanger(self, parent)
+        self.languageChanger = LanguageChanger(self, parent, True)
         self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
         
         # Header Form
@@ -1494,10 +1494,10 @@ class LogInWindow(QMainWindow):
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
 
-        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
-        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
-        updateButtonsPosition(window.categoryManager, True)
+        createCategoryIn(window.categoryManager, 'Empty', window.widget)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget)
+        updateButtonsPosition(window.categoryManager)
 
         window.languageChanger.changeLang(self.languageChanger.language)
         window.languageChanger.setCurrentText(self.languageChanger.language)
@@ -1536,10 +1536,10 @@ def getMongoInfo():
         for category in Mongo.CATEGORIES_COLLECTION.find({}):
             Category.addCategory(category['name'], category['color'])
 
-            createCategoryIn(window.categoryManager, category['name'], window.widget, True)
+            createCategoryIn(window.categoryManager, category['name'], window.widget)
             mongoCategories += 1
         
-        updateButtonsPosition(window.categoryManager, True)
+        updateButtonsPosition(window.categoryManager)
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
         UserManager.setUser('Guest', 'Offline')
 
@@ -1554,10 +1554,10 @@ def getMongoInfo():
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
 
-        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
-        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
-        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
-        updateButtonsPosition(window.categoryManager, True)
+        createCategoryIn(window.categoryManager, 'Empty', window.widget)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget)
+        updateButtonsPosition(window.categoryManager)
         
     setEmptyCategory(window.categoryManager)
 
