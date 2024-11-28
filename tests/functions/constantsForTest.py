@@ -8,7 +8,7 @@ if Mongo.connectionIsOpen():
 
 from app_tests.utils.category import Category
 from app_tests.utils.userManager import UserManager
-from app_tests.constants import STORES, SPACES, SHELVES, SHELVES_FORMS
+from app_tests.constants import STORES, SHELVES, SHELVES_FORMS
 
 from app_tests.main import MainWindow, LogInWindow, Shelf
 
@@ -35,7 +35,6 @@ class WINDOWS():
     @staticmethod
     def resetGlobalVariables():
         STORES.clear()
-        SPACES.clear()
         SHELVES.clear()
         SHELVES_FORMS.clear()
 

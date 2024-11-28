@@ -4,8 +4,8 @@ import os
 DIRECTORY = "app_tests"
 OUTPUT_DIR = "app"
 
-textToReplace = "app_tests"
-newText = "app"
+textToReplace = "app_tests."
+newText = "app."
 
 print(f"Source directory: {DIRECTORY}")
 print(f"Output directory: {OUTPUT_DIR}")

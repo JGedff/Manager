@@ -13,7 +13,7 @@ from app_tests.styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, 
 from app_tests.styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 from app_tests.styles.colorFunctions import getStyleSheet
 
-from app_tests.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from app_tests.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, CATEGORY_NAMES
 
 from app_tests.utils.functions.globalFunctions import getMaxFloor
 from app_tests.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -613,8 +613,76 @@ class ShelfInfo():
 
             if numSpaces > maxSpaces:
                 maxSpaces = numSpaces
-        
+
         return maxSpaces
+
+    @staticmethod
+    def createShelfSpaces(spacesLength, posx, posy, actualFloor, floors, storeIndex, actualNumber, parent):
+        times5 = 0
+        spaces = []
+
+        for index in range(spacesLength):
+            mod5 = (index + 1) % 5
+
+            if mod5 != 0:
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, index, parent))
+            else:
+                times5 += 1
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, index, parent, False, times5))
+    
+        return spaces
+
+    @staticmethod
+    def createDoubleShelfSpaces(spacesLength, posx, posy, actualFloor, floors, storeIndex, actualNumber, parent):
+        times5 = 0
+        spaces = []
+        indexSpace = 0
+        mod = spacesLength % 2
+        sideSpaces = (spacesLength / 2).__trunc__()
+
+        for index in range(sideSpaces):
+            if (index + 1) % 5 != 0:
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent))
+            else:
+                times5 += 1
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, False, times5))
+
+            indexSpace += 1
+
+        for index in range(sideSpaces):
+            spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent))
+            indexSpace += 1
+        
+        if mod > 0:
+            if (sideSpaces + 1) % 5 != 0:
+                spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, True))
+            else:
+                times5 += 1
+                spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, True, times5))
+
+            indexSpace += 1
+        
+        return spaces
+
+    @staticmethod
+    def createStoreSpaces(shelf, posx, posy, parent):
+        spaces = []
+        posy += 35
+
+        for actualFloor in range(shelf.storeFloors):
+            if shelf.double_shelf:
+                doubleShelfSpaces = ShelfInfo.createDoubleShelfSpaces(shelf.spacesLength, posx, posy, actualFloor, shelf.floors, shelf.storeIndex, shelf.actualNumber, parent)
+
+                for newSpace in doubleShelfSpaces:
+                    spaces.append(newSpace)
+
+            else:
+                shelfSpaces = ShelfInfo.createShelfSpaces(shelf.spacesLength, posx, posy, actualFloor, shelf.floors, shelf.storeIndex, shelf.actualNumber, parent)
+            
+                for newSpace in shelfSpaces:
+                    spaces.append(newSpace)
+
+        return spaces
 
     def __init__(self, posx, posy, floors, spaces, double_shelf, storeFloors, shelfNumber = 1, storeIndex = 1, parent = None):
         self.initVariables(posx, floors, spaces, double_shelf, storeFloors, shelfNumber, storeIndex)
@@ -636,46 +704,7 @@ class ShelfInfo():
         self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), posy, 100, 25)
         self.shelfNumber.hide()
 
-        posy += 35
-
-        for actualFloor in range(self.storeFloors):
-            times5 = 0
-
-            if self.double_shelf:
-                indexSpace = 0
-                mod = self.spacesLength % 2
-                sideSpaces = (self.spacesLength / 2).__trunc__()
-
-                for index in range(sideSpaces):
-                    if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
-                    else:
-                        times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
-
-                    indexSpace += 1
-
-                for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
-                    indexSpace += 1
-                
-                if mod > 0:
-                    if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
-                    else:
-                        times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
-
-                    indexSpace += 1
-            else:
-                for index in range(self.spacesLength):
-                    mod5 = (index + 1) % 5
-
-                    if mod5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
-                    else:
-                        times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
+        self.spaces = ShelfInfo.createStoreSpaces(self, posx, posy, parent)
 
         self.shelfNumber.setFont(FONT_TEXT)
 
@@ -891,8 +920,8 @@ class Shelf(QLabel):
 
     @staticmethod
     def showAllForms():    
-        for i in SHELVES_FORMS:
-            i.showForm()
+        for shelf in SHELVES_FORMS:
+            shelf.showForm()
 
     def __init__(self, name, posx, posy, parent = None):
         super().__init__(parent)
