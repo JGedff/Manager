@@ -1,4 +1,4 @@
-name: Deploy
+name: Send to test
 
 on:
   pull_request:
