@@ -36,4 +36,3 @@ jobs:
           commit_user_name: Jordi Marmi [GitHub Actions]
           commit_user_email: jordimarmi1@gmail.com
           commit_author: JGedff
-          push_options: '--force'
