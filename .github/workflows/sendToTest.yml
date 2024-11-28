@@ -31,8 +31,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: Refactor to test
-          create_branch: true
-          branch: refactor_build
+          branch: tests
           file_pattern: 'app/*'
           commit_user_name: Jordi Marmi [GitHub Actions]
           commit_user_email: jordimarmi1@gmail.com
