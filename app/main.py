@@ -169,6 +169,16 @@ class SpaceCategory(QLabel):
         if self.shortcut:
             window.hideMainButtons()
         else:
+            print('self.storeIndex')
+            print(self.storeIndex)
+            print('self.shelfIndex')
+            print(self.shelfIndex)
+            print('STORES')
+            print(SHELVES.__len__())
+            print(SHELVES)
+            print('SHELVES')
+            print(SHELVES[self.storeIndex].__len__())
+            print(SHELVES[self.storeIndex])
             SHELVES[self.storeIndex][self.shelfIndex].spaces[(self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex].openSpaceConfig.show()
 
     def showUI(self):
@@ -400,13 +410,13 @@ class SpaceCategory(QLabel):
             self.doubleButtons[0].setDisabledButton2(True)
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
+    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0, doubleShelf = False, upSpace = False):
         super().__init__(parent)
 
         self.setGeometry(posx, posy, 75, 75)
 
         self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
-        self.initUI(shelfIndex, parent, times5Space)
+        self.initUI(shelfIndex, parent, times5Space, doubleShelf, upSpace)
         self.initEvents()
         
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
@@ -421,9 +431,18 @@ class Space(QLabel):
         if actualFloor > floors:
             setUnreachableCategory(self.category)
 
-    def initUI(self, shelfIndex, parent, times5Space):
+    def initUI(self, shelfIndex, parent, times5Space, doubleShelf, upSpace):
         nameSpace = str(times5Space * 5) if times5Space > 0 else ""
         numberSpace = str(shelfIndex + 1)
+
+        if self.long:
+            numberSpace = str(int((shelfIndex ) / 2))
+
+        if doubleShelf:
+            if upSpace:
+                numberSpace += "a"
+            else:
+                numberSpace += "b"
         
         self.shelfNumber = QLabel(Language.get("shelf") + str(shelfIndex + 1), parent)
         self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(self.shelfNumber.width() / 2), 25, 100, 25)
@@ -620,16 +639,19 @@ class ShelfInfo():
     def createShelfSpaces(spacesLength, posx, posy, actualFloor, floors, storeIndex, actualNumber, parent):
         times5 = 0
         spaces = []
+        indexSpace = 0
 
         for index in range(spacesLength):
             mod5 = (index + 1) % 5
 
             if mod5 != 0:
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, index, parent))
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber, spacesLength, indexSpace, parent))
             else:
                 times5 += 1
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, index, parent, False, times5))
-    
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber, spacesLength, indexSpace, parent, False, times5))
+            
+            indexSpace += 1
+
         return spaces
 
     @staticmethod
@@ -637,29 +659,18 @@ class ShelfInfo():
         times5 = 0
         spaces = []
         indexSpace = 0
-        mod = spacesLength % 2
-        sideSpaces = (spacesLength / 2).__trunc__()
 
-        for index in range(sideSpaces):
+        for index in range(spacesLength):
             if (index + 1) % 5 != 0:
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent))
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber, spacesLength, indexSpace, parent, doubleShelf=True, upSpace=True))
             else:
                 times5 += 1
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, False, times5))
+                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber, spacesLength, indexSpace, parent, False, times5, doubleShelf=True, upSpace=True))
 
             indexSpace += 1
 
-        for index in range(sideSpaces):
-            spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent))
-            indexSpace += 1
-        
-        if mod > 0:
-            if (sideSpaces + 1) % 5 != 0:
-                spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, True))
-            else:
-                times5 += 1
-                spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, True, times5))
-
+        for index in range(spacesLength):
+            spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, floors, storeIndex, index, spacesLength, indexSpace, parent, doubleShelf=True, upSpace=False))
             indexSpace += 1
         
         return spaces
