@@ -1,11 +1,11 @@
 from PyQt5.QtWidgets import QLabel, QComboBox
 
-from app.styles.styleSheets import COMBO_BOX
-from app.styles.fonts import FONT_SMALL_TEXT
+from styles.styleSheets import COMBO_BOX
+from styles.fonts import FONT_SMALL_TEXT
 
-from app.constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
+from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
 
-from app.utils.language import Language
+from utils.language import Language
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):

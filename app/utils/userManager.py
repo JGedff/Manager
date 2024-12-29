@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 from PyQt5.QtWidgets import QMessageBox
 
-from app.utils.encrypt import Encrypt
+from utils.encrypt import Encrypt
 
 class UserManager:
     MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")

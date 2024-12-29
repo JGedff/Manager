@@ -1,4 +1,4 @@
-from app.utils.json import JsonManager
+from utils.json import JsonManager
 
 class Language():
     lang = "English"

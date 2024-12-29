@@ -1,6 +1,6 @@
-from app.constants import WINDOW_HEIGHT, WINDOW_WIDTH
+from constants import WINDOW_HEIGHT, WINDOW_WIDTH
 
-from app.utils.language import Language
+from utils.language import Language
 
 def saveShelfInfo(arrayShelfs):
     for shelf in arrayShelfs:

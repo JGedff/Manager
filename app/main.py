@@ -9,27 +9,27 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Netwo
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 
-from app.styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
-from app.styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
-from app.styles.colorFunctions import getStyleSheet
+from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
+from styles.colorFunctions import getStyleSheet
 
-from app.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
-from app.utils.functions.globalFunctions import getMaxFloor
-from app.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from app.utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName
+from utils.functions.globalFunctions import getMaxFloor
+from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
+from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName
 
-from app.utils.mongoDb import Mongo
-from app.utils.userManager import UserManager
+from utils.mongoDb import Mongo
+from utils.userManager import UserManager
 
-from app.utils.language import Language
-from app.utils.category import Category
+from utils.language import Language
+from utils.category import Category
 
-from app.components.inputBool import InputBool
-from app.components.inputNumber import InputNumber
-from app.components.imageButton import ImageButton
-from app.components.doubleButton import DoubleButton
-from app.components.languageChanger import LanguageChanger
+from components.inputBool import InputBool
+from components.inputNumber import InputNumber
+from components.imageButton import ImageButton
+from components.doubleButton import DoubleButton
+from components.languageChanger import LanguageChanger
 
 app = QApplication(sys.argv)
 
@@ -492,7 +492,7 @@ class Space(QLabel):
         window.hideAllButtons()
 
         Store.hideAllStores()
-        # Store.configSpace(self.storeIndex) This line is commented because unpredictible errors while testing
+        Store.configSpace(self.storeIndex)
 
         self.box.hide()
 
@@ -505,7 +505,7 @@ class Space(QLabel):
         window.resizeHeightScroll()
             
     def openConfigCategories(self):
-        # Store.configCategory(self.storeIndex) This line is commented because unpredictible errors while testing
+        Store.configCategory(self.storeIndex)
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
@@ -524,7 +524,7 @@ class Space(QLabel):
         self.category.cancelAddCategory()
 
         ShelfInfo.hideAllSpaces()
-        # Store.stopConfigCategory(self.storeIndex) This line is commented because unpredictible errors while testing
+        Store.stopConfigCategory(self.storeIndex)
 
         self.configBox.show()
         self.shelfNumber.show()
@@ -1521,7 +1521,7 @@ class LogInWindow(QMainWindow):
 
         self.close()
 
-        # getMongoInfo() This line was commented so it does not load categories or stores that could change the tests
+        getMongoInfo()
 
         window.languageChanger.update()
         window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
@@ -1531,6 +1531,7 @@ class LogInWindow(QMainWindow):
 def getMongoInfo():
     storeIndex = 0
     mongoCategories = 0
+    mongoConnection = False
 
     try:
         for category in Mongo.CATEGORIES_COLLECTION.find({}):
@@ -1539,6 +1540,8 @@ def getMongoInfo():
             createCategoryIn(window.categoryManager, category['name'], window.widget, True)
             mongoCategories += 1
         
+        mongoConnection = True
+
         updateButtonsPosition(window.categoryManager, True)
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
         UserManager.setUser('Guest', 'Offline')
@@ -1547,8 +1550,24 @@ def getMongoInfo():
 
         mongoCategories = 0
 
-    if mongoCategories <= 0:
-        QMessageBox.warning(None, "You don't have any category in the database", "You'll use the default categories")
+    if mongoConnection and mongoCategories <= 0:
+        QMessageBox.warning(None, "There aren't any categories in the database", "The default categories will be created")
+
+        Mongo.addMongoCategory('Empty', 'white')
+        Mongo.addMongoCategory('Unreachable', 'red')
+        Mongo.addMongoCategory('Fill', 'green')
+
+        Category.addCategory('Empty', 'white')
+        Category.addCategory('Unreachable', 'red')
+        Category.addCategory('Fill', 'green')
+
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+        updateButtonsPosition(window.categoryManager, True)
+
+    elif mongoCategories <= 0:
+        QMessageBox.warning(None, "You don't have connection to the database", "You'll use the default categories")
 
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
@@ -1603,9 +1622,9 @@ class main():
     logInWindow = LogInWindow(window)
     logInWindow.show()
 
-    # sys.exit(app.exec_()) This line is commented, so the tests can run correctly
+    sys.exit(app.exec_())
 
-    # Mongo.closeMongoConnection() This line is commented, so mongodb connections can work properly while testing
+    Mongo.closeMongoConnection()
 
 if __name__ == "__main__":
     main()

@@ -1,4 +1,4 @@
-from app.styles.colorFunctions import darken_color
+from styles.colorFunctions import darken_color
 
 INPUT_TEXT = f"""
     QLineEdit {{
