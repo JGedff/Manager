@@ -7,6 +7,8 @@ from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
 
 from utils.language import Language
 
+from components.product import Product
+
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
         super().__init__(parent)
@@ -99,6 +101,10 @@ class LanguageChanger(QLabel):
                         space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
                         space.category.createCategoryButton.setText(Language.get("create"))
                         space.category.addCategoryName.setPlaceholderText(Language.get("name"))
+
+                        if isinstance(space.product, Product):
+                            space.product.labelProduct.setText(Language.get('product'))
+                            space.product.labelAmount.setText(Language.get('amount'))
             
             self.WINDOW.reOpenHome()
         except:

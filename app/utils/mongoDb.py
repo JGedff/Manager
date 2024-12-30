@@ -15,6 +15,7 @@ class Mongo:
     STORES_COLLECTION = DB['stores']
     SPACES_COLLECTION = DB['spaces']
     SHELVES_COLLECTION = DB['shelfs']
+    PRODUCTS_COLLECTION = DB['products']
     CATEGORIES_COLLECTION = DB['categorys']
 
     @staticmethod
@@ -32,10 +33,12 @@ class Mongo:
     @staticmethod
     def reconnect():
         Mongo.MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+
         Mongo.DB = Mongo.MONGO_CLIENT['manager']
         Mongo.STORES_COLLECTION = Mongo.DB['stores']
         Mongo.SPACES_COLLECTION = Mongo.DB['spaces']
         Mongo.SHELVES_COLLECTION = Mongo.DB['shelfs']
+        Mongo.PRODUCTS_COLLECTION = Mongo.DB['products']
         Mongo.CATEGORIES_COLLECTION = Mongo.DB['categorys']
 
     @classmethod
@@ -175,12 +178,39 @@ class Mongo:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
     @classmethod
-    def addMongoCategory(cls, name, color):
+    def addMongoCategory(cls, name, color, canHoldProduct):
         try:
             cls.CATEGORIES_COLLECTION.insert_one({
                 "name": name,
-                "color": color
+                "color": color,
+                "hold": canHoldProduct
             })
         except (ConnectionFailure, ServerSelectionTimeoutError):
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not created", "There was an issue with the network")
+
+    @classmethod
+    def getMongoProducts(cls):
+        try:
+            allProducts = []
+
+            for product in cls.PRODUCTS_COLLECTION.find({}):
+                allProducts.append({ "name": product['name'] })
+
+            return allProducts
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "Products not found", "There was an issue with the network")
+
+            return []
+    
+    @classmethod
+    def addMongoProducts(cls, name, price):
+        try:
+            cls.PRODUCTS_COLLECTION.insert_one({
+                "name": name,
+                "price": price
+            })
+        except (ConnectionFailure, ServerSelectionTimeoutError):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The product was not created", "There was an issue with the network")

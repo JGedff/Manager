@@ -25,6 +25,7 @@ from utils.userManager import UserManager
 from utils.language import Language
 from utils.category import Category
 
+from components.product import Product
 from components.inputBool import InputBool
 from components.inputNumber import InputNumber
 from components.imageButton import ImageButton
@@ -340,7 +341,7 @@ class SpaceCategory(QLabel):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         if window.userRole == 'Admin':
-            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
         updateButtonsPosition(window.categoryManager, True)
@@ -411,8 +412,9 @@ class Space(QLabel):
         self.initEvents()
         
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
-        self.mongo_id = None
         self.long = long
+        self.product = None
+        self.mongo_id = None
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
@@ -501,6 +503,9 @@ class Space(QLabel):
         self.labelCategory.show()
         self.editCategories.show()
         self.categorySelector.show()
+    
+        if isinstance(self.product, Product):
+            self.product.show()
         
         window.resizeHeightScroll()
             
@@ -514,6 +519,9 @@ class Space(QLabel):
         self.labelCategory.hide()
         self.editCategories.hide()
         self.categorySelector.hide()
+
+        if isinstance(self.product, Product):
+            self.product.hide()
 
         self.openSpaceConfig.show()
         self.category.showUI()
@@ -532,6 +540,9 @@ class Space(QLabel):
         self.editCategories.show()
         self.categorySelector.show()
 
+        if isinstance(self.product, Product):
+            self.product.show()
+
         self.openSpaceConfig.hide()
     
     def changeCategory(self, category):
@@ -539,6 +550,16 @@ class Space(QLabel):
 
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
+
+        if Category.categoryCanHoldProduct(category):
+            self.product = Product(154, 116, self.parent())
+            self.product.show()
+
+        else:
+            if isinstance(self.product, Product):
+                self.product.hide()
+
+            self.product = None
 
         if window.userRole == 'Admin':
             Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
@@ -560,6 +581,10 @@ class Space(QLabel):
         self.editCategories.hide()
         self.openSpaceConfig.hide()
         self.categorySelector.hide()
+
+        if isinstance(self.product, Product):
+            self.product.hide()
+        
         self.category.hideUI()
 
     def showSpace(self):
@@ -573,6 +598,9 @@ class Space(QLabel):
         self.editCategories.hide()
         self.openSpaceConfig.hide()
         self.categorySelector.hide()
+
+        if isinstance(self.product, Product):
+            self.product.hide()
 
         self.box.raise_()
 
@@ -1493,6 +1521,7 @@ class LogInWindow(QMainWindow):
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
+        Category.changeCategoryCanHoldProduct('Fill', True)
 
         createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
         createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
@@ -1536,6 +1565,7 @@ def getMongoInfo():
     try:
         for category in Mongo.CATEGORIES_COLLECTION.find({}):
             Category.addCategory(category['name'], category['color'])
+            Category.changeCategoryCanHoldProduct(category['name'], category['hold'])
 
             createCategoryIn(window.categoryManager, category['name'], window.widget, True)
             mongoCategories += 1
@@ -1553,13 +1583,14 @@ def getMongoInfo():
     if mongoConnection and mongoCategories <= 0:
         QMessageBox.warning(None, "There aren't any categories in the database", "The default categories will be created")
 
-        Mongo.addMongoCategory('Empty', 'white')
-        Mongo.addMongoCategory('Unreachable', 'red')
-        Mongo.addMongoCategory('Fill', 'green')
+        Mongo.addMongoCategory('Empty', 'white', False)
+        Mongo.addMongoCategory('Unreachable', 'red', False)
+        Mongo.addMongoCategory('Fill', 'green', True)
 
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
+        Category.changeCategoryCanHoldProduct('Fill', True)
 
         createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
         createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
@@ -1572,6 +1603,7 @@ def getMongoInfo():
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
+        Category.changeCategoryCanHoldProduct('Fill', True)
 
         createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
         createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
@@ -1609,9 +1641,14 @@ def getMongoInfo():
 
                     if mongoCategories > 0:
                         category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
-                        SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
-                        SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
-                        SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+
+                        if category != None:
+                            SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
+                            SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
+                            SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+
+                            if isinstance(SHELVES[storeIndex][shelfIndex].spaces[index].product, Product):
+                                SHELVES[storeIndex][shelfIndex].spaces[index].product.hide()
             
             storeIndex =+ 1
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):

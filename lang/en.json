@@ -37,5 +37,6 @@
     "access_offline": "Offilne",
     "forgot_password": "Forgot your password?",
     "change_image": "Change the image",
-    "default_image": "Set default image"
+    "default_image": "Set default image",
+    "amount": "Amount: "
 }
