@@ -38,5 +38,6 @@
     "forgot_password": "¿Olvidaste tu contraseña?",
     "change_image": "Cambia la imagen",
     "default_image": "Pon la imagen por defecto",
-    "amount": "Cantidad: "
+    "amount": "Cantidad: ",
+    "category_hold_product": "¿Esta categoría contiene productos?"
 }

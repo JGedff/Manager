@@ -448,6 +448,12 @@ class Space(QLabel):
 
         self.editCategories = QPushButton("⚙️", parent)
 
+        self.labelCategoryHoldProduct = QLabel(Language.get("category_hold_product"), parent)
+        self.labelCategoryHoldProduct.setGeometry(152, 124, 250, 25)
+        
+        self.changeCategoryHoldProduct = InputBool(Language.get('yes'), Language.get('no'), parent, self.categoryCanHoldProduct, self.categoryCanNotHoldProduct)
+        self.changeCategoryHoldProduct.setGeometry(395, 117, 175, 35)
+
         if self.long:
             self.box.setFixedHeight(151)
             self.configBox.setFixedHeight(151)
@@ -470,6 +476,7 @@ class Space(QLabel):
         self.editCategories.setFont(FONT_SMALL_TEXT)
         self.openSpaceConfig.setFont(FONT_SMALL_TEXT)
         self.categorySelector.setFont(FONT_SMALL_TEXT)
+        self.labelCategoryHoldProduct.setFont(FONT_SMALL_TEXT)
         
         self.box.setFont(FONT_SMALLEST_CHAR)
         self.configBox.setFont(FONT_SMALLEST_CHAR)
@@ -489,6 +496,21 @@ class Space(QLabel):
         self.openSpaceConfig.clicked.connect(self.stopConfigSpace)
         self.editCategories.clicked.connect(self.openConfigCategories)
         self.categorySelector.currentTextChanged.connect(self.changeCategory)
+    
+    def categoryCanHoldProduct(self):
+        Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), True)
+
+        if not isinstance(self.product, Product):
+            self.product = Product(153, 165, self.parent())
+            self.product.show()
+    
+    def categoryCanNotHoldProduct(self):
+        Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
+
+        if isinstance(self.product, Product):
+            self.product.hide()
+
+            self.product = None
 
     def configSpace(self):
         window.hideAllButtons()
@@ -502,6 +524,8 @@ class Space(QLabel):
         self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
+        self.labelCategoryHoldProduct.show()
+        self.changeCategoryHoldProduct.show()
         self.categorySelector.show()
     
         if isinstance(self.product, Product):
@@ -518,6 +542,8 @@ class Space(QLabel):
         self.configBox.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.labelCategoryHoldProduct.hide()
+        self.changeCategoryHoldProduct.hide()
         self.categorySelector.hide()
 
         if isinstance(self.product, Product):
@@ -538,6 +564,8 @@ class Space(QLabel):
         self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
+        self.labelCategoryHoldProduct.show()
+        self.changeCategoryHoldProduct.show()
         self.categorySelector.show()
 
         if isinstance(self.product, Product):
@@ -552,10 +580,15 @@ class Space(QLabel):
         self.updateSpaceColor()
 
         if Category.categoryCanHoldProduct(category):
-            self.product = Product(154, 116, self.parent())
-            self.product.show()
+            self.changeCategoryHoldProduct.setValue(True)
+
+            if not isinstance(self.product, Product):
+                self.product = Product(153, 165, self.parent())
+                self.product.show()
 
         else:
+            self.changeCategoryHoldProduct.setValue(False)
+
             if isinstance(self.product, Product):
                 self.product.hide()
 
@@ -579,6 +612,8 @@ class Space(QLabel):
         self.configBox.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.labelCategoryHoldProduct.hide()
+        self.changeCategoryHoldProduct.hide()
         self.openSpaceConfig.hide()
         self.categorySelector.hide()
 
@@ -596,6 +631,8 @@ class Space(QLabel):
         self.configBox.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.labelCategoryHoldProduct.hide()
+        self.changeCategoryHoldProduct.hide()
         self.openSpaceConfig.hide()
         self.categorySelector.hide()
 

@@ -38,5 +38,6 @@
     "forgot_password": "Has oblidat la teva contrasenya?",
     "change_image": "Canvia la imatge",
     "default_image": "Posa la imatge per defecte",
-    "amount": "Quantitat: "
+    "amount": "Quantitat: ",
+    "category_hold_product": "Aquesta categoria inclou productes?"
 }
