@@ -503,6 +503,8 @@ class Space(QLabel):
         if not isinstance(self.product, Product):
             self.product = Product(153, 165, self.parent())
             self.product.show()
+
+            Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
     
     def categoryCanNotHoldProduct(self):
         Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
@@ -511,6 +513,8 @@ class Space(QLabel):
             self.product.hide()
 
             self.product = None
+
+            Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), False)
 
     def configSpace(self):
         window.hideAllButtons()

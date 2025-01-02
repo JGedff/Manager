@@ -190,6 +190,18 @@ class Mongo:
             QMessageBox.warning(None, "The category was not created", "There was an issue with the network")
 
     @classmethod
+    def updateMongoCategoryHoldsProducts(cls, category, holdsProduct):
+        categoryId = cls.getMongoCategoryByName(category, category)
+
+        try:
+            cls.CATEGORIES_COLLECTION.update_one({ "_id": categoryId }, { "$set": { "hold": holdsProduct } })
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The category was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
     def getMongoProducts(cls):
         try:
             allProducts = []
