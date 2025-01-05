@@ -501,7 +501,7 @@ class Space(QLabel):
         Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), True)
 
         if not isinstance(self.product, Product):
-            self.product = Product(153, 165, self.parent())
+            self.product = Product(153, 165, self, self.parent())
             self.product.show()
 
             Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
@@ -515,6 +515,8 @@ class Space(QLabel):
             self.product = None
 
             Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), False)
+            Mongo.updateMongoSpaceProduct(self.mongo_id, "")
+            Mongo.updateMongoSpaceAmount(self.mongo_id, 0)
 
     def configSpace(self):
         window.hideAllButtons()
@@ -587,7 +589,7 @@ class Space(QLabel):
             self.changeCategoryHoldProduct.setValue(True)
 
             if not isinstance(self.product, Product):
-                self.product = Product(153, 165, self.parent())
+                self.product = Product(153, 165, self, self.parent())
                 self.product.show()
 
         else:

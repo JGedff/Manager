@@ -207,7 +207,7 @@ class Mongo:
             allProducts = []
 
             for product in cls.PRODUCTS_COLLECTION.find({}):
-                allProducts.append({ "name": product['name'] })
+                allProducts.append({ "name": product['name'].capitalize() })
 
             return allProducts
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -220,9 +220,52 @@ class Mongo:
     def addMongoProducts(cls, name, price):
         try:
             cls.PRODUCTS_COLLECTION.insert_one({
-                "name": name,
+                "name": name.lower(),
                 "price": price
             })
         except (ConnectionFailure, ServerSelectionTimeoutError):
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The product was not created", "There was an issue with the network")
+
+    @classmethod
+    def updateMongoSpaceAmount(cls, spaceId, amount):
+        if spaceId != None:
+            try:
+                cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "amount": amount } })
+            except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+                UserManager.setUser('Guest', 'Offline')
+                QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+            except (OperationFailure, WriteError) as e:
+                QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def getMongoProductByName(cls, nameProduct):
+        try:
+            file = cls.PRODUCTS_COLLECTION.find_one({ "name": nameProduct.lower() })
+
+            return file['_id']
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "Category not found", "There was an issue with the network")
+
+            return None
+
+    @classmethod
+    def updateMongoSpaceProduct(cls, spaceId, newProduct):
+        if spaceId != None:
+            try:
+                if newProduct != '':
+                    productId = cls.getMongoProductByName(newProduct)
+
+                    if productId != None:
+                        cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "product": productId } })
+                    else:
+                        QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+                else:
+                    cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$unset": { "product": "" } })
+
+            except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+                UserManager.setUser('Guest', 'Offline')
+                QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+            except (OperationFailure, WriteError) as e:
+                QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")

@@ -39,5 +39,7 @@
     "change_image": "Cambia la imagen",
     "default_image": "Pon la imagen por defecto",
     "amount": "Cantidad: ",
-    "category_hold_product": "¿Esta categoría contiene productos?"
+    "category_hold_product": "¿Esta categoría contiene productos?",
+    "product_name": "Nombre del nuevo producto: ",
+    "product_price": "Precio: "
 }

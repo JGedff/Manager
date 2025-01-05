@@ -39,5 +39,7 @@
     "change_image": "Change the image",
     "default_image": "Set default image",
     "amount": "Amount: ",
-    "category_hold_product": "Does this category hold products?"
+    "category_hold_product": "Does this category hold products?",
+    "product_name": "New product name: ",
+    "product_price": "Price: "
 }
