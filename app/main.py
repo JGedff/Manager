@@ -505,6 +505,8 @@ class Space(QLabel):
             self.product.show()
 
             Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
+            Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
+            Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
     
     def categoryCanNotHoldProduct(self):
         Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
@@ -591,6 +593,9 @@ class Space(QLabel):
             if not isinstance(self.product, Product):
                 self.product = Product(153, 165, self, self.parent())
                 self.product.show()
+
+                Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
+                Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
 
         else:
             self.changeCategoryHoldProduct.setValue(False)
