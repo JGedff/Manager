@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 
 from styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
@@ -58,28 +56,28 @@ class InputNumberDecimal(QLabel):
 
     def addNum(self):
         actualNum = self.inputNum.text()
-        self.inputNum.setText(str(Decimal(actualNum) + 1))
+        self.inputNum.setText(str(float(actualNum) + 1))
 
     def restNum(self):
         actualNum = self.inputNum.text()
     
-        if Decimal(actualNum) > self.defaultNumber:
-            self.inputNum.setText(str(Decimal(actualNum) - 1))
+        if float(actualNum) > self.defaultNumber:
+            self.inputNum.setText(str(float(actualNum) - 1))
 
     def checkNumber(self):
         textToCheck = self.inputNum.text()
+        decimals = textToCheck.split(".")
 
-        if decimals[1].__len__() > self.maxDecimals:
+        if decimals.__len__() >= 2 and decimals[1].__len__() > self.maxDecimals:
             textToCheck = decimals[0] + "." + decimals[1][0] + decimals[1][1]
 
         isNumber = checkIsDecimal(textToCheck)
-        decimals = textToCheck.split(".")
-        
 
-        if textToCheck == "" or not isNumber or Decimal(textToCheck) < self.defaultNumber:
+        if textToCheck == "" or not isNumber or float(textToCheck) < self.defaultNumber:
             self.inputNum.setText(str(self.lastNumber))
         else:
             self.lastNumber = textToCheck
+            self.inputNum.setText(str(textToCheck))
 
     def setValue(self, num):
         if num >= self.defaultNumber:
@@ -87,4 +85,4 @@ class InputNumberDecimal(QLabel):
             self.inputNum.setText(str(self.lastNumber))
 
     def getNum(self):
-        return Decimal(self.inputNum.text())
+        return float(self.inputNum.text())

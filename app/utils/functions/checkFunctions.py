@@ -1,5 +1,3 @@
-from decimal import Decimal
-
 def checkIsNum(numToCheck):
     try:
         int(numToCheck)
@@ -9,7 +7,7 @@ def checkIsNum(numToCheck):
 
 def checkIsDecimal(numToCheck):
     try:
-        Decimal(numToCheck)
+        float(numToCheck)
         return True
     except ValueError:
         return False

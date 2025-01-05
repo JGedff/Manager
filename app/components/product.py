@@ -79,38 +79,41 @@ class Product(QLabel):
         self.addProduct = QPushButton(Language.get("add_product"), parent)
         self.addProduct.setFont(FONT_SMALL_TEXT)
         self.addProduct.setStyleSheet(BLUE_BUTTON)
-        self.addProduct.setGeometry(self.posX, self.posY + 100, 200, 25)
+        self.addProduct.setGeometry(self.posX, self.posY + 125, 200, 25)
 
         self.labelNewProduct = QLabel(Language.get('product_name'), parent)
         self.labelNewProduct.setFont(FONT_SMALL_TEXT)
-        self.labelNewProduct.setGeometry(self.posX, self.posY + 145, 150, 35)
+        self.labelNewProduct.setGeometry(self.posX, self.posY + 170, 150, 35)
 
         self.editNewName = QLineEdit(parent)
         self.editNewName.setFont(FONT_SMALL_TEXT)
         self.editNewName.setStyleSheet(INPUT_TEXT)
         self.editNewName.setPlaceholderText(Language.get("product"))
-        self.editNewName.setGeometry(self.posX, self.posY + 145, 150, 35)
+        self.editNewName.setGeometry(self.posX + 175, self.posY + 170, 150, 35)
 
         self.labelNewPrice = QLabel(Language.get('product_price'), parent)
         self.labelNewPrice.setFont(FONT_SMALL_TEXT)
-        self.labelNewPrice.setGeometry(self.posX, self.posY + 200, 150, 35)
+        self.labelNewPrice.setGeometry(self.posX, self.posY + 230, 150, 35)
 
-        self.editNewPrice = InputNumberDecimal(1, True, parent)
-        self.editNewPrice.setGeometry(self.posX + 87, self.posY + 46, 175, 65)
+        self.editNewPrice = InputNumberDecimal(1, True, 2, parent)
+        self.editNewPrice.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
 
         self.cancelButtonAddProduct = QPushButton(Language.get("cancel"), parent)
         self.cancelButtonAddProduct.setFont(FONT_SMALL_TEXT)
         self.cancelButtonAddProduct.setStyleSheet(OFF_BUTTON)
-        self.cancelButtonAddProduct.setGeometry(self.posX + 87, self.posY + 46, 175, 65)
+        self.cancelButtonAddProduct.setGeometry(self.posX, self.posY + 125, 175, 25)
+        self.cancelButtonAddProduct.hide()
 
         self.createProductButton = QPushButton(Language.get("create"), parent)
         self.createProductButton.setFont(FONT_SMALL_TEXT)
         self.createProductButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
-        self.createProductButton.setGeometry(self.posX + 438, self.posY, 100, 25)
+        self.createProductButton.setGeometry(self.posX + 250, self.posY + 300, 100, 25)
+        self.createProductButton.hide()
 
     def initEvents(self):
         self.addProduct.clicked.connect(self.showHideCreateProduct)
         self.createProductButton.clicked.connect(self.createProduct)
+        self.editNewName.textChanged.connect(self.enableCreateButton)
         self.editAmount.inputNum.textChanged.connect(self.updateBDspaceAmount)
         self.cancelButtonAddProduct.clicked.connect(self.showHideCreateProduct)
         self.selectProduct.currentTextChanged.connect(self.updateDBProductSpace)
@@ -121,7 +124,7 @@ class Product(QLabel):
 
     def updateBDspaceAmount(self):
         if UserManager.getUserRole() != 'Offline':
-            Mongo.updateMongoSpaceAmount(self.SPACE.mongo_id, self.editAmount.inputNum)
+            Mongo.updateMongoSpaceAmount(self.SPACE.mongo_id, self.editAmount.getNum())
     
     def createProduct(self):
         if UserManager.getUserRole() != 'Offline':
@@ -129,19 +132,36 @@ class Product(QLabel):
 
     def showHideCreateProduct(self):
         if self.creatingProduct:
+            self.addProduct.setGeometry(self.posX, self.posY + 125, 200, 25)
+            self.addProduct.setDisabled(False)
+
             self.editNewName.hide()
             self.editNewPrice.hide()
             self.labelNewPrice.hide()
             self.labelNewProduct.hide()
             self.createProductButton.hide()
+            self.cancelButtonAddProduct.hide()
         else:
+            self.addProduct.setGeometry(self.posX, self.posY + 300, 200, 25)
+            self.createProductButton.setDisabled(True)
+            self.addProduct.setDisabled(True)
+            self.editNewPrice.setValue(1.0)
+            self.editNewName.setText("")
+
             self.editNewName.show()
             self.editNewPrice.show()
             self.labelNewPrice.show()
             self.labelNewProduct.show()
             self.createProductButton.show()
+            self.cancelButtonAddProduct.show()
 
         self.creatingProduct = not self.creatingProduct
+    
+    def enableCreateButton(self):
+        if self.editNewName.text().__len__() > 0:
+            self.createProductButton.setDisabled(False)
+        else:
+            self.createProductButton.setDisabled(True)
 
     def show(self):
         super().show()

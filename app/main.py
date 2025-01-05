@@ -643,6 +643,9 @@ class Space(QLabel):
         self.categorySelector.hide()
 
         if isinstance(self.product, Product):
+            if self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+
             self.product.hide()
 
         self.box.raise_()

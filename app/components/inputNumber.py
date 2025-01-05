@@ -71,6 +71,7 @@ class InputNumber(QLabel):
             self.inputNum.setText(str(self.lastNumber))
         else:
             self.lastNumber = textToCheck
+            self.inputNum.setText(str(textToCheck))
 
     def setValue(self, num):
         if num >= self.defaultNumber:
