@@ -6,6 +6,8 @@ from PyQt5.QtCore import Qt
 
 from utils.language import Language
 
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+
 from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
 from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 from styles.colorFunctions import getStyleSheet
@@ -128,7 +130,15 @@ class Product(QLabel):
     
     def createProduct(self):
         if UserManager.getUserRole() != 'Offline':
-            Mongo.addMongoProducts(self.editNewName, self.editNewPrice)
+            Mongo.addMongoProducts(self.editNewName.text(), self.editNewPrice.getNum())
+        
+        self.showHideCreateProduct()
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    if isinstance(space.product, Product):
+                        space.product.selectProduct.addItem(self.editNewName.text().capitalize())
 
     def showHideCreateProduct(self):
         if self.creatingProduct:
