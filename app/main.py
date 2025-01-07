@@ -408,7 +408,7 @@ class Space(QLabel):
         self.setGeometry(posx, posy, 75, 75)
 
         self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
-        self.initUI(shelfIndex, parent, times5Space)
+        self.initUI(spaceIndex, parent, times5Space)
         self.initEvents()
         
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
@@ -423,11 +423,11 @@ class Space(QLabel):
         if actualFloor > floors:
             setUnreachableCategory(self.category)
 
-    def initUI(self, shelfIndex, parent, times5Space):
+    def initUI(self, spaceIndex, parent, times5Space):
         nameSpace = str(times5Space * 5) if times5Space > 0 else ""
-        numberSpace = str(shelfIndex + 1)
+        numberSpace = str(spaceIndex + 1)
         
-        self.shelfNumber = QLabel(Language.get("shelf") + str(shelfIndex + 1), parent)
+        self.shelfNumber = QLabel(Language.get("shelf") + str(spaceIndex + 1), parent)
         self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(self.shelfNumber.width() / 2), 25, 100, 25)
 
         self.box = QPushButton(nameSpace, parent)
@@ -840,6 +840,7 @@ class Store():
     @staticmethod
     def showAllStoreIcons():
         for store in STORES:
+            store.raiseIcon()
             store.showIcon()
 
     @staticmethod
@@ -942,6 +943,9 @@ class Store():
 
     def showIcon(self):
         self.storeIcon.show()
+
+    def raiseIcon(self):
+        self.storeIcon.raise_()
 
     def hideIcon(self):
         self.storeIcon.hide()
