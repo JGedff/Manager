@@ -410,7 +410,7 @@ class Space(QLabel):
         self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
         self.initUI(spaceIndex, parent, times5Space)
         self.initEvents()
-        
+
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
         self.long = long
         self.product = None
@@ -840,8 +840,8 @@ class Store():
     @staticmethod
     def showAllStoreIcons():
         for store in STORES:
-            store.raiseIcon()
             store.showIcon()
+            store.raiseIcon()
 
     @staticmethod
     def hideAllStores():
@@ -883,6 +883,7 @@ class Store():
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
         self.goBackStore.setGeometry(1260, 10, 140, 50)
+        self.goBackStore.hide()
 
         self.storeIcon = ImageButton(name, image, parent)
         self.storeIcon.setGeometry(posx, posy, 150, 150)
@@ -1159,6 +1160,8 @@ class MainWindow(QMainWindow):
 
         Store.showAllStoreIcons()
 
+        self.raiseMainButtons()
+
     def initEvents(self):
         # Click buttons
         self.goHome.clicked.connect(self.reOpenHome)
@@ -1234,6 +1237,7 @@ class MainWindow(QMainWindow):
         Store.showAllStoreIcons()
         ShelfInfo.hideAllSpaces()
 
+        self.raiseMainButtons()
         self.resizeMain()
 
     def addStore(self):

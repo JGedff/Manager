@@ -41,5 +41,7 @@
     "amount": "Cantidad: ",
     "category_hold_product": "¿Esta categoría contiene productos?",
     "product_name": "Nombre del nuevo producto: ",
-    "product_price": "Precio: "
+    "product_price": "Precio: ",
+    "edit_product": "⚙️ Editar producto",
+    "edit_product_name": "Nuevo nombre: "
 }

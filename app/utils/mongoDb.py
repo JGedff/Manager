@@ -207,7 +207,7 @@ class Mongo:
             allProducts = []
 
             for product in cls.PRODUCTS_COLLECTION.find({}):
-                allProducts.append({ "name": product['name'].capitalize() })
+                allProducts.append({ "name": product['name'].capitalize(), "price": product['price'] })
 
             return allProducts
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):

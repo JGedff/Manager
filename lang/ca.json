@@ -40,5 +40,7 @@
     "default_image": "Posa la imatge per defecte",
     "amount": "Quantitat: ",
     "category_hold_product": "Aquesta categoria inclou productes?",
-    "product_name": "Nom del nou producte: "
+    "product_name": "Nom del nou producte: ",
+    "edit_product": "⚙️ Editar producte",
+    "edit_product_name": "Nou nom: "
 }
