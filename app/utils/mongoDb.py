@@ -269,3 +269,48 @@ class Mongo:
                 QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
             except (OperationFailure, WriteError) as e:
                 QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def updateMongoProduct(cls, oldName, newName, newPrice):
+        try:
+            productId = cls.getMongoProductByName(oldName)
+
+            if productId != None:
+                cls.PRODUCTS_COLLECTION.update_one({ "_id": productId }, { "$set": { "name": newName.lower(), "price": newPrice } })
+            else:
+                QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def updateMongoProductName(cls, oldName, newName):
+        try:
+            productId = cls.getMongoProductByName(oldName)
+
+            if productId != None:
+                cls.PRODUCTS_COLLECTION.update_one({ "_id": productId }, { "$set": { "name": newName.lower() } })
+            else:
+                QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def updateMongoProductPrice(cls, oldName, newPrice):
+        try:
+            productId = cls.getMongoProductByName(oldName)
+
+            if productId != None:
+                cls.PRODUCTS_COLLECTION.update_one({ "_id": productId }, { "$set": { "price": newPrice } })
+            else:
+                QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")

@@ -194,6 +194,7 @@ class SpaceCategory(QLabel):
         self.hideUI()
         self.newColor = ''
         self.showSpace.show()
+        self.addCategory.hide()
         self.cancelAddCategory()
             
         # self.doubleButtons[0].button1.sender() will be used as the receptor of events
@@ -507,11 +508,21 @@ class Space(QLabel):
             Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
             Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
             Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
+        else:
+            if self.product.edittingProduct:
+                self.product.showHideEdit()
+            elif self.product.creatingProduct:
+                self.product.showHideCreateProduct()
     
     def categoryCanNotHoldProduct(self):
         Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
 
         if isinstance(self.product, Product):
+            if self.product.edittingProduct:
+                self.product.showHideEdit()
+            elif self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+
             self.product.hide()
 
             self.product = None
@@ -542,6 +553,12 @@ class Space(QLabel):
         window.resizeHeightScroll()
             
     def openConfigCategories(self):
+        if isinstance(self.product, Product):
+            if self.product.edittingProduct:
+                self.product.showHideEdit()
+            elif self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+
         Store.configCategory(self.storeIndex)
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)

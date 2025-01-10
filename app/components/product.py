@@ -44,6 +44,14 @@ class ProductManager():
     @staticmethod
     def updateProductPrice(index, price):
         PRODUCTS_INFO[index][1] = price
+    
+    @staticmethod
+    def getIndexByName(name):
+        for i, prod in enumerate(PRODUCTS_INFO):
+            if prod[0] == name:
+                return i
+        
+        return -1
 
 class Product(QLabel):
     def __init__(self, posX, posY, space, parent = None):
@@ -220,7 +228,53 @@ class Product(QLabel):
         return product[1]
 
     def edit(self):
-        pass
+        self.showHideEdit()
+        
+        if self.price != self.editPrice.getNum() and (self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != ""):
+            index = ProductManager.getIndexByName(self.name)
+
+            if index != -1:
+                ProductManager.updateProduct(index, self.editProductName.text(), self.editPrice.getNum())
+
+                if UserManager.getUserRole() != 'Offline':
+                    Mongo.updateMongoProduct(self.name, self.editProductName.text(), self.editPrice.getNum())
+
+                self.name = self.editProductName.text()
+                self.price = self.editPrice.getNum()
+
+                self.selectProduct.setItemText(self.selectProduct.currentIndex(), self.name.capitalize())
+                self.priceLabel.setText(str(self.price) + " €")
+
+        elif self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != "":
+            index = ProductManager.getIndexByName(self.name)
+
+            if index != -1:
+                ProductManager.updateProductName(index, self.editProductName.text())
+
+                if UserManager.getUserRole() != 'Offline':
+                    Mongo.updateMongoProductName(self.name, self.editProductName.text())
+
+                self.name = self.editProductName.text()
+
+                self.selectProduct.setItemText(self.selectProduct.currentIndex(), self.name.capitalize())
+
+        elif self.price != self.editPrice.getNum():
+            index = ProductManager.getIndexByName(self.name)
+
+            if index != -1:
+                ProductManager.updateProductPrice(index, self.editPrice.getNum())
+
+                if UserManager.getUserRole() != 'Offline':
+                    Mongo.updateMongoProductPrice(self.name, self.editPrice.getNum())
+
+                self.price = self.editPrice.getNum()
+
+                self.priceLabel.setText(str(self.price) + " €")
+
+        else:
+            QMessageBox.warning(None, "Update failed", "Price or name must be diferent from the actual values")
+
+        self.editProductName.setText("")
 
     def showHideEdit(self):
         if self.edittingProduct:
@@ -255,7 +309,7 @@ class Product(QLabel):
     def checkNewInfo(self):
         if self.price != self.editPrice.getNum():
             self.editProductButton.setDisabled(False)
-        elif self.name != self.editProductName.text().capitalize() and self.editProductName.text() != "":
+        elif self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != "":
             self.editProductButton.setDisabled(False)
         else:
             self.editProductButton.setDisabled(True)
@@ -268,6 +322,9 @@ class Product(QLabel):
         self.price = self.getActualProductPrice()
 
         self.priceLabel.setText(str(self.price) + " €")
+
+        if self.edittingProduct:
+            self.showHideEdit()
 
     def updateBDspaceAmount(self):
         if UserManager.getUserRole() != 'Offline':
