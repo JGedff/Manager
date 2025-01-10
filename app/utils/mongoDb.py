@@ -173,7 +173,7 @@ class Mongo:
             cls.CATEGORIES_COLLECTION.delete_one({ "name": name })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.setUser('Guest', 'Offline')
-            QMessageBox.warning(None, "The user was deleted", "There was an issue with the network")
+            QMessageBox.warning(None, "The user was not deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
@@ -314,3 +314,13 @@ class Mongo:
             QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
         except (OperationFailure, WriteError) as e:
             QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def delMongoProduct(cls, name):
+        try:
+            cls.PRODUCTS_COLLECTION.delete_one({ "name": name.capitalize() })
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The product was not deleted", "There was an issue with the network")
+        except WriteError as e:
+            QMessageBox.warning(None, "There was an issue deleting the product", f"Write error: {e.details}")

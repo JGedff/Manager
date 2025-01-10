@@ -237,7 +237,7 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-            if window.userRole == 'Admin':
+            if UserManager.getUserRole() != 'Offline':
                 Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
 
             self.nameModifiedCategory = newName
@@ -245,7 +245,7 @@ class SpaceCategory(QLabel):
         if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
 
-            if window.userRole == 'Admin':
+            if UserManager.getUserRole() != 'Offline':
                 Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
@@ -341,7 +341,7 @@ class SpaceCategory(QLabel):
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
-        if window.userRole == 'Admin':
+        if UserManager.getUserRole() != 'Offline':
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
         createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
@@ -381,7 +381,7 @@ class SpaceCategory(QLabel):
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
-        if window.userRole == 'Admin':
+        if UserManager.getUserRole() != 'Offline':
             Mongo.delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
@@ -396,7 +396,7 @@ class SpaceCategory(QLabel):
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 
-                        if categoryName == oldName and window.userRole == 'Admin':
+                        if categoryName == oldName and UserManager.getUserRole() != 'Offline':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
 
         if self.doubleButtons.__len__() <= 1:
@@ -466,10 +466,17 @@ class Space(QLabel):
             if category != self.category.name:
                 self.categorySelector.addItem(category.capitalize())
 
-        if window.userRole == 'Offline' or window.userRole == 'Admin':
+        if Category.categoryCanHoldProduct(self.category.name):
+            self.changeCategoryHoldProduct.setValue(True)
+
+        if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
             self.editCategories.setGeometry(390, 71, 35, 35)
+        elif UserManager.getUserRole() == 'Product':
+            self.editCategories.setGeometry(0, 0, 0, 0)
         else:
             self.editCategories.setGeometry(0, 0, 0, 0)
+            self.changeCategoryHoldProduct.trueButton.setDisabled(True)
+            self.changeCategoryHoldProduct.falseButton.setDisabled(True)
 
         self.shelfNumber.setFont(FONT_TEXT)
         
@@ -622,7 +629,7 @@ class Space(QLabel):
 
             self.product = None
 
-        if window.userRole == 'Admin':
+        if UserManager.getUserRole() != 'Offline':
             Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
@@ -1092,7 +1099,6 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def initVariables(self):
-        self.userRole = 'Guest'
         self.image = DEFAULT_IMAGE
 
         # Window config
@@ -1287,7 +1293,7 @@ class MainWindow(QMainWindow):
             if storeName == "":
                 storeName = Language.get("store") + str(STORES.__len__() + 1)
 
-            if window.userRole == 'Admin':
+            if UserManager.getUserRole() != 'Offline':
                 Store.createMongoStore(storeName, self.image)
 
             Shelf.hideAllForms()
@@ -1394,10 +1400,11 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.editCategories.raise_()
 
-    def changeUserRole(self, role):
-        self.userRole = role
+    def changeUserRole(self, role, username = ''):
+        if role != 'Offline':
+            UserManager.setUser(username, role)
 
-        if self.userRole == 'Offline' or self.userRole == 'Admin':
+        if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
             self.addStoreButton.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
             self.editCategories.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
         else:
@@ -1407,7 +1414,7 @@ class MainWindow(QMainWindow):
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    if window.userRole == 'Offline' or window.userRole == 'Admin':
+                    if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
                         space.editCategories.setGeometry(320, 26, 26, 26)
                     else:
                         space.editCategories.setGeometry(0, 0, 0, 0)
@@ -1583,16 +1590,17 @@ class LogInWindow(QMainWindow):
         UserManager.setUser('Guest', 'Offline')
         self.accessOffline()
 
-    def accessOffline(self):
+    def accessOffline(self):        
         if UserManager.username != 'Guest' and UserManager.role != 'Offline':
-            UserManager.setUser('Guest', 'Offline')
             QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
         else:
             QMessageBox.information(self, "Offline version", "You opened the offline version")
 
+        window.changeUserRole('Offline')
+
         self.close()
 
-        window.changeUserRole('Offline')
+        UserManager.setUser('Guest', 'Offline')
 
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
@@ -1616,13 +1624,13 @@ class LogInWindow(QMainWindow):
         [_, role] = UserManager.findUser(username)
         UserManager.setUser(username, role)
 
-        window.changeUserRole(role)
-
         if UserManager.username == 'Guest' and UserManager.role == 'Offline':
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.information(None, "You don't have internet connection", "There was an issue with the network")
         else:
             QMessageBox.information(None, "Login successful", "Login successful")
+
+        window.changeUserRole(role, username)
 
         self.close()
 

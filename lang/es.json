@@ -43,5 +43,6 @@
     "product_name": "Nombre del nuevo producto: ",
     "product_price": "Precio: ",
     "edit_product": "⚙️ Editar producto",
-    "edit_product_name": "Nuevo nombre: "
+    "edit_product_name": "Nuevo nombre: ",
+    "del_product": "❌ Eliminar producto"
 }
