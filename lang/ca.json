@@ -41,6 +41,7 @@
     "amount": "Quantitat: ",
     "category_hold_product": "Aquesta categoria inclou productes?",
     "product_name": "Nom del nou producte: ",
+    "product_price": "Preu: ",
     "edit_product": "⚙️ Editar producte",
     "edit_product_name": "Nou nom: ",
     "del_product": "❌ Eliminar producte"

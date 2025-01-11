@@ -419,6 +419,7 @@ class Space(QLabel):
         self.mongo_id = None
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
+        self.shelfIndex = shelfIndex
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
         updateButtonsPosition(self)
 
@@ -429,8 +430,8 @@ class Space(QLabel):
         nameSpace = str(times5Space * 5) if times5Space > 0 else ""
         numberSpace = str(spaceIndex + 1)
         
-        self.shelfNumber = QLabel(Language.get("shelf") + str(spaceIndex + 1), parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(self.shelfNumber.width() / 2), 25, 100, 25)
+        self.shelfNumber = QLabel(Language.get("shelf") + str(self.shelfIndex + 1), parent)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(125 / 2), 25, 125, 25)
 
         self.box = QPushButton(nameSpace, parent)
         self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 151)
@@ -451,10 +452,10 @@ class Space(QLabel):
         self.editCategories = QPushButton("⚙️", parent)
 
         self.labelCategoryHoldProduct = QLabel(Language.get("category_hold_product"), parent)
-        self.labelCategoryHoldProduct.setGeometry(152, 124, 250, 25)
+        self.labelCategoryHoldProduct.setGeometry(152, 124, 260, 25)
         
         self.changeCategoryHoldProduct = InputBool(Language.get('yes'), Language.get('no'), parent, self.categoryCanHoldProduct, self.categoryCanNotHoldProduct)
-        self.changeCategoryHoldProduct.setGeometry(395, 117, 175, 35)
+        self.changeCategoryHoldProduct.setGeometry(425, 117, 175, 35)
 
         if self.long:
             self.box.setFixedHeight(151)
@@ -738,7 +739,7 @@ class ShelfInfo():
 
     def initUI(self, posx, posy, parent):
         self.shelfNumber = QLabel(Language.get("shelf") + str(self.actualNumber) + ":", parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), posy, 100, 25)
+        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 125 / 2), posy, 125, 25)
         self.shelfNumber.hide()
 
         posy += 35
@@ -1638,7 +1639,10 @@ class LogInWindow(QMainWindow):
 
         getMongoInfo()
 
+        window.languageChanger.changeLang(self.languageChanger.language)
+        window.languageChanger.setCurrentText(self.languageChanger.language)
         window.languageChanger.update()
+
         window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
         window.reOpenHome()
         window.show()

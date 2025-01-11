@@ -159,13 +159,13 @@ class Product(QLabel):
 
         self.labelNewProduct = QLabel(Language.get('product_name'), parent)
         self.labelNewProduct.setFont(FONT_SMALL_TEXT)
-        self.labelNewProduct.setGeometry(self.posX, self.posY + 170, 150, 35)
+        self.labelNewProduct.setGeometry(self.posX, self.posY + 170, 212, 35)
 
         self.editNewName = QLineEdit(parent)
         self.editNewName.setFont(FONT_SMALL_TEXT)
         self.editNewName.setStyleSheet(INPUT_TEXT)
         self.editNewName.setPlaceholderText(Language.get("product"))
-        self.editNewName.setGeometry(self.posX + 175, self.posY + 170, 150, 35)
+        self.editNewName.setGeometry(self.posX + 237, self.posY + 170, 150, 35)
 
         self.labelNewPrice = QLabel(Language.get('product_price'), parent)
         self.labelNewPrice.setFont(FONT_SMALL_TEXT)
@@ -189,7 +189,7 @@ class Product(QLabel):
         self.editProduct = QPushButton(Language.get('edit_product'), parent)
         self.editProduct.setFont(FONT_SMALL_TEXT)
         self.editProduct.setStyleSheet(EDIT_BUTTON)
-        self.editProduct.setGeometry(self.posX + 237, self.posY + 125, 150, 25)
+        self.editProduct.setGeometry(self.posX + 237, self.posY + 125, 175, 25)
 
         self.editProductButton = QPushButton(Language.get("save"), parent)
         self.editProductButton.setFont(FONT_SMALL_TEXT)
@@ -216,13 +216,13 @@ class Product(QLabel):
         self.editProductName.setFont(FONT_SMALL_TEXT)
         self.editProductName.setStyleSheet(INPUT_TEXT)
         self.editProductName.setPlaceholderText(Language.get("product"))
-        self.editProductName.setGeometry(self.posX + 175, self.posY + 170, 150, 35)
+        self.editProductName.setGeometry(self.posX + 237, self.posY + 170, 150, 35)
         self.editProductName.hide()
 
         self.deleteProduct = QPushButton(Language.get('del_product'), parent)
         self.deleteProduct.setFont(FONT_SMALL_TEXT)
         self.deleteProduct.setStyleSheet(REST_BUTTON)
-        self.deleteProduct.setGeometry(self.posX + 427, self.posY + 125, 150, 25)
+        self.deleteProduct.setGeometry(self.posX + 450, self.posY + 125, 175, 25)
         self.deleteProduct.hide()
 
     def initEvents(self):

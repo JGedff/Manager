@@ -88,6 +88,8 @@ class LanguageChanger(QLabel):
 
                     # Space
                     for space in shelf.spaces:
+                        space.shelfNumber.setText(Language.get("shelf") + str(space.shelfIndex + 1) + ":")
+                        space.labelCategoryHoldProduct.setText(Language.get("category_hold_product"))
                         space.openSpaceConfig.setText(Language.get("go_back"))
                         space.labelCategory.setText(Language.get("category"))
 
@@ -103,6 +105,18 @@ class LanguageChanger(QLabel):
                         space.category.addCategoryName.setPlaceholderText(Language.get("name"))
 
                         if isinstance(space.product, Product):
+                            space.product.labelEditProductName.setText(Language.get('edit_product_name'))
+                            space.product.editProductName.setPlaceholderText(Language.get("product"))
+                            space.product.editNewName.setPlaceholderText(Language.get("product"))
+                            space.product.cancelButtonEditProduct.setText(Language.get("cancel"))
+                            space.product.cancelButtonAddProduct.setText(Language.get("cancel"))
+                            space.product.labelNewProduct.setText(Language.get('product_name'))
+                            space.product.labelNewPrice.setText(Language.get('product_price'))
+                            space.product.createProductButton.setText(Language.get("create"))
+                            space.product.deleteProduct.setText(Language.get('del_product'))
+                            space.product.editProduct.setText(Language.get('edit_product'))
+                            space.product.editProductButton.setText(Language.get("save"))
+                            space.product.addProduct.setText(Language.get("add_product"))
                             space.product.labelProduct.setText(Language.get('product'))
                             space.product.labelAmount.setText(Language.get('amount'))
             
