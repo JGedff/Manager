@@ -1,0 +1,11 @@
+{
+  "name": "build-app",
+  "version": "1.0.0",
+  "description": "Store manager with python",
+  "main": "buildScript.js",
+  "author": "Jordi Marmi",
+  "license": "ISC",
+  "scripts": {
+    "build": "node ./"
+  }
+}

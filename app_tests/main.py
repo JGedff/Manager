@@ -9,28 +9,28 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Netwo
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 
-from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
-from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
-from styles.colorFunctions import getStyleSheet
+from app_tests.styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from app_tests.styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
+from app_tests.styles.colorFunctions import getStyleSheet
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from app_tests.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
-from utils.functions.globalFunctions import getMaxFloor
-from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
-from utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName
+from app_tests.utils.functions.globalFunctions import getMaxFloor
+from app_tests.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
+from app_tests.utils.functions.spaceCategoryFunctions import setUnreachableCategory, setCategoryByName, createCategoryIn, updateNameCategory, deleteCategoryFrom, updateButtonsPosition, setEmptyCategory, getEmptyCategoryName
 
-from utils.mongoDb import Mongo
-from utils.userManager import UserManager
+from app_tests.utils.mongoDb import Mongo
+from app_tests.utils.userManager import UserManager
 
-from utils.language import Language
-from utils.category import Category
+from app_tests.utils.language import Language
+from app_tests.utils.category import Category
 
-from components.product import Product
-from components.inputBool import InputBool
-from components.inputNumber import InputNumber
-from components.imageButton import ImageButton
-from components.doubleButton import DoubleButton
-from components.languageChanger import LanguageChanger
+from app_tests.components.product import Product
+from app_tests.components.inputBool import InputBool
+from app_tests.components.inputNumber import InputNumber
+from app_tests.components.imageButton import ImageButton
+from app_tests.components.doubleButton import DoubleButton
+from app_tests.components.languageChanger import LanguageChanger
 
 app = QApplication(sys.argv)
 
@@ -199,6 +199,7 @@ class SpaceCategory(QLabel):
             
         # self.doubleButtons[0].button1.sender() will be used as the receptor of events
         self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
+
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
 
@@ -590,6 +591,7 @@ class Space(QLabel):
         self.category.cancelAddCategory()
 
         ShelfInfo.hideAllSpaces()
+
         Store.stopConfigCategory(self.storeIndex)
 
         self.configBox.show()
@@ -716,7 +718,7 @@ class ShelfInfo():
 
             if numSpaces > maxSpaces:
                 maxSpaces = numSpaces
-        
+
         return maxSpaces
 
     def __init__(self, posx, posy, floors, spaces, double_shelf, storeFloors, shelfNumber = 1, storeIndex = 1, parent = None):
@@ -999,8 +1001,8 @@ class Shelf(QLabel):
 
     @staticmethod
     def showAllForms():    
-        for i in SHELVES_FORMS:
-            i.showForm()
+        for shelf in SHELVES_FORMS:
+            shelf.showForm()
 
     def __init__(self, name, posx, posy, parent = None):
         super().__init__(parent)
@@ -1590,7 +1592,7 @@ class LogInWindow(QMainWindow):
         UserManager.setUser('Guest', 'Offline')
         self.accessOffline()
 
-    def accessOffline(self):        
+    def accessOffline(self):
         if UserManager.username != 'Guest' and UserManager.role != 'Offline':
             QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
         else:
