@@ -1,13 +1,13 @@
 from PyQt5.QtWidgets import QLabel, QComboBox
 
-from styles.styleSheets import COMBO_BOX
-from styles.fonts import FONT_SMALL_TEXT
+from app_tests.components.product import Product
 
-from constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
+from app_tests.styles.styleSheets import COMBO_BOX
+from app_tests.styles.fonts import FONT_SMALL_TEXT
 
-from utils.language import Language
+from app_tests.constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
 
-from components.product import Product
+from app_tests.utils.language import Language
 
 class LanguageChanger(QLabel):
     def __init__(self, window, parent):
@@ -108,6 +108,7 @@ class LanguageChanger(QLabel):
             
             self.WINDOW.reOpenHome()
         except:
+            self.WINDOW.reOpenHome()
             self.WINDOW.setWindowTitle(Language.get("log_in"))
             self.WINDOW.logInTitle.setText(Language.get("log_in"))
             self.WINDOW.userLabel.setText(Language.get("user_name"))

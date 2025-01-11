@@ -1,8 +1,8 @@
-from constants import CATEGORY_NAMES, CATEGORY_COLORS, WINDOW_HEIGHT
+from app_tests.constants import CATEGORY_NAMES, CATEGORY_COLORS, WINDOW_HEIGHT
 
-from utils.category import Category
+from app_tests.utils.category import Category
 
-from components.doubleButton import DoubleButton
+from app_tests.components.doubleButton import DoubleButton
 
 def createCategoryIn(space, categoryName, parent, shortcut = False):
     if not shortcut:
@@ -45,6 +45,7 @@ def updateNameCategory(space, color, actualName, newName, shortcut = False):
             for i in range(space.categorySelector.count()):
                 if space.categorySelector.itemText(i) == actualName:
                     space.categorySelector.setItemText(i, newName)
+
     else:
         for button in space.doubleButtons:
             if button.textButton1() == actualName:

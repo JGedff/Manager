@@ -5,7 +5,7 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Opera
 
 from PyQt5.QtWidgets import QMessageBox
 
-from utils.userManager import UserManager
+from app_tests.utils.userManager import UserManager
 
 class Mongo:
     MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
@@ -324,3 +324,4 @@ class Mongo:
             QMessageBox.warning(None, "The product was not deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the product", f"Write error: {e.details}")
+
