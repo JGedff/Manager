@@ -66,12 +66,12 @@ class LanguageChanger(QLabel):
             
             # Shelf forms
             for shelfIndex, shelf in enumerate(SHELVES_FORMS):
+                shelf.shelfLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
                 shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
                 shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
-                shelf.doubleShelfInput.trueButton.setText(Language.get("yes"))
-                shelf.doubleShelfInput.falseButton.setText(Language.get("no"))
                 shelf.shelfFloorsLabel.setText(Language.get("shelf_question_4"))
-                shelf.shelfLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
+                shelf.doubleShelfInput.setTrueButtonText(Language.get("yes"))
+                shelf.doubleShelfInput.setFalseButtonText(Language.get("no"))
 
             # Stores
             for store in STORES:
@@ -90,19 +90,21 @@ class LanguageChanger(QLabel):
                     for space in shelf.spaces:
                         space.shelfNumber.setText(Language.get("shelf") + str(space.shelfIndex + 1) + ":")
                         space.labelCategoryHoldProduct.setText(Language.get("category_hold_product"))
+                        space.changeCategoryHoldProduct.setTrueButtonText(Language.get("yes"))
+                        space.changeCategoryHoldProduct.setFalseButtonText(Language.get("no"))
                         space.openSpaceConfig.setText(Language.get("go_back"))
                         space.labelCategory.setText(Language.get("category"))
 
                         space.category.showSpace.setText(Language.get("go_back"))
-                        space.category.categoryNameLabel.setText(Language.get("category_name"))
-                        space.category.categoryColorLabel.setText(Language.get("category_color"))
                         space.category.saveCategory.setText(Language.get("save"))
-                        space.category.categoryColor.setText(Language.get("select_color"))
                         space.category.addCategory.setText(Language.get("add_category"))
-                        space.category.newCategoryColorButton.setText(Language.get("select_color"))
-                        space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
+                        space.category.categoryColor.setText(Language.get("select_color"))
                         space.category.createCategoryButton.setText(Language.get("create"))
+                        space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
+                        space.category.categoryNameLabel.setText(Language.get("category_name"))
                         space.category.addCategoryName.setPlaceholderText(Language.get("name"))
+                        space.category.categoryColorLabel.setText(Language.get("category_color"))
+                        space.category.newCategoryColorButton.setText(Language.get("select_color"))
 
                         if isinstance(space.product, Product):
                             space.product.labelEditProductName.setText(Language.get('edit_product_name'))
@@ -134,8 +136,8 @@ class LanguageChanger(QLabel):
             self.WINDOW.repeatPasswordQLineEdit.setPlaceholderText(Language.get("enter_password"))
 
             if self.WINDOW.logIn:
-                self.WINDOW.logInButton.setText(Language.get("log_in"))
                 self.WINDOW.registerButton.setText(Language.get("register"))
+                self.WINDOW.logInButton.setText(Language.get("log_in"))
             else:
                 self.WINDOW.logInButton.setText(Language.get("register"))
                 self.WINDOW.registerButton.setText(Language.get("log_in"))

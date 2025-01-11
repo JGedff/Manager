@@ -477,8 +477,8 @@ class Space(QLabel):
             self.editCategories.setGeometry(0, 0, 0, 0)
         else:
             self.editCategories.setGeometry(0, 0, 0, 0)
-            self.changeCategoryHoldProduct.trueButton.setDisabled(True)
-            self.changeCategoryHoldProduct.falseButton.setDisabled(True)
+            self.changeCategoryHoldProduct.setTrueButtonDisabled(True)
+            self.changeCategoryHoldProduct.setFalseButtonDisabled(True)
 
         self.shelfNumber.setFont(FONT_TEXT)
         
