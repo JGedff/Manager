@@ -1,0 +1,35 @@
+name: Send to test
+
+on:
+  pull_request:
+  push:
+    branches:
+      - products
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Get repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: Feat to refactor
+          branch: refactor
+          file_pattern: 'app_tests/*'
+          commit_user_name: Jordi Marmi [GitHub Actions]
+          commit_user_email: jordimarmi1@gmail.com
+          commit_author: JGedff
