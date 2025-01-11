@@ -318,7 +318,7 @@ class Mongo:
     @classmethod
     def delMongoProduct(cls, name):
         try:
-            cls.PRODUCTS_COLLECTION.delete_one({ "name": name.capitalize() })
+            cls.PRODUCTS_COLLECTION.delete_one({ "name": name.lower() })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The product was not deleted", "There was an issue with the network")
