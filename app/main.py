@@ -13,7 +13,7 @@ from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTO
 from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 from styles.colorFunctions import getStyleSheet
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
+from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, CATEGORY_NAMES
 
 from utils.functions.globalFunctions import getMaxFloor
 from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -754,23 +754,23 @@ class ShelfInfo():
 
                 for index in range(sideSpaces):
                     if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
 
                     indexSpace += 1
 
                 for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                    self.spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
                     indexSpace += 1
                 
                 if mod > 0:
                     if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
+                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
+                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
 
                     indexSpace += 1
             else:
@@ -778,10 +778,10 @@ class ShelfInfo():
                     mod5 = (index + 1) % 5
 
                     if mod5 != 0:
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
 
         self.shelfNumber.setFont(FONT_TEXT)
 

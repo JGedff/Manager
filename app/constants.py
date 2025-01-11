@@ -12,6 +12,4 @@ CATEGORY_NAMES = [] # ['Empty', 'Unreachable', 'Fill']
 CATEGORY_COLORS = [] # ['white', 'red', 'green']
 CATEGORY_HOLDS_PRODUCT = [] # [False, False, True]
 
-DEFAULT_SPACE_MARGIN = 75
-
 DEFAULT_IMAGE = "img/magazine.png"

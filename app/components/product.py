@@ -1,16 +1,14 @@
 from utils.mongoDb import Mongo
 from utils.userManager import UserManager
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox
 
 from utils.language import Language
 
-from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES, PRODUCTS_INFO
+from constants import SHELVES, PRODUCTS_INFO
 
-from styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, REGISTER_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
-from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
-from styles.colorFunctions import getStyleSheet
+from styles.styleSheets import INPUT_TEXT, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, IMPORTANT_ACTION_BUTTON
+from styles.fonts import FONT_SMALL_TEXT
 
 from components.inputNumber import InputNumber
 from components.inputNumberDecimal import InputNumberDecimal
@@ -73,13 +71,12 @@ class Product(QLabel):
         self.initEvents()
 
     def initVariables(self, posX, posY, space):
+        self.spaceId = space.mongo_id
         self.edittingProduct = False
         self.creatingProduct = False
-        self.SPACE = space
         self.products = []
         self.posX = posX
         self.posY = posY
-        self.amount = 0
         self.price = 0
         self.name = ''
 
@@ -89,42 +86,21 @@ class Product(QLabel):
             if self.products.__len__() < 1:
                 QMessageBox.warning(None, "Products not found", "It will create the default products")
 
-                self.products.append({ "name": 'Sock', "price": 8 })
-                self.products.append({ "name": 'Dress', "price": 20 })
-                self.products.append({ "name": 'Jacket', "price": 25 })
-                self.products.append({ "name": 'Shirt', "price": 30 })
-                self.products.append({ "name": 'Sweater', "price": 35 })
+                self.addDefaultProducts()
 
                 Mongo.addMongoProducts('Sock', 8)
-                Mongo.addMongoProducts('Shirt', 20)
-                Mongo.addMongoProducts('Dress', 25)
-                Mongo.addMongoProducts('Sweater', 30)
-                Mongo.addMongoProducts('Jacket', 35)
-
-                ProductManager.add('Sock', 8)
-                ProductManager.add('Shirt', 20)
-                ProductManager.add('Dress', 25)
-                ProductManager.add('Sweater', 30)
-                ProductManager.add('Jacket', 35)
+                Mongo.addMongoProducts('Dress', 20)
+                Mongo.addMongoProducts('Shirt', 30)
+                Mongo.addMongoProducts('Jacket', 25)
+                Mongo.addMongoProducts('Sweater', 35)
 
             else:
                 for prod in self.products:
                     ProductManager.add(prod['name'], prod['price'])
 
         else:
-            self.products.append({ "name": 'Sock', "price": 8 })
-            self.products.append({ "name": 'Dress', "price": 20 })
-            self.products.append({ "name": 'Jacket', "price": 25 })
-            self.products.append({ "name": 'Shirt', "price": 30 })
-            self.products.append({ "name": 'Sweater', "price": 35 })
-
-            ProductManager.add('Sock', 8)
-            ProductManager.add('Shirt', 20)
-            ProductManager.add('Dress', 25)
-            ProductManager.add('Sweater', 30)
-            ProductManager.add('Jacket', 35)
-        
-
+            self.addDefaultProducts()
+    
     def initUI(self, parent):
         self.labelProduct = QLabel(Language.get('product'), parent)
         self.labelProduct.setFont(FONT_SMALL_TEXT)
@@ -138,16 +114,6 @@ class Product(QLabel):
         self.selectProduct.setFont(FONT_SMALL_TEXT)
         self.selectProduct.setStyleSheet(COMBO_BOX)
         self.selectProduct.setGeometry(self.posX + 96, self.posY + 6, 125, 30)
-
-        for item in self.products:
-            self.selectProduct.addItem(item['name'])
-
-        self.name = self.selectProduct.currentText()
-        self.price = self.getActualProductPrice()
-
-        self.priceLabel = QLabel(str(self.price) + " €", parent)
-        self.priceLabel.setFont(FONT_SMALL_TEXT)
-        self.priceLabel.setGeometry(self.posX + 252, self.posY + 5, 125, 30)
 
         self.editAmount = InputNumber(1, True, parent)
         self.editAmount.setGeometry(self.posX + 87, self.posY + 46, 175, 65)
@@ -225,6 +191,16 @@ class Product(QLabel):
         self.deleteProduct.setGeometry(self.posX + 450, self.posY + 125, 175, 25)
         self.deleteProduct.hide()
 
+        for item in self.products:
+            self.selectProduct.addItem(item['name'])
+
+        self.name = self.selectProduct.currentText()
+        self.price = self.getActualProductPrice()
+
+        self.priceLabel = QLabel(str(self.price) + " €", parent)
+        self.priceLabel.setFont(FONT_SMALL_TEXT)
+        self.priceLabel.setGeometry(self.posX + 252, self.posY + 5, 125, 30)
+
     def initEvents(self):
         self.editProductButton.clicked.connect(self.edit)
         self.editProduct.clicked.connect(self.showHideEdit)
@@ -239,6 +215,19 @@ class Product(QLabel):
         self.cancelButtonAddProduct.clicked.connect(self.showHideCreateProduct)
         self.selectProduct.currentTextChanged.connect(self.updateDBProductSpace)
     
+    def addDefaultProducts(self):
+        self.products.append({ "name": 'Sock', "price": 8 })
+        self.products.append({ "name": 'Dress', "price": 20 })
+        self.products.append({ "name": 'Shirt', "price": 30 })
+        self.products.append({ "name": 'Jacket', "price": 25 })
+        self.products.append({ "name": 'Sweater', "price": 35 })
+
+        ProductManager.add('Sock', 8)
+        ProductManager.add('Dress', 20)
+        ProductManager.add('Shirt', 30)
+        ProductManager.add('Jacket', 25)
+        ProductManager.add('Sweater', 35)
+
     def getActualProductPrice(self):
         productName = self.selectProduct.currentText()
         product = ProductManager.getByName(productName)
@@ -296,7 +285,6 @@ class Product(QLabel):
 
     def showHideEdit(self):
         if self.edittingProduct:
-            self.edittingProduct = False
             self.addProduct.setDisabled(False)
             self.editProduct.setDisabled(False)
             self.deleteProduct.setDisabled(False)
@@ -311,7 +299,6 @@ class Product(QLabel):
             self.editProductButton.hide()
             self.cancelButtonEditProduct.hide()
         else:
-            self.edittingProduct = True
             self.addProduct.setDisabled(True)
             self.editProduct.setDisabled(True)
             self.deleteProduct.setDisabled(True)
@@ -322,19 +309,20 @@ class Product(QLabel):
             self.editPrice.show()
             self.labelNewPrice.show()
             self.editProductName.show()
-            self.labelEditProductName.show()
             self.editProductButton.show()
+            self.labelEditProductName.show()
             self.cancelButtonEditProduct.show()
             self.editProductButton.setDisabled(True)
+        
+        self.edittingProduct = not self.edittingProduct
     
     def delProduct(self):
-        if ProductManager.countProducts() <= 1:
+        if ProductManager.countProducts() <= 2:
             self.deleteProduct.setDisabled(True)
-            return
 
         if UserManager.getUserRole != 'Offline':
             Mongo.delMongoProduct(self.name)
-        
+
         ProductManager.deleteByName(self.name)
 
         for store in SHELVES:
@@ -349,7 +337,6 @@ class Product(QLabel):
                             space.product.name = space.product.selectProduct.currentText()
                             space.product.price = space.product.getActualProductPrice()
 
-
     def checkNewInfo(self):
         if self.price != self.editPrice.getNum():
             self.editProductButton.setDisabled(False)
@@ -360,7 +347,7 @@ class Product(QLabel):
 
     def updateDBProductSpace(self):
         if UserManager.getUserRole() != 'Offline':
-            Mongo.updateMongoSpaceProduct(self.SPACE.mongo_id, self.selectProduct.currentText())
+            Mongo.updateMongoSpaceProduct(self.spaceId, self.selectProduct.currentText())
 
         self.name = self.selectProduct.currentText()
         self.price = self.getActualProductPrice()
@@ -372,7 +359,7 @@ class Product(QLabel):
 
     def updateBDspaceAmount(self):
         if UserManager.getUserRole() != 'Offline':
-            Mongo.updateMongoSpaceAmount(self.SPACE.mongo_id, self.editAmount.getNum())
+            Mongo.updateMongoSpaceAmount(self.spaceId, self.editAmount.getNum())
     
     def createProduct(self):
         if ProductManager.countProducts() > 1:

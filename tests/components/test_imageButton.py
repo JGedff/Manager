@@ -1,1 +1,0 @@
-# The image button uses built in functions, so there's no need to test that

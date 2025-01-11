@@ -1,5 +1,5 @@
-from pymongo.errors import DuplicateKeyError, ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout, WriteError, InvalidDocument
 from pymongo import MongoClient
+from pymongo.errors import DuplicateKeyError, ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout, WriteError, InvalidDocument
 
 from PyQt5.QtWidgets import QMessageBox
 
