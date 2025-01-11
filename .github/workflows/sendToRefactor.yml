@@ -1,4 +1,4 @@
-name: Send to test
+name: Send to refactor
 
 on:
   pull_request:
