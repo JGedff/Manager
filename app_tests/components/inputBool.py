@@ -70,9 +70,3 @@ class InputBool(QLabel):
             self.buttonTrueClicked()
         else:
             self.buttonFalseClicked()
-
-    def setTrueText(self, string):
-        self.trueButton.setText(string)
-
-    def setFalseText(self, string):
-        self.falseButton.setText(string)

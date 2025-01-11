@@ -13,7 +13,7 @@ from app_tests.styles.styleSheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, 
 from app_tests.styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT, FONT_BOLD_TITLE
 from app_tests.styles.colorFunctions import getStyleSheet
 
-from app_tests.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, CATEGORY_NAMES
+from app_tests.constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, DEFAULT_SPACE_MARGIN, CATEGORY_NAMES
 
 from app_tests.utils.functions.globalFunctions import getMaxFloor
 from app_tests.utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
@@ -25,6 +25,7 @@ from app_tests.utils.userManager import UserManager
 from app_tests.utils.language import Language
 from app_tests.utils.category import Category
 
+from app_tests.components.product import Product
 from app_tests.components.inputBool import InputBool
 from app_tests.components.inputNumber import InputNumber
 from app_tests.components.imageButton import ImageButton
@@ -193,9 +194,12 @@ class SpaceCategory(QLabel):
         self.hideUI()
         self.newColor = ''
         self.showSpace.show()
+        self.addCategory.hide()
         self.cancelAddCategory()
             
-        self.nameModifiedCategory = self.doubleButtons[0].getSender().text()
+        # self.doubleButtons[0].button1.sender() will be used as the receptor of events
+        self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
+
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
 
@@ -234,7 +238,7 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-            if window.userRole == 'Admin':
+            if UserManager.getUserRole() != 'Offline':
                 Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
 
             self.nameModifiedCategory = newName
@@ -242,7 +246,7 @@ class SpaceCategory(QLabel):
         if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
 
-            if window.userRole == 'Admin':
+            if UserManager.getUserRole() != 'Offline':
                 Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
@@ -338,17 +342,17 @@ class SpaceCategory(QLabel):
     def createCategory(self):
         Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
 
-        if window.userRole == 'Admin':
-            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+        if UserManager.getUserRole() != 'Offline':
+            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
-        createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent)
-        updateButtonsPosition(window.categoryManager)
+        createCategoryIn(window.categoryManager, self.newCategoryName.capitalize(), self.mainParent, True)
+        updateButtonsPosition(window.categoryManager, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    createCategoryIn(space.category, self.newCategoryName.capitalize(), self.mainParent)
-                    updateButtonsPosition(space.category)
+                    createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
+                    updateButtonsPosition(space)
 
         self.showUI()
         self.cancelAddCategory()
@@ -378,11 +382,11 @@ class SpaceCategory(QLabel):
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
-        if window.userRole == 'Admin':
+        if UserManager.getUserRole() != 'Offline':
             Mongo.delMongoCategory(categoryName)
 
         deleteCategoryFrom(window.categoryManager, indexButtonPressed, categoryName, True)
-        updateButtonsPosition(window.categoryManager)
+        updateButtonsPosition(window.categoryManager, True)
 
         for store in SHELVES:
             for shelf in store:
@@ -391,9 +395,9 @@ class SpaceCategory(QLabel):
                         oldName = space.category.name
 
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
-                        updateButtonsPosition(space.category)
+                        updateButtonsPosition(space)
 
-                        if categoryName == oldName and window.userRole == 'Admin':
+                        if categoryName == oldName and UserManager.getUserRole() != 'Offline':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
 
         if self.doubleButtons.__len__() <= 1:
@@ -406,26 +410,26 @@ class Space(QLabel):
         self.setGeometry(posx, posy, 75, 75)
 
         self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
-        self.initUI(shelfIndex, parent, times5Space)
+        self.initUI(spaceIndex, parent, times5Space)
         self.initEvents()
-        
+
     def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
-        self.mongo_id = None
         self.long = long
+        self.product = None
+        self.mongo_id = None
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
-        
-        updateButtonsPosition(self.category)
+        updateButtonsPosition(self)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
 
-    def initUI(self, shelfIndex, parent, times5Space):
+    def initUI(self, spaceIndex, parent, times5Space):
         nameSpace = str(times5Space * 5) if times5Space > 0 else ""
-        numberSpace = str(shelfIndex + 1)
+        numberSpace = str(spaceIndex + 1)
         
-        self.shelfNumber = QLabel(Language.get("shelf") + str(shelfIndex + 1), parent)
+        self.shelfNumber = QLabel(Language.get("shelf") + str(spaceIndex + 1), parent)
         self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(self.shelfNumber.width() / 2), 25, 100, 25)
 
         self.box = QPushButton(nameSpace, parent)
@@ -446,6 +450,12 @@ class Space(QLabel):
 
         self.editCategories = QPushButton("⚙️", parent)
 
+        self.labelCategoryHoldProduct = QLabel(Language.get("category_hold_product"), parent)
+        self.labelCategoryHoldProduct.setGeometry(152, 124, 250, 25)
+        
+        self.changeCategoryHoldProduct = InputBool(Language.get('yes'), Language.get('no'), parent, self.categoryCanHoldProduct, self.categoryCanNotHoldProduct)
+        self.changeCategoryHoldProduct.setGeometry(395, 117, 175, 35)
+
         if self.long:
             self.box.setFixedHeight(151)
             self.configBox.setFixedHeight(151)
@@ -457,10 +467,17 @@ class Space(QLabel):
             if category != self.category.name:
                 self.categorySelector.addItem(category.capitalize())
 
-        if window.userRole == 'Offline' or window.userRole == 'Admin':
+        if Category.categoryCanHoldProduct(self.category.name):
+            self.changeCategoryHoldProduct.setValue(True)
+
+        if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
             self.editCategories.setGeometry(390, 71, 35, 35)
+        elif UserManager.getUserRole() == 'Product':
+            self.editCategories.setGeometry(0, 0, 0, 0)
         else:
             self.editCategories.setGeometry(0, 0, 0, 0)
+            self.changeCategoryHoldProduct.trueButton.setDisabled(True)
+            self.changeCategoryHoldProduct.falseButton.setDisabled(True)
 
         self.shelfNumber.setFont(FONT_TEXT)
         
@@ -468,6 +485,7 @@ class Space(QLabel):
         self.editCategories.setFont(FONT_SMALL_TEXT)
         self.openSpaceConfig.setFont(FONT_SMALL_TEXT)
         self.categorySelector.setFont(FONT_SMALL_TEXT)
+        self.labelCategoryHoldProduct.setFont(FONT_SMALL_TEXT)
         
         self.box.setFont(FONT_SMALLEST_CHAR)
         self.configBox.setFont(FONT_SMALLEST_CHAR)
@@ -487,12 +505,45 @@ class Space(QLabel):
         self.openSpaceConfig.clicked.connect(self.stopConfigSpace)
         self.editCategories.clicked.connect(self.openConfigCategories)
         self.categorySelector.currentTextChanged.connect(self.changeCategory)
+    
+    def categoryCanHoldProduct(self):
+        Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), True)
+
+        if not isinstance(self.product, Product):
+            self.product = Product(153, 165, self, self.parent())
+            self.product.show()
+
+            Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
+            Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
+            Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
+        else:
+            if self.product.edittingProduct:
+                self.product.showHideEdit()
+            elif self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+    
+    def categoryCanNotHoldProduct(self):
+        Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
+
+        if isinstance(self.product, Product):
+            if self.product.edittingProduct:
+                self.product.showHideEdit()
+            elif self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+
+            self.product.hide()
+
+            self.product = None
+
+            Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), False)
+            Mongo.updateMongoSpaceProduct(self.mongo_id, "")
+            Mongo.updateMongoSpaceAmount(self.mongo_id, 0)
 
     def configSpace(self):
         window.hideAllButtons()
 
         Store.hideAllStores()
-        # Store.configSpace(self.storeIndex) This line is commented because unpredictible errors while testing
+        Store.configSpace(self.storeIndex)
 
         self.box.hide()
 
@@ -500,12 +551,23 @@ class Space(QLabel):
         self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
+        self.labelCategoryHoldProduct.show()
+        self.changeCategoryHoldProduct.show()
         self.categorySelector.show()
+    
+        if isinstance(self.product, Product):
+            self.product.show()
         
         window.resizeHeightScroll()
             
     def openConfigCategories(self):
-        # Store.configCategory(self.storeIndex) This line is commented because unpredictible errors while testing
+        if isinstance(self.product, Product):
+            if self.product.edittingProduct:
+                self.product.showHideEdit()
+            elif self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+
+        Store.configCategory(self.storeIndex)
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
@@ -513,7 +575,12 @@ class Space(QLabel):
         self.configBox.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.labelCategoryHoldProduct.hide()
+        self.changeCategoryHoldProduct.hide()
         self.categorySelector.hide()
+
+        if isinstance(self.product, Product):
+            self.product.hide()
 
         self.openSpaceConfig.show()
         self.category.showUI()
@@ -524,13 +591,19 @@ class Space(QLabel):
         self.category.cancelAddCategory()
 
         ShelfInfo.hideAllSpaces()
-        # Store.stopConfigCategory(self.storeIndex) This line is commented because unpredictible errors while testing
+
+        Store.stopConfigCategory(self.storeIndex)
 
         self.configBox.show()
         self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
+        self.labelCategoryHoldProduct.show()
+        self.changeCategoryHoldProduct.show()
         self.categorySelector.show()
+
+        if isinstance(self.product, Product):
+            self.product.show()
 
         self.openSpaceConfig.hide()
     
@@ -540,7 +613,25 @@ class Space(QLabel):
         setCategoryByName(self.category, category)
         self.updateSpaceColor()
 
-        if window.userRole == 'Admin':
+        if Category.categoryCanHoldProduct(category):
+            self.changeCategoryHoldProduct.setValue(True)
+
+            if not isinstance(self.product, Product):
+                self.product = Product(153, 165, self, self.parent())
+                self.product.show()
+
+                Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
+                Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
+
+        else:
+            self.changeCategoryHoldProduct.setValue(False)
+
+            if isinstance(self.product, Product):
+                self.product.hide()
+
+            self.product = None
+
+        if UserManager.getUserRole() != 'Offline':
             Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
 
     def updateVerticalHeaderPosition(self, value):
@@ -558,8 +649,14 @@ class Space(QLabel):
         self.configBox.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.labelCategoryHoldProduct.hide()
+        self.changeCategoryHoldProduct.hide()
         self.openSpaceConfig.hide()
         self.categorySelector.hide()
+
+        if isinstance(self.product, Product):
+            self.product.hide()
+        
         self.category.hideUI()
 
     def showSpace(self):
@@ -571,8 +668,16 @@ class Space(QLabel):
         self.configBox.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.labelCategoryHoldProduct.hide()
+        self.changeCategoryHoldProduct.hide()
         self.openSpaceConfig.hide()
         self.categorySelector.hide()
+
+        if isinstance(self.product, Product):
+            if self.product.creatingProduct:
+                self.product.showHideCreateProduct()
+
+            self.product.hide()
 
         self.box.raise_()
 
@@ -616,74 +721,6 @@ class ShelfInfo():
 
         return maxSpaces
 
-    @staticmethod
-    def createShelfSpaces(spacesLength, posx, posy, actualFloor, floors, storeIndex, actualNumber, parent):
-        times5 = 0
-        spaces = []
-
-        for index in range(spacesLength):
-            mod5 = (index + 1) % 5
-
-            if mod5 != 0:
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, index, parent))
-            else:
-                times5 += 1
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, index, parent, False, times5))
-    
-        return spaces
-
-    @staticmethod
-    def createDoubleShelfSpaces(spacesLength, posx, posy, actualFloor, floors, storeIndex, actualNumber, parent):
-        times5 = 0
-        spaces = []
-        indexSpace = 0
-        mod = spacesLength % 2
-        sideSpaces = (spacesLength / 2).__trunc__()
-
-        for index in range(sideSpaces):
-            if (index + 1) % 5 != 0:
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent))
-            else:
-                times5 += 1
-                spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, False, times5))
-
-            indexSpace += 1
-
-        for index in range(sideSpaces):
-            spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent))
-            indexSpace += 1
-        
-        if mod > 0:
-            if (sideSpaces + 1) % 5 != 0:
-                spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, True))
-            else:
-                times5 += 1
-                spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, floors, storeIndex, actualNumber - 1, spacesLength, indexSpace, parent, True, times5))
-
-            indexSpace += 1
-        
-        return spaces
-
-    @staticmethod
-    def createStoreSpaces(shelf, posx, posy, parent):
-        spaces = []
-        posy += 35
-
-        for actualFloor in range(shelf.storeFloors):
-            if shelf.double_shelf:
-                doubleShelfSpaces = ShelfInfo.createDoubleShelfSpaces(shelf.spacesLength, posx, posy, actualFloor, shelf.floors, shelf.storeIndex, shelf.actualNumber, parent)
-
-                for newSpace in doubleShelfSpaces:
-                    spaces.append(newSpace)
-
-            else:
-                shelfSpaces = ShelfInfo.createShelfSpaces(shelf.spacesLength, posx, posy, actualFloor, shelf.floors, shelf.storeIndex, shelf.actualNumber, parent)
-            
-                for newSpace in shelfSpaces:
-                    spaces.append(newSpace)
-
-        return spaces
-
     def __init__(self, posx, posy, floors, spaces, double_shelf, storeFloors, shelfNumber = 1, storeIndex = 1, parent = None):
         self.initVariables(posx, floors, spaces, double_shelf, storeFloors, shelfNumber, storeIndex)
         self.initUI(posx, posy, parent)
@@ -704,7 +741,46 @@ class ShelfInfo():
         self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), posy, 100, 25)
         self.shelfNumber.hide()
 
-        self.spaces = ShelfInfo.createStoreSpaces(self, posx, posy, parent)
+        posy += 35
+
+        for actualFloor in range(self.storeFloors):
+            times5 = 0
+
+            if self.double_shelf:
+                indexSpace = 0
+                mod = self.spacesLength % 2
+                sideSpaces = (self.spacesLength / 2).__trunc__()
+
+                for index in range(sideSpaces):
+                    if (index + 1) % 5 != 0:
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                    else:
+                        times5 += 1
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
+
+                    indexSpace += 1
+
+                for index in range(sideSpaces):
+                    self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy + DEFAULT_SPACE_MARGIN, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                    indexSpace += 1
+                
+                if mod > 0:
+                    if (sideSpaces + 1) % 5 != 0:
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
+                    else:
+                        times5 += 1
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
+
+                    indexSpace += 1
+            else:
+                for index in range(self.spacesLength):
+                    mod5 = (index + 1) % 5
+
+                    if mod5 != 0:
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
+                    else:
+                        times5 += 1
+                        self.spaces.append(Space(posx + (DEFAULT_SPACE_MARGIN * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
 
         self.shelfNumber.setFont(FONT_TEXT)
 
@@ -791,6 +867,7 @@ class Store():
     def showAllStoreIcons():
         for store in STORES:
             store.showIcon()
+            store.raiseIcon()
 
     @staticmethod
     def hideAllStores():
@@ -832,6 +909,7 @@ class Store():
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
         self.goBackStore.setGeometry(1260, 10, 140, 50)
+        self.goBackStore.hide()
 
         self.storeIcon = ImageButton(name, image, parent)
         self.storeIcon.setGeometry(posx, posy, 150, 150)
@@ -892,6 +970,9 @@ class Store():
 
     def showIcon(self):
         self.storeIcon.show()
+
+    def raiseIcon(self):
+        self.storeIcon.raise_()
 
     def hideIcon(self):
         self.storeIcon.hide()
@@ -1020,7 +1101,6 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def initVariables(self):
-        self.userRole = 'Guest'
         self.image = DEFAULT_IMAGE
 
         # Window config
@@ -1044,7 +1124,7 @@ class MainWindow(QMainWindow):
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
         self.editCategories = QPushButton(Language.get("edit_categories"), parent)
 
-        self.languageChanger = LanguageChanger(self, parent, True)
+        self.languageChanger = LanguageChanger(self, parent)
         self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
         
         # Header Form
@@ -1104,6 +1184,8 @@ class MainWindow(QMainWindow):
         self.createStoreButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
         Store.showAllStoreIcons()
+
+        self.raiseMainButtons()
 
     def initEvents(self):
         # Click buttons
@@ -1180,6 +1262,7 @@ class MainWindow(QMainWindow):
         Store.showAllStoreIcons()
         ShelfInfo.hideAllSpaces()
 
+        self.raiseMainButtons()
         self.resizeMain()
 
     def addStore(self):
@@ -1212,7 +1295,7 @@ class MainWindow(QMainWindow):
             if storeName == "":
                 storeName = Language.get("store") + str(STORES.__len__() + 1)
 
-            if window.userRole == 'Admin':
+            if UserManager.getUserRole() != 'Offline':
                 Store.createMongoStore(storeName, self.image)
 
             Shelf.hideAllForms()
@@ -1319,10 +1402,11 @@ class MainWindow(QMainWindow):
         self.addStoreButton.raise_()
         self.editCategories.raise_()
 
-    def changeUserRole(self, role):
-        self.userRole = role
+    def changeUserRole(self, role, username = ''):
+        if role != 'Offline':
+            UserManager.setUser(username, role)
 
-        if self.userRole == 'Offline' or self.userRole == 'Admin':
+        if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
             self.addStoreButton.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
             self.editCategories.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
         else:
@@ -1332,7 +1416,7 @@ class MainWindow(QMainWindow):
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    if window.userRole == 'Offline' or window.userRole == 'Admin':
+                    if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
                         space.editCategories.setGeometry(320, 26, 26, 26)
                     else:
                         space.editCategories.setGeometry(0, 0, 0, 0)
@@ -1510,23 +1594,25 @@ class LogInWindow(QMainWindow):
 
     def accessOffline(self):
         if UserManager.username != 'Guest' and UserManager.role != 'Offline':
-            UserManager.setUser('Guest', 'Offline')
             QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
         else:
             QMessageBox.information(self, "Offline version", "You opened the offline version")
 
+        window.changeUserRole('Offline')
+
         self.close()
 
-        window.changeUserRole('Offline')
+        UserManager.setUser('Guest', 'Offline')
 
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
+        Category.changeCategoryCanHoldProduct('Fill', True)
 
-        createCategoryIn(window.categoryManager, 'Empty', window.widget)
-        createCategoryIn(window.categoryManager, 'Unreachable', window.widget)
-        createCategoryIn(window.categoryManager, 'Fill', window.widget)
-        updateButtonsPosition(window.categoryManager)
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+        updateButtonsPosition(window.categoryManager, True)
 
         window.languageChanger.changeLang(self.languageChanger.language)
         window.languageChanger.setCurrentText(self.languageChanger.language)
@@ -1540,17 +1626,17 @@ class LogInWindow(QMainWindow):
         [_, role] = UserManager.findUser(username)
         UserManager.setUser(username, role)
 
-        window.changeUserRole(role)
-
         if UserManager.username == 'Guest' and UserManager.role == 'Offline':
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.information(None, "You don't have internet connection", "There was an issue with the network")
         else:
             QMessageBox.information(None, "Login successful", "Login successful")
 
+        window.changeUserRole(role, username)
+
         self.close()
 
-        # getMongoInfo() This line was commented so it does not load categories or stores that could change the tests
+        getMongoInfo()
 
         window.languageChanger.update()
         window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
@@ -1560,15 +1646,19 @@ class LogInWindow(QMainWindow):
 def getMongoInfo():
     storeIndex = 0
     mongoCategories = 0
+    mongoConnection = False
 
     try:
         for category in Mongo.CATEGORIES_COLLECTION.find({}):
             Category.addCategory(category['name'], category['color'])
+            Category.changeCategoryCanHoldProduct(category['name'], category['hold'])
 
-            createCategoryIn(window.categoryManager, category['name'], window.widget)
+            createCategoryIn(window.categoryManager, category['name'], window.widget, True)
             mongoCategories += 1
         
-        updateButtonsPosition(window.categoryManager)
+        mongoConnection = True
+
+        updateButtonsPosition(window.categoryManager, True)
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
         UserManager.setUser('Guest', 'Offline')
 
@@ -1576,17 +1666,35 @@ def getMongoInfo():
 
         mongoCategories = 0
 
-    if mongoCategories <= 0:
-        QMessageBox.warning(None, "You don't have any category in the database", "You'll use the default categories")
+    if mongoConnection and mongoCategories <= 0:
+        QMessageBox.warning(None, "There aren't any categories in the database", "The default categories will be created")
+
+        Mongo.addMongoCategory('Empty', 'white', False)
+        Mongo.addMongoCategory('Unreachable', 'red', False)
+        Mongo.addMongoCategory('Fill', 'green', True)
 
         Category.addCategory('Empty', 'white')
         Category.addCategory('Unreachable', 'red')
         Category.addCategory('Fill', 'green')
+        Category.changeCategoryCanHoldProduct('Fill', True)
 
-        createCategoryIn(window.categoryManager, 'Empty', window.widget)
-        createCategoryIn(window.categoryManager, 'Unreachable', window.widget)
-        createCategoryIn(window.categoryManager, 'Fill', window.widget)
-        updateButtonsPosition(window.categoryManager)
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+        updateButtonsPosition(window.categoryManager, True)
+
+    elif mongoCategories <= 0:
+        QMessageBox.warning(None, "You don't have connection to the database", "You'll use the default categories")
+
+        Category.addCategory('Empty', 'white')
+        Category.addCategory('Unreachable', 'red')
+        Category.addCategory('Fill', 'green')
+        Category.changeCategoryCanHoldProduct('Fill', True)
+
+        createCategoryIn(window.categoryManager, 'Empty', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Unreachable', window.widget, True)
+        createCategoryIn(window.categoryManager, 'Fill', window.widget, True)
+        updateButtonsPosition(window.categoryManager, True)
         
     setEmptyCategory(window.categoryManager)
 
@@ -1619,9 +1727,14 @@ def getMongoInfo():
 
                     if mongoCategories > 0:
                         category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
-                        SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
-                        SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
-                        SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+
+                        if category != None:
+                            SHELVES[storeIndex][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
+                            SHELVES[storeIndex][shelfIndex].spaces[index].category.name = category['name']
+                            SHELVES[storeIndex][shelfIndex].spaces[index].category.color = category['color']
+
+                            if isinstance(SHELVES[storeIndex][shelfIndex].spaces[index].product, Product):
+                                SHELVES[storeIndex][shelfIndex].spaces[index].product.hide()
             
             storeIndex =+ 1
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -1632,9 +1745,9 @@ class main():
     logInWindow = LogInWindow(window)
     logInWindow.show()
 
-    # sys.exit(app.exec_()) This line is commented, so the tests can run correctly
+    sys.exit(app.exec_())
 
-    # Mongo.closeMongoConnection() This line is commented, so mongodb connections can work properly while testing
+    Mongo.closeMongoConnection()
 
 if __name__ == "__main__":
     main()

@@ -1,21 +1,22 @@
 from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 
-from app_tests.styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
-from app_tests.styles.fonts import FONT_SMALLEST_CHAR
+from styles.styleSheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
+from styles.fonts import FONT_SMALLEST_CHAR
 
-from app_tests.utils.functions.checkFunctions import checkIsNum
+from utils.functions.checkFunctions import checkIsDecimal
 
-class InputNumber(QLabel):
-    def __init__(self, defaultNumber = 0, writeNumber = False, parent = None):
+class InputNumberDecimal(QLabel):
+    def __init__(self, defaultNumber = 0, writeNumber = False, maxDecimals = 2, parent = None):
         super().__init__(parent)
 
-        self.initVariables(defaultNumber)
+        self.initVariables(defaultNumber, maxDecimals)
         self.initUI(not writeNumber)
         self.initEvents()
     
-    def initVariables(self, defaultNumber):
+    def initVariables(self, defaultNumber, maxDecimals):
         self.defaultNumber = defaultNumber
         self.lastNumber = defaultNumber
+        self.maxDecimals = maxDecimals
 
     def initUI(self, writeNumber):
         layout = QHBoxLayout(self)
@@ -55,19 +56,24 @@ class InputNumber(QLabel):
 
     def addNum(self):
         actualNum = self.inputNum.text()
-        self.inputNum.setText(str(int(actualNum) + 1))
+        self.inputNum.setText(str(float(actualNum) + 1))
 
     def restNum(self):
         actualNum = self.inputNum.text()
     
-        if int(actualNum) > self.defaultNumber:
-            self.inputNum.setText(str(int(actualNum) - 1))
+        if float(actualNum) > self.defaultNumber:
+            self.inputNum.setText(str(float(actualNum) - 1))
 
     def checkNumber(self):
         textToCheck = self.inputNum.text()
-        isNumber = checkIsNum(textToCheck)
+        decimals = textToCheck.split(".")
 
-        if textToCheck == "" or not isNumber or int(textToCheck) < self.defaultNumber:
+        if decimals.__len__() >= 2 and decimals[1].__len__() > self.maxDecimals:
+            textToCheck = decimals[0] + "." + decimals[1][0] + decimals[1][1]
+
+        isNumber = checkIsDecimal(textToCheck)
+
+        if textToCheck == "" or not isNumber or float(textToCheck) < self.defaultNumber:
             self.inputNum.setText(str(self.lastNumber))
         else:
             self.lastNumber = textToCheck
@@ -79,4 +85,4 @@ class InputNumber(QLabel):
             self.inputNum.setText(str(self.lastNumber))
 
     def getNum(self):
-        return int(float(self.inputNum.text()))
+        return float(self.inputNum.text())

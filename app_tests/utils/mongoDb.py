@@ -15,6 +15,7 @@ class Mongo:
     STORES_COLLECTION = DB['stores']
     SPACES_COLLECTION = DB['spaces']
     SHELVES_COLLECTION = DB['shelfs']
+    PRODUCTS_COLLECTION = DB['products']
     CATEGORIES_COLLECTION = DB['categorys']
 
     @staticmethod
@@ -32,10 +33,12 @@ class Mongo:
     @staticmethod
     def reconnect():
         Mongo.MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+
         Mongo.DB = Mongo.MONGO_CLIENT['manager']
         Mongo.STORES_COLLECTION = Mongo.DB['stores']
         Mongo.SPACES_COLLECTION = Mongo.DB['spaces']
         Mongo.SHELVES_COLLECTION = Mongo.DB['shelfs']
+        Mongo.PRODUCTS_COLLECTION = Mongo.DB['products']
         Mongo.CATEGORIES_COLLECTION = Mongo.DB['categorys']
 
     @classmethod
@@ -170,17 +173,155 @@ class Mongo:
             cls.CATEGORIES_COLLECTION.delete_one({ "name": name })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.setUser('Guest', 'Offline')
-            QMessageBox.warning(None, "The user was deleted", "There was an issue with the network")
+            QMessageBox.warning(None, "The user was not deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
     @classmethod
-    def addMongoCategory(cls, name, color):
+    def addMongoCategory(cls, name, color, canHoldProduct):
         try:
             cls.CATEGORIES_COLLECTION.insert_one({
                 "name": name,
-                "color": color
+                "color": color,
+                "hold": canHoldProduct
             })
         except (ConnectionFailure, ServerSelectionTimeoutError):
             UserManager.setUser('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not created", "There was an issue with the network")
+
+    @classmethod
+    def updateMongoCategoryHoldsProducts(cls, category, holdsProduct):
+        categoryId = cls.getMongoCategoryByName(category, category)
+
+        try:
+            cls.CATEGORIES_COLLECTION.update_one({ "_id": categoryId }, { "$set": { "hold": holdsProduct } })
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The category was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def getMongoProducts(cls):
+        try:
+            allProducts = []
+
+            for product in cls.PRODUCTS_COLLECTION.find({}):
+                allProducts.append({ "name": product['name'].capitalize(), "price": product['price'] })
+
+            return allProducts
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "Products not found", "There was an issue with the network")
+
+            return []
+    
+    @classmethod
+    def addMongoProducts(cls, name, price):
+        try:
+            cls.PRODUCTS_COLLECTION.insert_one({
+                "name": name.lower(),
+                "price": price
+            })
+        except (ConnectionFailure, ServerSelectionTimeoutError):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The product was not created", "There was an issue with the network")
+
+    @classmethod
+    def updateMongoSpaceAmount(cls, spaceId, amount):
+        if spaceId != None:
+            try:
+                cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "amount": amount } })
+            except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+                UserManager.setUser('Guest', 'Offline')
+                QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+            except (OperationFailure, WriteError) as e:
+                QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def getMongoProductByName(cls, nameProduct):
+        try:
+            file = cls.PRODUCTS_COLLECTION.find_one({ "name": nameProduct.lower() })
+
+            return file['_id']
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "Category not found", "There was an issue with the network")
+
+            return None
+
+    @classmethod
+    def updateMongoSpaceProduct(cls, spaceId, newProduct):
+        if spaceId != None:
+            try:
+                if newProduct != '':
+                    productId = cls.getMongoProductByName(newProduct)
+
+                    if productId != None:
+                        cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "product": productId } })
+                    else:
+                        QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+                else:
+                    cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$unset": { "product": "" } })
+
+            except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+                UserManager.setUser('Guest', 'Offline')
+                QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+            except (OperationFailure, WriteError) as e:
+                QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def updateMongoProduct(cls, oldName, newName, newPrice):
+        try:
+            productId = cls.getMongoProductByName(oldName)
+
+            if productId != None:
+                cls.PRODUCTS_COLLECTION.update_one({ "_id": productId }, { "$set": { "name": newName.lower(), "price": newPrice } })
+            else:
+                QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def updateMongoProductName(cls, oldName, newName):
+        try:
+            productId = cls.getMongoProductByName(oldName)
+
+            if productId != None:
+                cls.PRODUCTS_COLLECTION.update_one({ "_id": productId }, { "$set": { "name": newName.lower() } })
+            else:
+                QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def updateMongoProductPrice(cls, oldName, newPrice):
+        try:
+            productId = cls.getMongoProductByName(oldName)
+
+            if productId != None:
+                cls.PRODUCTS_COLLECTION.update_one({ "_id": productId }, { "$set": { "price": newPrice } })
+            else:
+                QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
+        except (OperationFailure, WriteError) as e:
+            QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
+
+    @classmethod
+    def delMongoProduct(cls, name):
+        try:
+            cls.PRODUCTS_COLLECTION.delete_one({ "name": name.capitalize() })
+        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+            UserManager.setUser('Guest', 'Offline')
+            QMessageBox.warning(None, "The product was not deleted", "There was an issue with the network")
+        except WriteError as e:
+            QMessageBox.warning(None, "There was an issue deleting the product", f"Write error: {e.details}")
+

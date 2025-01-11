@@ -37,5 +37,12 @@
     "access_offline": "Offilne",
     "forgot_password": "Forgot your password?",
     "change_image": "Change the image",
-    "default_image": "Set default image"
+    "default_image": "Set default image",
+    "amount": "Amount: ",
+    "category_hold_product": "Does this category hold products?",
+    "product_name": "New product name: ",
+    "product_price": "Price: ",
+    "edit_product": "⚙️ Edit product",
+    "edit_product_name": "New name: ",
+    "del_product": "❌ Delete product"
 }

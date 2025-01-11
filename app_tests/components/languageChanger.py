@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QLabel, QComboBox
 
+from app_tests.components.product import Product
+
 from app_tests.styles.styleSheets import COMBO_BOX
 from app_tests.styles.fonts import FONT_SMALL_TEXT
 
@@ -8,17 +10,16 @@ from app_tests.constants import WINDOW_HEIGHT, STORES, SHELVES_FORMS, SHELVES
 from app_tests.utils.language import Language
 
 class LanguageChanger(QLabel):
-    def __init__(self, window, parent, mainWindow = False):
+    def __init__(self, window, parent):
         super().__init__(parent)
 
-        self.initVariables(window, mainWindow)
+        self.initVariables(window)
         self.initUI(parent)
         self.initEvents()
 
-    def initVariables(self, window, mainWindow):
+    def initVariables(self, window):
         self.language = 'English'
         self.WINDOW = window
-        self.mainWindow = mainWindow
 
     def initUI(self,parent):
         self.changer = QComboBox(parent)
@@ -40,7 +41,7 @@ class LanguageChanger(QLabel):
         self.language = language
 
     def updateUI(self):
-        if self.mainWindow:
+        try:
             self.WINDOW.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
             self.WINDOW.createStoreButton.setText(Language.get("create_store"))
             self.WINDOW.editCategories.setText(Language.get("edit_categories"))
@@ -67,8 +68,8 @@ class LanguageChanger(QLabel):
             for shelfIndex, shelf in enumerate(SHELVES_FORMS):
                 shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
                 shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
-                shelf.doubleShelfInput.setTrueText(Language.get("yes"))
-                shelf.doubleShelfInput.setFalseText(Language.get("no"))
+                shelf.doubleShelfInput.trueButton.setText(Language.get("yes"))
+                shelf.doubleShelfInput.falseButton.setText(Language.get("no"))
                 shelf.shelfFloorsLabel.setText(Language.get("shelf_question_4"))
                 shelf.shelfLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
 
@@ -100,9 +101,14 @@ class LanguageChanger(QLabel):
                         space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
                         space.category.createCategoryButton.setText(Language.get("create"))
                         space.category.addCategoryName.setPlaceholderText(Language.get("name"))
+
+                        if isinstance(space.product, Product):
+                            space.product.labelProduct.setText(Language.get('product'))
+                            space.product.labelAmount.setText(Language.get('amount'))
             
             self.WINDOW.reOpenHome()
-        else:
+        except:
+            self.WINDOW.reOpenHome()
             self.WINDOW.setWindowTitle(Language.get("log_in"))
             self.WINDOW.logInTitle.setText(Language.get("log_in"))
             self.WINDOW.userLabel.setText(Language.get("user_name"))
