@@ -42,7 +42,7 @@ class LanguageChanger(QLabel):
 
     def update_ui(self):
         try:
-            self.main_window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+            self.main_window.storeNameInput.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
             self.main_window.createStoreButton.setText(Language.get("create_store"))
             self.main_window.editCategories.setText(Language.get("edit_categories"))
             self.main_window.setDefaultIcon.setText(Language.get("default_image"))

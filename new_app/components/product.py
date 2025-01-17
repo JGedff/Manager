@@ -40,7 +40,7 @@ class Product(QLabel):
     def add_db_products(self):
         self.products = Mongo.get_products()
 
-        if self.products.__len__() < 1:
+        if len(self.products) < 1:
             QMessageBox.warning(None, "Products not found", "It will create the default products")
 
             self.add_default_products()
@@ -243,12 +243,14 @@ class Product(QLabel):
 
     def show_hide_edit(self):
         if self.editting_product:
+            # Disable buttons
             self.add_product_button.setDisabled(False)
-            self.edit_product.setDisabled(False)
             self.delete_product.setDisabled(False)
+            self.edit_product.setDisabled(False)
 
             self.edit_product.setGeometry(self.pos_x + 237, self.pos_y + 125, self.edit_product.width(), self.edit_product.height())
 
+            # Hide edit elements
             self.edit_price.hide()
             self.label_new_price.hide()
             self.edit_product_name.hide()
@@ -257,6 +259,7 @@ class Product(QLabel):
             self.cancel_button_edit_product.hide()
 
         else:
+            # Enable buttons
             self.add_product_button.setDisabled(True)
             self.edit_product.setDisabled(True)
             self.delete_product.setDisabled(True)
@@ -264,6 +267,7 @@ class Product(QLabel):
             self.edit_product.setGeometry(self.pos_x, self.pos_y + 300, self.edit_product.width(), self.edit_product.height())
             self.edit_price.set_value(self.price)
 
+            # Show edit elements
             self.edit_price.show()
             self.label_new_price.show()
             self.edit_product_name.show()
@@ -275,55 +279,70 @@ class Product(QLabel):
         self.editting_product = not self.editting_product
 
     def update_name_price(self, index: int):
+        # Update the information in the db and local
         ProductManager.update_product(index, self.edit_product_name.text(), self.edit_price.get_value())
 
         if UserManager.get_user_role() != 'Offline':
             Mongo.updateMongoProduct(self.name, self.edit_product_name.text(), self.edit_price.get_value())
 
+        # Update properties
         self.name = self.edit_product_name.text().capitalize()
         self.price = self.edit_price.get_value()
 
+        # Update labels and dropdown
         self.select_product.setItemText(self.select_product.currentIndex(), self.name.capitalize())
         self.label_price.setText(str(self.price) + " €")
 
     def update_name(self, index: int):
+        # Update the information in the db and local
         ProductManager.update_product_name(index, self.edit_product_name.text())
 
         if UserManager.get_user_role() != 'Offline':
             Mongo.updateMongoProductName(self.name, self.edit_product_name.text())
 
+        # Update name property
         self.name = self.edit_product_name.text().capitalize()
 
+        # Update product dropdown
         self.select_product.setItemText(self.select_product.currentIndex(), self.name.capitalize())
 
     def update_price(self, index: int):
+        # Update the information in the db and local
         ProductManager.update_product_price(index, self.edit_price.get_value())
 
         if UserManager.get_user_role() != 'Offline':
             Mongo.updateMongoProductPrice(self.name, self.edit_price.get_value())
 
+        # Update price property
         self.price = self.edit_price.get_value()
 
+        # Update price label
         self.label_price.setText(str(self.price) + " €")
 
     def del_product_function(self):
+        # Disable delete button if there are two or less products
         if ProductManager.count() <= 2:
             self.delete_product.setDisabled(True)
 
+        # Delete the actual product in db and local
         if UserManager.get_user_role() != 'Offline':
             Mongo.del_product(self.name)
 
         ProductManager.delete_by_name(self.name)
 
+        # Update all spaces with products
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
+                    # If the space has a product
                     if isinstance(space.product, Product):
                         index = space.product.select_product.findText(self.name)
 
                         if index != -1:
+                            # Remove the product from the dropdown
                             space.product.select_product.removeItem(index)
 
+                            # Update the name and price of the space product
                             space.product.name = space.product.select_product.currentText()
                             space.product.price = space.product.get_actual_product_price()
 
@@ -336,9 +355,11 @@ class Product(QLabel):
             self.edit_product_button.setDisabled(True)
 
     def update_db_product_space(self):
+        # Update the space, so now, it holds the new product
         if UserManager.get_user_role() != 'Offline':
             Mongo.update_space_product(self._space_id, self.select_product.currentText())
 
+        # Update the name and price of the product
         self.name = self.select_product.currentText()
         self.price = self.get_actual_product_price()
 
@@ -348,6 +369,7 @@ class Product(QLabel):
             self.show_hide_edit()
 
     def update_bd_space_amount(self):
+        # Update the space amount
         if UserManager.get_user_role() != 'Offline':
             Mongo.update_space_amount(self._space_id, self.edit_amount.get_value())
     
@@ -362,6 +384,7 @@ class Product(QLabel):
         
         self.show_hide_create_product()
 
+        # Add the new product in the dropdown of every space that has a product
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
@@ -370,12 +393,14 @@ class Product(QLabel):
 
     def show_hide_create(self):
         if self.creating_product:
+            # Enable buttons
             self.edit_product.setDisabled(False)
             self.delete_product.setDisabled(False)
             self.add_product_button.setDisabled(False)
 
             self.add_product_button.setGeometry(self.pos_x, self.pos_y + 125, 200, 25)
 
+            # Hide elements
             self.edit_new_name.hide()
             self.edit_new_price.hide()
             self.label_new_price.hide()
@@ -383,6 +408,7 @@ class Product(QLabel):
             self.create_product_button.hide()
             self.cancel_add_product_button.hide()
         else:
+            # Disable elements
             self.edit_product.setDisabled(True)
             self.delete_product.setDisabled(True)
             self.add_product_button.setDisabled(True)
@@ -390,9 +416,11 @@ class Product(QLabel):
 
             self.add_product_button.setGeometry(self.pos_x, self.pos_y + 300, 200, 25)
 
+            # Reset the edit product inputs
             self.edit_new_price.set_value(1.0)
             self.edit_new_name.setText("")
 
+            # Show elements
             self.edit_new_name.show()
             self.edit_new_price.show()
             self.label_new_price.show()
@@ -403,7 +431,7 @@ class Product(QLabel):
         self.creating_product = not self.creating_product
     
     def enable_disable_create_button(self):
-        if self.edit_new_name.text().__len__() > 0:
+        if len(self.edit_new_name.text().strip()) > 0:
             self.create_product_button.setDisabled(False)
         else:
             self.create_product_button.setDisabled(True)
@@ -417,6 +445,7 @@ class Product(QLabel):
         self.label_product.show()
         self.select_product.show()
 
+        # If the user has not any of those roles, should be unable to see or press the next buttons
         if UserManager.get_user_role() == 'Manager' or UserManager.get_user_role() == 'Product' or UserManager.get_user_role() == 'Offline':
             self.add_product_button.show()
             self.delete_product.show()
@@ -490,4 +519,4 @@ class ProductManager():
 
     @staticmethod
     def count():
-        return PRODUCTS_INFO.__len__()
+        return len(PRODUCTS_INFO)

@@ -173,7 +173,7 @@ class LogInWindow(QMainWindow):
         self.close()
 
         # Open main window
-        self.main_app.store_name_input.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+        self.main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
         self.main_app.re_open_home()
         self.main_app.show()
 
@@ -203,7 +203,7 @@ class LogInWindow(QMainWindow):
         self.close()
 
         # Open main window
-        self.main_app.store_name_input.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+        self.main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
         self.main_app.re_open_home()
         self.main_app.show()
     
@@ -260,9 +260,9 @@ class LogInWindow(QMainWindow):
 
     def register(self):
         # Check buisness rules for name and password
-        if self.user_name_input.text().__len__() < 4:
+        if len(self.user_name_input.text()) < 4:
             QMessageBox.warning(None, "Username too short", "The username must be at least 5 characters long")
-        elif self.password_input.text().__len__() < 8 or self.repeat_password_input.text().strip().__len__() < 8:
+        elif len(self.password_input.text()) < 8 or len(self.repeat_password_input.text().strip()) < 8:
             QMessageBox.warning(None, "Weak password", "The passwords must be 8 digits long")
         elif self.password_input.text() != self.repeat_password_input.text():
             QMessageBox.warning(None, "Diferent passwords", "The passwords must be the same")

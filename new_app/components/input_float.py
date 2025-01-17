@@ -71,7 +71,7 @@ class InputFloat(QLabel):
         decimals = new_value.split(".")
 
         # If it has decimals and there are more decimals than the maximum decimals, keep the decimals until it reach the maximum
-        if decimals.__len__() >= 2 and decimals[1].__len__() > self._max_decimals:
+        if len(decimals) >= 2 and len(decimals[1]) > self._max_decimals:
             new_value = decimals[0] + "."
 
             for i in range(self._max_decimals):
