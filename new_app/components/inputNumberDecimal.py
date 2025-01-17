@@ -84,5 +84,5 @@ class InputNumberDecimal(QLabel):
             self.lastNumber = num
             self.inputNum.setText(str(self.lastNumber))
 
-    def getNum(self):
+    def get_value(self):
         return float(self.inputNum.text())

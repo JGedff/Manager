@@ -392,8 +392,8 @@ class Mongo:
                     
                     Shelf.createShelf(widget)
 
-                    SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__() / store['storeFloors'])
-                    SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
+                    SHELVES_FORMS[index].input_spaces.set_value(shelf['spaces'].__len__() / store['storeFloors'])
+                    SHELVES_FORMS[index].input_shelf_floors.set_value(shelf['floors'])
                     SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
                     SHELVES_FORMS[index].hideForm()
 

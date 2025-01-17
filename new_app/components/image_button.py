@@ -13,7 +13,7 @@ class ImageButton(QPushButton):
 
     def init_ui(self, text, icon_path):
         # Create a layout for the button to hold icon and text
-        self._layout = QVBoxLayout(self)
+        layout = QVBoxLayout(self)
 
         # Create image
         pixmap = QPixmap(icon_path)
@@ -29,14 +29,16 @@ class ImageButton(QPushButton):
         self._text_label.setFont(FONT_SMALL_TEXT)
         self._text_label.setAlignment(Qt.AlignCenter)
 
-        # Add icon and text to the layout
-        self._layout.addWidget(self._icon_image)
-        self._layout.addWidget(self._text_label)
-
         # Style icon
-        self._layout.setAlignment(Qt.AlignCenter)
-        self._layout.setSpacing(5)
         self.setStyleSheet(IMAGE_BUTTON)
+
+        # Add icon and text to the layout
+        layout.addWidget(self._icon_image)
+        layout.addWidget(self._text_label)
+
+        # Style layout
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(5)
 
     def text(self):
         return self._text_label.text()

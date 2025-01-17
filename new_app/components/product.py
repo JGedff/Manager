@@ -10,7 +10,7 @@ from constants import SHELVES, PRODUCTS_INFO
 from styles.style_sheets import INPUT_TEXT, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, IMPORTANT_ACTION_BUTTON
 from styles.fonts import FONT_SMALL_TEXT
 
-from components.inputNumber import InputNumber
+from components.input_number import InputNumber
 from components.inputNumberDecimal import InputNumberDecimal
 
 class ProductManager():
@@ -115,8 +115,8 @@ class Product(QLabel):
         self.selectProduct.setStyleSheet(COMBO_BOX)
         self.selectProduct.setGeometry(self.posX + 96, self.posY + 6, 125, 30)
 
-        self.editAmount = InputNumber(1, True, parent)
-        self.editAmount.setGeometry(self.posX + 87, self.posY + 46, 175, 65)
+        self.edit_amount = InputNumber(1, True, parent)
+        self.edit_amount.setGeometry(self.posX + 87, self.posY + 46, 175, 65)
 
         self.addProduct = QPushButton(Language.get("add_product"), parent)
         self.addProduct.setFont(FONT_SMALL_TEXT)
@@ -211,7 +211,7 @@ class Product(QLabel):
         self.editNewName.textChanged.connect(self.enableCreateButton)
         self.editPrice.inputNum.textChanged.connect(self.checkNewInfo)
         self.cancelButtonEditProduct.clicked.connect(self.showHideEdit)
-        self.editAmount.inputNum.textChanged.connect(self.updateBDspaceAmount)
+        self.edit_amount.get_input().textChanged.connect(self.updateBDspaceAmount)
         self.cancelButtonAddProduct.clicked.connect(self.showHideCreateProduct)
         self.selectProduct.currentTextChanged.connect(self.updateDBProductSpace)
     
@@ -237,17 +237,17 @@ class Product(QLabel):
     def edit(self):
         self.showHideEdit()
         
-        if self.price != self.editPrice.getNum() and (self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != ""):
+        if self.price != self.editPrice.get_value() and (self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != ""):
             index = ProductManager.getIndexByName(self.name)
 
             if index != -1:
-                ProductManager.updateProduct(index, self.editProductName.text(), self.editPrice.getNum())
+                ProductManager.updateProduct(index, self.editProductName.text(), self.editPrice.get_value())
 
                 if UserManager.getUserRole() != 'Offline':
-                    Mongo.updateMongoProduct(self.name, self.editProductName.text(), self.editPrice.getNum())
+                    Mongo.updateMongoProduct(self.name, self.editProductName.text(), self.editPrice.get_value())
 
                 self.name = self.editProductName.text()
-                self.price = self.editPrice.getNum()
+                self.price = self.editPrice.get_value()
 
                 self.selectProduct.setItemText(self.selectProduct.currentIndex(), self.name.capitalize())
                 self.priceLabel.setText(str(self.price) + " €")
@@ -265,16 +265,16 @@ class Product(QLabel):
 
                 self.selectProduct.setItemText(self.selectProduct.currentIndex(), self.name.capitalize())
 
-        elif self.price != self.editPrice.getNum():
+        elif self.price != self.editPrice.get_value():
             index = ProductManager.getIndexByName(self.name)
 
             if index != -1:
-                ProductManager.updateProductPrice(index, self.editPrice.getNum())
+                ProductManager.updateProductPrice(index, self.editPrice.get_value())
 
                 if UserManager.getUserRole() != 'Offline':
-                    Mongo.updateMongoProductPrice(self.name, self.editPrice.getNum())
+                    Mongo.updateMongoProductPrice(self.name, self.editPrice.get_value())
 
-                self.price = self.editPrice.getNum()
+                self.price = self.editPrice.get_value()
 
                 self.priceLabel.setText(str(self.price) + " €")
 
@@ -338,7 +338,7 @@ class Product(QLabel):
                             space.product.price = space.product.getActualProductPrice()
 
     def checkNewInfo(self):
-        if self.price != self.editPrice.getNum():
+        if self.price != self.editPrice.get_value():
             self.editProductButton.setDisabled(False)
         elif self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != "":
             self.editProductButton.setDisabled(False)
@@ -359,16 +359,16 @@ class Product(QLabel):
 
     def updateBDspaceAmount(self):
         if UserManager.getUserRole() != 'Offline':
-            Mongo.updateMongoSpaceAmount(self.spaceId, self.editAmount.getNum())
+            Mongo.updateMongoSpaceAmount(self.spaceId, self.edit_amount.get_value())
     
     def createProduct(self):
         if ProductManager.countProducts() > 1:
             self.deleteProduct.setDisabled(False)
 
         if UserManager.getUserRole() != 'Offline':
-            Mongo.addMongoProducts(self.editNewName.text(), self.editNewPrice.getNum())
+            Mongo.addMongoProducts(self.editNewName.text(), self.editNewPrice.get_value())
         
-        ProductManager.add(self.editNewName.text(), self.editNewPrice.getNum())
+        ProductManager.add(self.editNewName.text(), self.editNewPrice.get_value())
         
         self.showHideCreateProduct()
 
@@ -421,7 +421,7 @@ class Product(QLabel):
     def show(self):
         super().show()
 
-        self.editAmount.show()
+        self.edit_amount.show()
         self.priceLabel.show()
         self.labelAmount.show()
         self.labelProduct.show()
@@ -435,7 +435,7 @@ class Product(QLabel):
     def hide(self):
         super().hide()
 
-        self.editAmount.hide()
+        self.edit_amount.hide()
         self.addProduct.hide()
         self.priceLabel.hide()
         self.editProduct.hide()

@@ -21,7 +21,7 @@ class InputBool(QLabel):
 
     def init_ui(self, true_text, false_text):
         # Create layout
-        self._layout = QHBoxLayout(self)
+        layout = QHBoxLayout(self)
 
         # Create buttons
         self._true_button = QPushButton(true_text, self)
@@ -38,11 +38,11 @@ class InputBool(QLabel):
         self._false_button.setStyleSheet(TRUE_BUTTON)
 
         # Add buttons to the layout
-        self._layout.addWidget(self._true_button)
-        self._layout.addWidget(self._false_button)
+        layout.addWidget(self._true_button)
+        layout.addWidget(self._false_button)
 
         # Change spacing between buttons
-        self._layout.setSpacing(0)
+        layout.setSpacing(0)
 
     def init_events(self):
         self._true_button.clicked.connect(self.true_function)

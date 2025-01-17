@@ -1,4 +1,4 @@
-def checkIsNum(numToCheck):
+def is_num(numToCheck):
     try:
         int(numToCheck)
         return True
