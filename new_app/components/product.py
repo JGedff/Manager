@@ -11,7 +11,7 @@ from styles.style_sheets import INPUT_TEXT, COMBO_BOX, REST_BUTTON, BLUE_BUTTON,
 from styles.fonts import FONT_SMALL_TEXT
 
 from components.input_integer import InputInteger
-from components.input_decimal import InputDecimal
+from components.input_float import InputFloat
 
 class ProductManager():
     @staticmethod
@@ -137,7 +137,7 @@ class Product(QLabel):
         self.labelNewPrice.setFont(FONT_SMALL_TEXT)
         self.labelNewPrice.setGeometry(self.posX, self.posY + 230, 150, 35)
 
-        self.edit_new_price = InputDecimal(1, True, 2, parent)
+        self.edit_new_price = InputFloat(1, True, 2, parent)
         self.edit_new_price.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
 
         self.cancelButtonAddProduct = QPushButton(Language.get("cancel"), parent)
@@ -169,7 +169,7 @@ class Product(QLabel):
         self.cancelButtonEditProduct.setGeometry(self.posX + 237, self.posY + 125, 100, 25)
         self.cancelButtonEditProduct.hide()
 
-        self.edit_price = InputDecimal(1, True, 2, parent)
+        self.edit_price = InputFloat(1, True, 2, parent)
         self.edit_price.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
         self.edit_price.hide()
 

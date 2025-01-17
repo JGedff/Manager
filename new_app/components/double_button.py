@@ -5,13 +5,13 @@ from styles.style_sheets import DEFAULT_BUTTON, REST_BUTTON
 from styles.fonts import FONT_SMALL_TEXT
 
 class DoubleButton(QLabel):
-    def __init__(self, text_first_button, text_second_button, function_first_button, funciton_second_button, parent = None):
+    def __init__(self, text_first_button: str, text_second_button: str, function_first_button, funciton_second_button, parent = None):
         super().__init__(parent)
 
         self.init_ui(text_first_button, text_second_button, parent)
         self.init_events(function_first_button, funciton_second_button)
 
-    def init_ui(self, text_first_button, text_second_button, parent):
+    def init_ui(self, text_first_button: str, text_second_button: str, parent):
         # Create a layout for the button to hold icon and text
         self.widget = QWidget(parent)
 
@@ -39,19 +39,19 @@ class DoubleButton(QLabel):
     def get_second_button_text(self):
         return self._second_button.text()
 
-    def set_first_button_text(self, value):
-        self._first_button.setText(value)
+    def set_first_button_text(self, text: str):
+        self._first_button.setText(text)
 
-    def set_second_button_text(self, value):
-        self._second_button.setText(value)
+    def set_second_button_text(self, text: str):
+        self._second_button.setText(text)
         
-    def set_first_button_disabled(self, value):
-        self._first_button.setDisabled(value)
+    def set_first_button_disabled(self, disabled: bool):
+        self._first_button.setDisabled(disabled)
 
-    def set_second_button_disabled(self, value):
-        self._second_button.setDisabled(value)
+    def set_second_button_disabled(self, disabled: bool):
+        self._second_button.setDisabled(disabled)
 
-    def setGeometry(self, x, y, width, height):
+    def setGeometry(self, x: int, y: int, width: int, height: int):
         super().setGeometry(x, y, width, height)
         self.widget.setGeometry(QRect(x, y, width, height))
 
@@ -73,14 +73,14 @@ class DoubleButton(QLabel):
         self._first_button.raise_()
         self._second_button.raise_()
 
-    def move(self, x, y):
+    def move(self, x: int, y: int):
         super().move(x, y)
         self.widget.move(QPoint(x, y))
 
         self._first_button.move(QPoint(x + self._first_button.x(), y + self._first_button.y()))
         self._second_button.move(QPoint(x + self._second_button.x(), y + self._second_button.y()))
 
-    def get_first_button_sender_text(self):
+    def get_first_button_sender_text(self) -> str:
         # The sender function acts as a click listener
         return self._first_button.sender().text()
     

@@ -6,7 +6,7 @@ from styles.fonts import FONT_SMALLEST_CHAR
 from utils.functions.globalFunctions import useless_function
 
 class InputBool(QLabel):
-    def __init__(self, true_text, false_text, parent = None, true_action = useless_function, false_action = useless_function):
+    def __init__(self, true_text: str, false_text: str, parent = None, true_action = useless_function, false_action = useless_function):
         super().__init__(parent)
 
         self.init_variables(true_action, false_action)
@@ -19,7 +19,7 @@ class InputBool(QLabel):
         self._true_action = true_action
         self._false_action = false_action
 
-    def init_ui(self, true_text, false_text):
+    def init_ui(self, true_text: str, false_text: str):
         # Create buttons
         self._true_button = QPushButton(true_text, self)
         self._true_button.setFixedHeight(25)
@@ -69,20 +69,20 @@ class InputBool(QLabel):
     def get_value(self):
         return self._value
     
-    def set_value(self, boolean):
-        if boolean:
+    def set_value(self, new_value: bool):
+        if new_value:
             self.true_function()
         else:
             self.false_function()
     
-    def set_true_text(self, string):
-        self._true_button.setText(string)
+    def set_true_text(self, text: str):
+        self._true_button.setText(text)
 
-    def set_false_text(self, string):
-        self._false_button.setText(string)
+    def set_false_text(self, text: str):
+        self._false_button.setText(text)
     
-    def set_true_button_disabled(self, bool):
-        self._true_button.setDisabled(bool)
+    def set_true_button_disabled(self, disabled: bool):
+        self._true_button.setDisabled(disabled)
 
-    def set_false_button_disabled(self, bool):
-        self._false_button.setDisabled(bool)
+    def set_false_button_disabled(self, disabled: bool):
+        self._false_button.setDisabled(disabled)

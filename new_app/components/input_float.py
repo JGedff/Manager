@@ -5,20 +5,20 @@ from styles.fonts import FONT_SMALLEST_CHAR
 
 from utils.functions.checkFunctions import is_decimal
 
-class InputDecimal(QLabel):
-    def __init__(self, min = 0, write_number = False, max_decimals = 2, parent = None):
+class InputFloat(QLabel):
+    def __init__(self, min = 0.0, write_number = False, max_decimals = 2, parent = None):
         super().__init__(parent)
 
         self.init_variables(min, max_decimals)
         self.init_ui(not write_number)
         self.init_events()
     
-    def init_variables(self, min, max_decimals):
+    def init_variables(self, min: float, max_decimals: int):
         self._min = min
         self._last_number = str(min)
         self._max_decimals = max_decimals
 
-    def init_ui(self, write_number):
+    def init_ui(self, write_number: bool):
         # Create input
         self._input = QLineEdit(self)
         self._input.setFixedHeight(50)
@@ -95,9 +95,9 @@ class InputDecimal(QLabel):
         if float(actual_num) > self._min:
             self._input.setText(str(float(actual_num) - 1))
 
-    def set_value(self, num):
-        if num >= self._min:
-            self._input.setText(str(num))
+    def set_value(self, new_value: float):
+        if new_value >= self._min:
+            self._input.setText(str(new_value))
 
     def get_value(self):
         return float(self._input.text())

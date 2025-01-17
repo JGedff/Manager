@@ -6,12 +6,12 @@ from styles.style_sheets import IMAGE_BUTTON
 from styles.fonts import FONT_SMALL_TEXT
 
 class ImageButton(QPushButton):
-    def __init__(self, text, icon_path, parent = None):
+    def __init__(self, text: str, icon_path: str, parent = None):
         super().__init__(parent)
 
         self.init_ui(text, icon_path)
 
-    def init_ui(self, text, icon_path):
+    def init_ui(self, text: str, icon_path: str):
         # Create image
         pixmap = QPixmap(icon_path)
 
@@ -43,10 +43,10 @@ class ImageButton(QPushButton):
     def text(self):
         return self._text_label.text()
 
-    def setText(self, text):
+    def setText(self, text: str):
         self._text_label.setText(text)
 
-    def setPixmap(self, icon):
-        pixmap = QPixmap(icon)
+    def setPixmap(self, icon_path: str):
+        pixmap = QPixmap(icon_path)
 
         self._icon_image.setPixmap(pixmap)

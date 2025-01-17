@@ -13,11 +13,11 @@ class InputInteger(QLabel):
         self.init_ui(not write_number)
         self.init_events()
     
-    def init_variables(self, min):
+    def init_variables(self, min: int):
         self._min = min
         self._last_number = str(min)
 
-    def init_ui(self, write_number):
+    def init_ui(self, write_number: bool):
         # Create buttons
         self._add_one_button = QPushButton("↑", self)
         self._add_one_button.setFixedWidth(50)
@@ -93,9 +93,9 @@ class InputInteger(QLabel):
 
             self._input.setText(new_value)
 
-    def set_value(self, number):
-        if number >= self._min:
-            self._input.setText(str(self._last_number))
+    def set_value(self, new_value: int):
+        if new_value >= self._min:
+            self._input.setText(str(new_value))
 
     def get_value(self):
         return int(self._input.text())

@@ -21,7 +21,7 @@ class LanguageChanger(QLabel):
         self.language = 'English'
         self.main_window = window
 
-    def init_ui(self,parent):
+    def init_ui(self, parent):
         self.changer = QComboBox(parent)
         self.changer.addItem("English")
         self.changer.addItem("Español")
@@ -30,15 +30,15 @@ class LanguageChanger(QLabel):
         self.changer.setFont(FONT_SMALL_TEXT)
         self.changer.setGeometry(15, WINDOW_HEIGHT - 50, 100, 25)
         self.changer.setStyleSheet(COMBO_BOX)
-    
+
     def init_events(self):
         self.changer.currentTextChanged.connect(self.change_lang)
 
-    def change_lang(self, language):
+    def change_lang(self, language: str):
         Language.changeTo(language)
 
-        self.update_ui()
         self.language = language
+        self.update_ui()
 
     def update_ui(self):
         try:
@@ -151,11 +151,11 @@ class LanguageChanger(QLabel):
     def raise_(self):
         self.changer.raise_()
 
-    def move(self, x, y):
+    def move(self, x: int, y: int):
         self.changer.move(x, y)
 
-    def setGeometry(self, x, y, width, height):
+    def setGeometry(self, x: int, y: int, width: int, height: int):
         self.changer.setGeometry(x, y, width, height)
 
-    def set_current_text(self, item):
+    def set_current_text(self, item: str):
         self.changer.setCurrentText(item)
