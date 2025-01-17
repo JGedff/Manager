@@ -19,7 +19,7 @@ class LanguageChanger(QLabel):
 
     def init_variables(self, window):
         self.language = 'English'
-        self.WINDOW = window
+        self.main_window = window
 
     def init_ui(self,parent):
         self.changer = QComboBox(parent)
@@ -42,27 +42,27 @@ class LanguageChanger(QLabel):
 
     def update_ui(self):
         try:
-            self.WINDOW.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
-            self.WINDOW.createStoreButton.setText(Language.get("create_store"))
-            self.WINDOW.editCategories.setText(Language.get("edit_categories"))
-            self.WINDOW.setDefaultIcon.setText(Language.get("default_image"))
-            self.WINDOW.formStoreIcon.setText(Language.get("change_image"))
-            self.WINDOW.storeNameLabel.setText(Language.get("name_store"))
-            self.WINDOW.addStoreButton.setText(Language.get("add_store"))
-            self.WINDOW.addShelfButton.setText(Language.get("add_shelf"))
-            self.WINDOW.setWindowTitle(Language.get("window_title"))
-            self.WINDOW.goHome.setText(Language.get("go_back"))
+            self.main_window.storeNameInput.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
+            self.main_window.createStoreButton.setText(Language.get("create_store"))
+            self.main_window.editCategories.setText(Language.get("edit_categories"))
+            self.main_window.setDefaultIcon.setText(Language.get("default_image"))
+            self.main_window.formStoreIcon.setText(Language.get("change_image"))
+            self.main_window.storeNameLabel.setText(Language.get("name_store"))
+            self.main_window.addStoreButton.setText(Language.get("add_store"))
+            self.main_window.addShelfButton.setText(Language.get("add_shelf"))
+            self.main_window.setWindowTitle(Language.get("window_title"))
+            self.main_window.goHome.setText(Language.get("go_back"))
 
-            self.WINDOW.categoryManager.showSpace.setText(Language.get("go_back"))
-            self.WINDOW.categoryManager.saveCategory.setText(Language.get("save"))
-            self.WINDOW.categoryManager.addCategory.setText(Language.get("add_category"))
-            self.WINDOW.categoryManager.categoryColor.setText(Language.get("select_color"))
-            self.WINDOW.categoryManager.createCategoryButton.setText(Language.get("create"))
-            self.WINDOW.categoryManager.cancelButtonAddCategory.setText(Language.get("cancel"))
-            self.WINDOW.categoryManager.categoryNameLabel.setText(Language.get("category_name"))
-            self.WINDOW.categoryManager.addCategoryName.setPlaceholderText(Language.get("name"))
-            self.WINDOW.categoryManager.categoryColorLabel.setText(Language.get("category_color"))
-            self.WINDOW.categoryManager.newCategoryColorButton.setText(Language.get("select_color"))
+            self.main_window.categoryManager.showSpace.setText(Language.get("go_back"))
+            self.main_window.categoryManager.saveCategory.setText(Language.get("save"))
+            self.main_window.categoryManager.addCategory.setText(Language.get("add_category"))
+            self.main_window.categoryManager.categoryColor.setText(Language.get("select_color"))
+            self.main_window.categoryManager.createCategoryButton.setText(Language.get("create"))
+            self.main_window.categoryManager.cancelButtonAddCategory.setText(Language.get("cancel"))
+            self.main_window.categoryManager.categoryNameLabel.setText(Language.get("category_name"))
+            self.main_window.categoryManager.addCategoryName.setPlaceholderText(Language.get("name"))
+            self.main_window.categoryManager.categoryColorLabel.setText(Language.get("category_color"))
+            self.main_window.categoryManager.newCategoryColorButton.setText(Language.get("select_color"))
             
             # Shelf forms
             for shelfIndex, shelf in enumerate(SHELVES_FORMS):
@@ -122,25 +122,25 @@ class LanguageChanger(QLabel):
                             space.product.labelProduct.setText(Language.get('product'))
                             space.product.labelAmount.setText(Language.get('amount'))
             
-            self.WINDOW.reOpenHome()
+            self.main_window.reOpenHome()
         except:
-            self.WINDOW.setWindowTitle(Language.get("log_in"))
-            self.WINDOW.log_in_title.setText(Language.get("log_in"))
-            self.WINDOW.user_label.setText(Language.get("user_name"))
-            self.WINDOW.password_label.setText(Language.get("password"))
-            self.WINDOW.register_title.setText(Language.get("register"))
-            self.WINDOW.access_offline_button.setText(Language.get("access_offline"))
-            self.WINDOW.repeat_password_label.setText(Language.get("repeat_password"))
-            self.WINDOW.password_input.setPlaceholderText(Language.get("enter_password"))
-            self.WINDOW.user_name_input.setPlaceholderText(Language.get("enter_user_name"))
-            self.WINDOW.repeat_password_input.setPlaceholderText(Language.get("enter_password"))
+            self.main_window.setWindowTitle(Language.get("log_in"))
+            self.main_window.log_in_title.setText(Language.get("log_in"))
+            self.main_window.user_label.setText(Language.get("user_name"))
+            self.main_window.password_label.setText(Language.get("password"))
+            self.main_window.register_title.setText(Language.get("register"))
+            self.main_window.access_offline_button.setText(Language.get("access_offline"))
+            self.main_window.repeat_password_label.setText(Language.get("repeat_password"))
+            self.main_window.password_input.setPlaceholderText(Language.get("enter_password"))
+            self.main_window.user_name_input.setPlaceholderText(Language.get("enter_user_name"))
+            self.main_window.repeat_password_input.setPlaceholderText(Language.get("enter_password"))
 
-            if self.WINDOW.log_in:
-                self.WINDOW.register_button.setText(Language.get("register"))
-                self.WINDOW.log_in_button.setText(Language.get("log_in"))
+            if self.main_window.log_in:
+                self.main_window.register_button.setText(Language.get("register"))
+                self.main_window.log_in_button.setText(Language.get("log_in"))
             else:
-                self.WINDOW.log_in_button.setText(Language.get("register"))
-                self.WINDOW.register_button.setText(Language.get("log_in"))
+                self.main_window.log_in_button.setText(Language.get("register"))
+                self.main_window.register_button.setText(Language.get("log_in"))
     
     def hide(self):
         self.changer.hide()

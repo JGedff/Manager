@@ -28,7 +28,7 @@ from components.log_in import LogInWindow
 from components.inputBool import InputBool
 from components.inputNumber import InputNumber
 from components.imageButton import ImageButton
-from components.doubleButton import DoubleButton
+from components.double_button import DoubleButton
 from components.language_changer import LanguageChanger
 
 app = QApplication(sys.argv)
@@ -48,7 +48,7 @@ class SpaceCategory(QLabel):
         self.color = ''
         self.newColor = ''
         self.floor = floor
-        self.doubleButtons = []
+        self.double_buttons = []
         self.mainParent = parent
         self.shortcut = shortcut
         self.newCategoryName = ""
@@ -91,11 +91,11 @@ class SpaceCategory(QLabel):
         posy = 25
 
         for category in CATEGORY_NAMES:
-            newDoubleButton = DoubleButton(category.capitalize(), "❌", self.editCategory, self.deleteCategory, parent)
-            newDoubleButton.setGeometry(posx - 12, posy - 12, 450, 69)
+            new_double_button = DoubleButton(category.capitalize(), "❌", self.editCategory, self.deleteCategory, parent)
+            new_double_button.setGeometry(posx - 12, posy - 12, 450, 69)
 
             posy += 69
-            self.doubleButtons.append(newDoubleButton)
+            self.double_buttons.append(new_double_button)
 
         # Adding a new category
         self.addCategory = QPushButton(Language.get("add_category"), parent)
@@ -172,11 +172,11 @@ class SpaceCategory(QLabel):
             SHELVES[self.storeIndex][self.shelfIndex].spaces[(self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex].openSpaceConfig.show()
 
     def showUI(self):
-        for button in self.doubleButtons:
+        for button in self.double_buttons:
             button.show()
             button.raise_()
 
-        if self.doubleButtons.__len__() < 37:
+        if self.double_buttons.__len__() < 37:
             self.addCategory.show()
             self.addCategory.raise_()
         else:
@@ -195,9 +195,9 @@ class SpaceCategory(QLabel):
         self.showSpace.show()
         self.addCategory.hide()
         self.cancelAddCategory()
-            
-        # self.doubleButtons[0].button1.sender() will be used as the receptor of events
-        self.nameModifiedCategory = self.doubleButtons[0].button1.sender().text()
+
+        # I don't understand why, but this works to get the text of the category pressed
+        self.nameModifiedCategory = self.double_buttons[0].get_first_button_sender_text()
 
         color = Category.getColorByName(self.nameModifiedCategory)
         self.colorModifiedCategory = color
@@ -222,7 +222,7 @@ class SpaceCategory(QLabel):
             Store.hideAllStores()
 
     def hideUI(self):
-        for button in self.doubleButtons:
+        for button in self.double_buttons:
             button.hide()
         
         self.addCategory.hide()
@@ -293,8 +293,8 @@ class SpaceCategory(QLabel):
         self.newCategoryColorButton.raise_()
         self.cancelButtonAddCategory.raise_()
 
-        for button in self.doubleButtons:
-            button.setDisabledButton2(True)
+        for button in self.double_buttons:
+            button.set_second_button_disabled(True)
 
     def cancelAddCategory(self):
         self.addCategoryName.hide()
@@ -317,8 +317,8 @@ class SpaceCategory(QLabel):
             self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() - 100)
             self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() - 100)
 
-        for button in self.doubleButtons:
-            button.setDisabledButton2(False)
+        for button in self.double_buttons:
+            button.set_second_button_disabled(False)
 
         self.creatingCategory = False
 
@@ -374,8 +374,9 @@ class SpaceCategory(QLabel):
     def deleteCategory(self):
         indexButtonPressed = 0
         
-        for index, send in enumerate(self.doubleButtons):
-            if send.button2 == self.sender():
+        # This time, like we want the index, something that is not inside the button, I made this to know which category is going to be deleted
+        for index, send in enumerate(self.double_buttons):
+            if send.get_second_button() == self.sender():
                 indexButtonPressed = index
 
         categoryName = Category.getNameByIndex(indexButtonPressed)
@@ -390,7 +391,7 @@ class SpaceCategory(QLabel):
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    if space.category.doubleButtons.__len__() > CATEGORY_NAMES.__len__():
+                    if space.category.double_buttons.__len__() > CATEGORY_NAMES.__len__():
                         oldName = space.category.name
 
                         deleteCategoryFrom(space, indexButtonPressed, categoryName)
@@ -399,8 +400,8 @@ class SpaceCategory(QLabel):
                         if categoryName == oldName and UserManager.getUserRole() != 'Offline':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
 
-        if self.doubleButtons.__len__() <= 1:
-            self.doubleButtons[0].setDisabledButton2(True)
+        if self.double_buttons.__len__() <= 1:
+            self.double_buttons[0].set_second_button_disabled(True)
 
 class Space(QLabel):
     def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
