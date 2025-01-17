@@ -27,7 +27,7 @@ from components.product import Product
 from components.log_in import LogInWindow
 from components.inputBool import InputBool
 from components.inputNumber import InputNumber
-from components.imageButton import ImageButton
+from components.image_button import ImageButton
 from components.double_button import DoubleButton
 from components.language_changer import LanguageChanger
 
@@ -862,13 +862,13 @@ class Store():
     @staticmethod
     def hideAllStoreIcons():
         for store in STORES:
-            store.hideIcon()
+            store.hide_icon()
 
     @staticmethod
     def showAllStoreIcons():
         for store in STORES:
-            store.showIcon()
-            store.raiseIcon()
+            store.show_icon()
+            store.raise_icon()
 
     @staticmethod
     def hideAllStores():
@@ -912,8 +912,8 @@ class Store():
         self.goBackStore.setGeometry(1260, 10, 140, 50)
         self.goBackStore.hide()
 
-        self.storeIcon = ImageButton(name, image, parent)
-        self.storeIcon.setGeometry(posx, posy, 150, 150)
+        self.store_icon = ImageButton(name, image, parent)
+        self.store_icon.setGeometry(posx, posy, 150, 150)
 
         self.changeFloorButton = QComboBox(parent)
         self.changeFloorButton.setGeometry(25, 10, 125, 30)
@@ -928,7 +928,7 @@ class Store():
         self.changeFloorButton.setStyleSheet(COMBO_BOX)
 
     def initEvents(self):
-        self.storeIcon.clicked.connect(self.openStore)
+        self.store_icon.clicked.connect(self.openStore)
         self.goBackStore.clicked.connect(self.openStore)
         self.changeFloorButton.currentTextChanged.connect(self.changeFloor)
 
@@ -969,14 +969,14 @@ class Store():
 
         self.changeFloorButton.hide()
 
-    def showIcon(self):
-        self.storeIcon.show()
+    def show_icon(self):
+        self.store_icon.show()
 
-    def raiseIcon(self):
-        self.storeIcon.raise_()
+    def raise_icon(self):
+        self.store_icon.raise_()
 
-    def hideIcon(self):
-        self.storeIcon.hide()
+    def hide_icon(self):
+        self.store_icon.hide()
 
     def configCategories(self):
         self.goBackStore.hide()
@@ -1144,9 +1144,9 @@ class MainWindow(QMainWindow):
         self.store_name_input.hide()
 
         # Body form
-        self.formStoreIcon = ImageButton(Language.get("change_image"), DEFAULT_IMAGE, parent)
-        self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
-        self.formStoreIcon.hide()
+        self.icon_new_store = ImageButton(Language.get("change_image"), DEFAULT_IMAGE, parent)
+        self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+        self.icon_new_store.hide()
 
         self.setDefaultIcon = ImageButton(Language.get("default_image"), DEFAULT_IMAGE, parent)
         self.setDefaultIcon.setGeometry(int(WINDOW_WIDTH / 2) + 25, 115, 225, 150)
@@ -1195,7 +1195,7 @@ class MainWindow(QMainWindow):
         self.addShelfButton.clicked.connect(self.createShelf)
         self.createStoreButton.clicked.connect(self.saveStoreInfo)
         self.editCategories.clicked.connect(self.configCategories)
-        self.formStoreIcon.clicked.connect(self.uploadImage)
+        self.icon_new_store.clicked.connect(self.uploadImage)
         self.setDefaultIcon.clicked.connect(self.setDefaultStoreIcon)
 
         # Do scroll
@@ -1248,7 +1248,7 @@ class MainWindow(QMainWindow):
         if STORES.__len__() < 25:
             self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         else:
-            self.widget.resize(WINDOW_WIDTH - 20, STORES[STORES.__len__() - 1].storeIcon.pos().y() + 290)
+            self.widget.resize(WINDOW_WIDTH - 20, STORES[STORES.__len__() - 1].store_icon.pos().y() + 290)
 
     # UI functions
     def re_open_home(self):
@@ -1324,19 +1324,19 @@ class MainWindow(QMainWindow):
         # Check if a file was selected
         if file_path:
             self.image = file_path
-            self.formStoreIcon.setPixmap(self.image)
+            self.icon_new_store.setPixmap(self.image)
 
             if self.image != DEFAULT_IMAGE:
-                self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 150, 115, 150, 150)
+                self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 150, 115, 150, 150)
                 self.setDefaultIcon.show()
             else:
-                self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+                self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
                 self.setDefaultIcon.hide()
 
     def setDefaultStoreIcon(self):
         self.image = DEFAULT_IMAGE
-        self.formStoreIcon.setPixmap(self.image)
-        self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+        self.icon_new_store.setPixmap(self.image)
+        self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
         self.setDefaultIcon.hide()
 
     # Show objects
@@ -1347,13 +1347,13 @@ class MainWindow(QMainWindow):
         self.store_name_input.show()
         self.storeNameLabel.show()
         self.addShelfButton.show()
-        self.formStoreIcon.show()
+        self.icon_new_store.show()
 
         if self.image != DEFAULT_IMAGE:
-            self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 175, 115, 150, 150)
+            self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 175, 115, 150, 150)
             self.setDefaultIcon.show()
         else:
-            self.formStoreIcon.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+            self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
             self.setDefaultIcon.hide()
 
     def showMainButtons(self):
@@ -1370,7 +1370,7 @@ class MainWindow(QMainWindow):
         self.storeNameLabel.hide()
         self.addShelfButton.hide()
         self.setDefaultIcon.hide()
-        self.formStoreIcon.hide()
+        self.icon_new_store.hide()
         self.goHome.hide()
 
     def hideAllButtons(self):

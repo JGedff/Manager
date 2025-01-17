@@ -46,7 +46,7 @@ class LanguageChanger(QLabel):
             self.main_window.createStoreButton.setText(Language.get("create_store"))
             self.main_window.editCategories.setText(Language.get("edit_categories"))
             self.main_window.setDefaultIcon.setText(Language.get("default_image"))
-            self.main_window.formStoreIcon.setText(Language.get("change_image"))
+            self.main_window.icon_new_store.setText(Language.get("change_image"))
             self.main_window.storeNameLabel.setText(Language.get("name_store"))
             self.main_window.addStoreButton.setText(Language.get("add_store"))
             self.main_window.addShelfButton.setText(Language.get("add_shelf"))
