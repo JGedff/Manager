@@ -20,9 +20,6 @@ class InputBool(QLabel):
         self._false_action = false_action
 
     def init_ui(self, true_text, false_text):
-        # Create layout
-        layout = QHBoxLayout(self)
-
         # Create buttons
         self._true_button = QPushButton(true_text, self)
         self._true_button.setFixedHeight(25)
@@ -36,6 +33,9 @@ class InputBool(QLabel):
 
         self._false_button.setFont(FONT_SMALLEST_CHAR)
         self._false_button.setStyleSheet(TRUE_BUTTON)
+
+        # Create layout
+        layout = QHBoxLayout(self)
 
         # Add buttons to the layout
         layout.addWidget(self._true_button)

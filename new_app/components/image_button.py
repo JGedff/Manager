@@ -12,9 +12,6 @@ class ImageButton(QPushButton):
         self.init_ui(text, icon_path)
 
     def init_ui(self, text, icon_path):
-        # Create a layout for the button to hold icon and text
-        layout = QVBoxLayout(self)
-
         # Create image
         pixmap = QPixmap(icon_path)
 
@@ -31,6 +28,9 @@ class ImageButton(QPushButton):
 
         # Style icon
         self.setStyleSheet(IMAGE_BUTTON)
+
+        # Create layout
+        layout = QVBoxLayout(self)
 
         # Add icon and text to the layout
         layout.addWidget(self._icon_image)

@@ -5,7 +5,7 @@ def is_num(numToCheck):
     except ValueError:
         return False
 
-def checkIsDecimal(numToCheck):
+def is_decimal(numToCheck):
     try:
         float(numToCheck)
         return True

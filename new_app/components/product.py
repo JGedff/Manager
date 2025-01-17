@@ -10,8 +10,8 @@ from constants import SHELVES, PRODUCTS_INFO
 from styles.style_sheets import INPUT_TEXT, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, IMPORTANT_ACTION_BUTTON
 from styles.fonts import FONT_SMALL_TEXT
 
-from components.input_number import InputNumber
-from components.inputNumberDecimal import InputNumberDecimal
+from components.input_integer import InputInteger
+from components.input_decimal import InputDecimal
 
 class ProductManager():
     @staticmethod
@@ -115,7 +115,7 @@ class Product(QLabel):
         self.selectProduct.setStyleSheet(COMBO_BOX)
         self.selectProduct.setGeometry(self.posX + 96, self.posY + 6, 125, 30)
 
-        self.edit_amount = InputNumber(1, True, parent)
+        self.edit_amount = InputInteger(1, True, parent)
         self.edit_amount.setGeometry(self.posX + 87, self.posY + 46, 175, 65)
 
         self.addProduct = QPushButton(Language.get("add_product"), parent)
@@ -137,8 +137,8 @@ class Product(QLabel):
         self.labelNewPrice.setFont(FONT_SMALL_TEXT)
         self.labelNewPrice.setGeometry(self.posX, self.posY + 230, 150, 35)
 
-        self.editNewPrice = InputNumberDecimal(1, True, 2, parent)
-        self.editNewPrice.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
+        self.edit_new_price = InputDecimal(1, True, 2, parent)
+        self.edit_new_price.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
 
         self.cancelButtonAddProduct = QPushButton(Language.get("cancel"), parent)
         self.cancelButtonAddProduct.setFont(FONT_SMALL_TEXT)
@@ -169,9 +169,9 @@ class Product(QLabel):
         self.cancelButtonEditProduct.setGeometry(self.posX + 237, self.posY + 125, 100, 25)
         self.cancelButtonEditProduct.hide()
 
-        self.editPrice = InputNumberDecimal(1, True, 2, parent)
-        self.editPrice.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
-        self.editPrice.hide()
+        self.edit_price = InputDecimal(1, True, 2, parent)
+        self.edit_price.setGeometry(self.posX + 87, self.posY + 215, 175, 65)
+        self.edit_price.hide()
 
         self.labelEditProductName = QLabel(Language.get('edit_product_name'), parent)
         self.labelEditProductName.setFont(FONT_SMALL_TEXT)
@@ -209,7 +209,7 @@ class Product(QLabel):
         self.addProduct.clicked.connect(self.showHideCreateProduct)
         self.createProductButton.clicked.connect(self.createProduct)
         self.editNewName.textChanged.connect(self.enableCreateButton)
-        self.editPrice.inputNum.textChanged.connect(self.checkNewInfo)
+        self.edit_price.get_input().textChanged.connect(self.checkNewInfo)
         self.cancelButtonEditProduct.clicked.connect(self.showHideEdit)
         self.edit_amount.get_input().textChanged.connect(self.updateBDspaceAmount)
         self.cancelButtonAddProduct.clicked.connect(self.showHideCreateProduct)
@@ -237,17 +237,17 @@ class Product(QLabel):
     def edit(self):
         self.showHideEdit()
         
-        if self.price != self.editPrice.get_value() and (self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != ""):
+        if self.price != self.edit_price.get_value() and (self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != ""):
             index = ProductManager.getIndexByName(self.name)
 
             if index != -1:
-                ProductManager.updateProduct(index, self.editProductName.text(), self.editPrice.get_value())
+                ProductManager.updateProduct(index, self.editProductName.text(), self.edit_price.get_value())
 
                 if UserManager.getUserRole() != 'Offline':
-                    Mongo.updateMongoProduct(self.name, self.editProductName.text(), self.editPrice.get_value())
+                    Mongo.updateMongoProduct(self.name, self.editProductName.text(), self.edit_price.get_value())
 
                 self.name = self.editProductName.text()
-                self.price = self.editPrice.get_value()
+                self.price = self.edit_price.get_value()
 
                 self.selectProduct.setItemText(self.selectProduct.currentIndex(), self.name.capitalize())
                 self.priceLabel.setText(str(self.price) + " €")
@@ -265,16 +265,16 @@ class Product(QLabel):
 
                 self.selectProduct.setItemText(self.selectProduct.currentIndex(), self.name.capitalize())
 
-        elif self.price != self.editPrice.get_value():
+        elif self.price != self.edit_price.get_value():
             index = ProductManager.getIndexByName(self.name)
 
             if index != -1:
-                ProductManager.updateProductPrice(index, self.editPrice.get_value())
+                ProductManager.updateProductPrice(index, self.edit_price.get_value())
 
                 if UserManager.getUserRole() != 'Offline':
-                    Mongo.updateMongoProductPrice(self.name, self.editPrice.get_value())
+                    Mongo.updateMongoProductPrice(self.name, self.edit_price.get_value())
 
-                self.price = self.editPrice.get_value()
+                self.price = self.edit_price.get_value()
 
                 self.priceLabel.setText(str(self.price) + " €")
 
@@ -291,7 +291,7 @@ class Product(QLabel):
 
             self.editProduct.setGeometry(self.posX + 237, self.posY + 125, self.editProduct.width(), self.editProduct.height())
 
-            self.editPrice.hide()
+            self.edit_price.hide()
             self.labelNewPrice.hide()
             self.editProductName.hide()
             self.labelEditProductName.hide()
@@ -304,9 +304,9 @@ class Product(QLabel):
             self.deleteProduct.setDisabled(True)
 
             self.editProduct.setGeometry(self.posX, self.posY + 300, self.editProduct.width(), self.editProduct.height())
-            self.editPrice.setValue(self.price)
+            self.edit_price.set_value(self.price)
 
-            self.editPrice.show()
+            self.edit_price.show()
             self.labelNewPrice.show()
             self.editProductName.show()
             self.editProductButton.show()
@@ -338,7 +338,7 @@ class Product(QLabel):
                             space.product.price = space.product.getActualProductPrice()
 
     def checkNewInfo(self):
-        if self.price != self.editPrice.get_value():
+        if self.price != self.edit_price.get_value():
             self.editProductButton.setDisabled(False)
         elif self.name != self.editProductName.text().capitalize() and self.editProductName.text().strip() != "":
             self.editProductButton.setDisabled(False)
@@ -366,9 +366,9 @@ class Product(QLabel):
             self.deleteProduct.setDisabled(False)
 
         if UserManager.getUserRole() != 'Offline':
-            Mongo.addMongoProducts(self.editNewName.text(), self.editNewPrice.get_value())
+            Mongo.addMongoProducts(self.editNewName.text(), self.edit_new_price.get_value())
         
-        ProductManager.add(self.editNewName.text(), self.editNewPrice.get_value())
+        ProductManager.add(self.editNewName.text(), self.edit_new_price.get_value())
         
         self.showHideCreateProduct()
 
@@ -387,7 +387,7 @@ class Product(QLabel):
             self.addProduct.setGeometry(self.posX, self.posY + 125, 200, 25)
 
             self.editNewName.hide()
-            self.editNewPrice.hide()
+            self.edit_new_price.hide()
             self.labelNewPrice.hide()
             self.labelNewProduct.hide()
             self.createProductButton.hide()
@@ -400,11 +400,11 @@ class Product(QLabel):
 
             self.addProduct.setGeometry(self.posX, self.posY + 300, 200, 25)
 
-            self.editNewPrice.setValue(1.0)
+            self.edit_new_price.setValue(1.0)
             self.editNewName.setText("")
 
             self.editNewName.show()
-            self.editNewPrice.show()
+            self.edit_new_price.show()
             self.labelNewPrice.show()
             self.labelNewProduct.show()
             self.createProductButton.show()
@@ -441,7 +441,7 @@ class Product(QLabel):
         self.editProduct.hide()
         self.labelAmount.hide()
         self.editNewName.hide()
-        self.editNewPrice.hide()
+        self.edit_new_price.hide()
         self.labelProduct.hide()
         self.deleteProduct.hide()
         self.labelNewPrice.hide()

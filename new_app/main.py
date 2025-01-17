@@ -26,7 +26,7 @@ from utils.category import Category
 from components.product import Product
 from components.log_in import LogInWindow
 from components.input_bool import InputBool
-from components.input_number import InputNumber
+from components.input_integer import InputInteger
 from components.image_button import ImageButton
 from components.double_button import DoubleButton
 from components.language_changer import LanguageChanger
@@ -1027,7 +1027,7 @@ class Shelf(QLabel):
         self.inputSpacesLabel = QLabel(Language.get("shelf_question_1"), self)
         self.inputSpacesLabel.setGeometry(0, 55, 500, 35)
 
-        self.input_spaces = InputNumber(1, True, self)
+        self.input_spaces = InputInteger(1, True, self)
         self.input_spaces.setGeometry(480, 35, 175, 65)
 
         self.doubleShelfLabel = QLabel(Language.get("shelf_question_2"), self)
@@ -1039,7 +1039,7 @@ class Shelf(QLabel):
         self.shelfFloorsLabel = QLabel(Language.get("shelf_question_4"), self)
         self.shelfFloorsLabel.setGeometry(0, 135, 500, 35)
 
-        self.input_shelf_floors = InputNumber(1, True, self)
+        self.input_shelf_floors = InputInteger(1, True, self)
         self.input_shelf_floors.setGeometry(480, 123, 175, 65)
 
         # Option to delete shelf if there is more than one shelf
