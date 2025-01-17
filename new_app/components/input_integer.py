@@ -18,7 +18,8 @@ class InputInteger(QLabel):
         self._last_number = str(min)
 
     def init_ui(self, write_number: bool):
-        # Create buttons
+        ## INITIALIZE OBJECTS ##
+        # Buttons
         self._add_one_button = QPushButton("↑", self)
         self._add_one_button.setFixedWidth(50)
         self._add_one_button.setFixedHeight(50)
@@ -27,24 +28,25 @@ class InputInteger(QLabel):
         self._rest_one_button.setFixedWidth(50)
         self._rest_one_button.setFixedHeight(50)
 
-        # Create input
+        # Inputs
         self._input = QLineEdit(self)
         self._input.setFixedHeight(50)
         self._input.setText(str(self._min))
         self._input.setReadOnly(write_number)
 
-        # Style buttons
+        ## STYLES ##
+        # Buttons
         self._add_one_button.setFont(FONT_SMALLEST_CHAR)
         self._add_one_button.setStyleSheet(ADD_BUTTON + NO_RIGHT_BORDER_BUTTON)
 
         self._rest_one_button.setFont(FONT_SMALLEST_CHAR)
         self._rest_one_button.setStyleSheet(REST_BUTTON)
 
-        # Style input
+        # Inputs
         self._input.setFont(FONT_SMALLEST_CHAR)
         self._input.setStyleSheet(INPUT_NUMBER + NO_RIGHT_BORDER_BUTTON_INPUT)
 
-        # Create layout
+        ## LAYOUT ##
         layout = QHBoxLayout(self)
 
         # Add buttons and input to layout

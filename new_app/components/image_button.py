@@ -15,21 +15,22 @@ class ImageButton(QPushButton):
         # Create image
         pixmap = QPixmap(icon_path)
 
-        # Create icon image
+        ## INITIALIZE OBJECTS ##
+        # Labels
+        # Label with pixmap (image)
         self._icon_image = QLabel(self)
         self._icon_image.setPixmap(pixmap)
         self._icon_image.setScaledContents(True)
         self._icon_image.setAlignment(Qt.AlignCenter)
 
-        # Create text label
         self._text_label = QLabel(text, self)
         self._text_label.setFont(FONT_SMALL_TEXT)
         self._text_label.setAlignment(Qt.AlignCenter)
 
-        # Style icon
+        ## STYLE ##
         self.setStyleSheet(IMAGE_BUTTON)
 
-        # Create layout
+        ## LAYOUT ##
         layout = QVBoxLayout(self)
 
         # Add icon and text to the layout

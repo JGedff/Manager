@@ -19,13 +19,8 @@ class InputFloat(QLabel):
         self._max_decimals = max_decimals
 
     def init_ui(self, write_number: bool):
-        # Create input
-        self._input = QLineEdit(self)
-        self._input.setFixedHeight(50)
-        self._input.setText(str(self._min))
-        self._input.setReadOnly(write_number)
-
-        # Create buttons
+        ## INITIALIZE OBJECTS ##
+        # Buttons
         self._add_one_button = QPushButton("↑", self)
         self._add_one_button.setFixedWidth(50)
         self._add_one_button.setFixedHeight(50)
@@ -34,14 +29,21 @@ class InputFloat(QLabel):
         self._rest_one_button.setFixedWidth(50)
         self._rest_one_button.setFixedHeight(50)
 
-        # Style buttons
+        # Inputs
+        self._input = QLineEdit(self)
+        self._input.setFixedHeight(50)
+        self._input.setText(str(self._min))
+        self._input.setReadOnly(write_number)
+
+        ## Style objects
+        # Buttons
         self._add_one_button.setFont(FONT_SMALLEST_CHAR)
         self._add_one_button.setStyleSheet(ADD_BUTTON + NO_RIGHT_BORDER_BUTTON)
 
         self._rest_one_button.setFont(FONT_SMALLEST_CHAR)
         self._rest_one_button.setStyleSheet(REST_BUTTON)
 
-        # Create layout
+        ## LAYOUT ##
         layout = QHBoxLayout(self)
 
         # Add input and buttons to layout

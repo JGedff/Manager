@@ -12,17 +12,19 @@ class DoubleButton(QLabel):
         self.init_events(function_first_button, funciton_second_button)
 
     def init_ui(self, text_first_button: str, text_second_button: str, parent):
-        # Create a layout for the button to hold icon and text
+        ## LAYOUT ##
         self.widget = QWidget(parent)
 
-        # Create buttons
+        ## INITIALIZE OBJECTS ##
+        # Buttons
         self._first_button = QPushButton(text_first_button, self.widget)
         self._first_button.setGeometry(25, 13, 250, 39)
 
         self._second_button = QPushButton(text_second_button, self.widget)
         self._second_button.setGeometry(300, 13, 50, 39)
 
-        # Style buttons
+        ## STYLE ##
+        # Buttons
         self._first_button.setFont(FONT_SMALL_TEXT)
         self._second_button.setFont(FONT_SMALL_TEXT)
 

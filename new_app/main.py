@@ -515,21 +515,21 @@ class Space(QLabel):
             self.product.show()
 
             Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
-            Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
-            Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
+            Mongo.update_space_product(self.mongo_id, self.product.select_product.currentText())
+            Mongo.update_space_amount(self.mongo_id, 1)
         else:
-            if self.product.edittingProduct:
-                self.product.showHideEdit()
-            elif self.product.creatingProduct:
+            if self.product.editting_product:
+                self.product.show_hide_edit()
+            elif self.product.creating_product:
                 self.product.showHideCreateProduct()
     
     def categoryCanNotHoldProduct(self):
         Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
 
         if isinstance(self.product, Product):
-            if self.product.edittingProduct:
-                self.product.showHideEdit()
-            elif self.product.creatingProduct:
+            if self.product.editting_product:
+                self.product.show_hide_edit()
+            elif self.product.creating_product:
                 self.product.showHideCreateProduct()
 
             self.product.hide()
@@ -537,8 +537,8 @@ class Space(QLabel):
             self.product = None
 
             Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), False)
-            Mongo.updateMongoSpaceProduct(self.mongo_id, "")
-            Mongo.updateMongoSpaceAmount(self.mongo_id, 0)
+            Mongo.update_space_product(self.mongo_id, "")
+            Mongo.update_space_amount(self.mongo_id, 0)
 
     def configSpace(self):
         window.hideAllButtons()
@@ -563,9 +563,9 @@ class Space(QLabel):
             
     def openConfigCategories(self):
         if isinstance(self.product, Product):
-            if self.product.edittingProduct:
-                self.product.showHideEdit()
-            elif self.product.creatingProduct:
+            if self.product.editting_product:
+                self.product.show_hide_edit()
+            elif self.product.creating_product:
                 self.product.showHideCreateProduct()
 
         Store.configCategory(self.storeIndex)
@@ -621,8 +621,8 @@ class Space(QLabel):
                 self.product = Product(153, 165, self, self.parent())
                 self.product.show()
 
-                Mongo.updateMongoSpaceProduct(self.mongo_id, self.product.selectProduct.currentText())
-                Mongo.updateMongoSpaceAmount(self.mongo_id, 1)
+                Mongo.update_space_product(self.mongo_id, self.product.select_product.currentText())
+                Mongo.update_space_amount(self.mongo_id, 1)
 
         else:
             self.category_can_hold_product.set_value(False)
@@ -675,7 +675,7 @@ class Space(QLabel):
         self.categorySelector.hide()
 
         if isinstance(self.product, Product):
-            if self.product.creatingProduct:
+            if self.product.creating_product:
                 self.product.showHideCreateProduct()
 
             self.product.hide()
