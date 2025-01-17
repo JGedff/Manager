@@ -394,7 +394,7 @@ class Mongo:
 
                     SHELVES_FORMS[index].inputSpaces.setValue(shelf['spaces'].__len__() / store['storeFloors'])
                     SHELVES_FORMS[index].shelfFloorsInput.setValue(shelf['floors'])
-                    SHELVES_FORMS[index].doubleShelfInput.setValue(shelf['double_shelf'])
+                    SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
                     SHELVES_FORMS[index].hideForm()
 
                     spacesInfo.append(mongoSpaces)

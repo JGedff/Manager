@@ -1,0 +1,88 @@
+from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
+
+from styles.style_sheets import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
+from styles.fonts import FONT_SMALLEST_CHAR
+
+from utils.functions.globalFunctions import useless_function
+
+class InputBool(QLabel):
+    def __init__(self, true_text, false_text, parent = None, true_action = useless_function, false_action = useless_function):
+        super().__init__(parent)
+
+        self.init_variables(true_action, false_action)
+        self.init_ui(true_text, false_text)
+        self.init_events()
+
+    def init_variables(self, true_action, false_action):
+        self._value = False
+
+        self._true_action = true_action
+        self._false_action = false_action
+
+    def init_ui(self, true_text, false_text):
+        # Create layout
+        self._layout = QHBoxLayout(self)
+
+        # Create buttons
+        self._true_button = QPushButton(true_text, self)
+        self._true_button.setFixedHeight(25)
+
+        self._false_button = QPushButton(false_text, self)
+        self._false_button.setFixedHeight(25)
+
+        # Style buttons
+        self._true_button.setFont(FONT_SMALLEST_CHAR)
+        self._true_button.setStyleSheet(FALSE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+
+        self._false_button.setFont(FONT_SMALLEST_CHAR)
+        self._false_button.setStyleSheet(TRUE_BUTTON)
+
+        # Add buttons to the layout
+        self._layout.addWidget(self._true_button)
+        self._layout.addWidget(self._false_button)
+
+        # Change spacing between buttons
+        self._layout.setSpacing(0)
+
+    def init_events(self):
+        self._true_button.clicked.connect(self.true_function)
+        self._false_button.clicked.connect(self.false_function)
+    
+    def true_function(self):
+        self._value = True
+
+        # Change style, so user knows which button is on
+        self._true_button.setStyleSheet(TRUE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+        self._false_button.setStyleSheet(FALSE_BUTTON)
+
+        self._true_action()
+
+    def false_function(self):
+        self._value = False
+
+        # Change style, so user knows which button is on
+        self._false_button.setStyleSheet(TRUE_BUTTON)
+        self._true_button.setStyleSheet(FALSE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+
+        self._false_action()
+
+    def get_value(self):
+        return self._value
+    
+    def set_value(self, boolean):
+        if boolean:
+            self.true_function()
+        else:
+            self.false_function()
+    
+    def set_true_text(self, string):
+        self._true_button.setText(string)
+
+    def set_false_text(self, string):
+        self._false_button.setText(string)
+    
+    def set_true_button_disabled(self, bool):
+        self._true_button.setDisabled(bool)
+
+    def set_false_button_disabled(self, bool):
+        self._false_button.setDisabled(bool)

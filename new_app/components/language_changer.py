@@ -70,8 +70,8 @@ class LanguageChanger(QLabel):
                 shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
                 shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
                 shelf.shelfFloorsLabel.setText(Language.get("shelf_question_4"))
-                shelf.doubleShelfInput.setTrueButtonText(Language.get("yes"))
-                shelf.doubleShelfInput.setFalseButtonText(Language.get("no"))
+                shelf.double_shelf_input.set_true_text(Language.get("yes"))
+                shelf.double_shelf_input.set_false_text(Language.get("no"))
 
             # Stores
             for store in STORES:
@@ -90,8 +90,8 @@ class LanguageChanger(QLabel):
                     for space in shelf.spaces:
                         space.shelfNumber.setText(Language.get("shelf") + str(space.shelfIndex + 1) + ":")
                         space.labelCategoryHoldProduct.setText(Language.get("category_hold_product"))
-                        space.changeCategoryHoldProduct.setTrueButtonText(Language.get("yes"))
-                        space.changeCategoryHoldProduct.setFalseButtonText(Language.get("no"))
+                        space.category_can_hold_product.set_true_text(Language.get("yes"))
+                        space.category_can_hold_product.set_false_text(Language.get("no"))
                         space.openSpaceConfig.setText(Language.get("go_back"))
                         space.labelCategory.setText(Language.get("category"))
 

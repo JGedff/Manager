@@ -1,4 +1,4 @@
-def useLessFunction():
+def useless_function():
     pass
 
 def getMaxFloor(arrayShelves):
