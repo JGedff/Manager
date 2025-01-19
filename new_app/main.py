@@ -15,7 +15,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
-from utils.functions.space_category_functions import setUnreachableCategory, setCategoryByName, updateNameCategory, deleteCategoryFrom, setEmptyCategory, getEmptyCategoryName
+from utils.functions.space_category_functions import setUnreachableCategory, setCategoryByName, update_category_name, deleteCategoryFrom, setEmptyCategory, getEmptyCategoryName
 
 from utils.mongoDb import Mongo
 from utils.user_manager import UserManager
@@ -252,12 +252,12 @@ class SpaceCategory(QLabel):
         index = Category.getIndexByName(self.nameModifiedCategory)
         Category.changeCategoryName(index, newName)
 
-        updateNameCategory(window.shortcut_category, self.colorModifiedCategory, self.nameModifiedCategory, newName, True)
+        update_category_name(window.shortcut_category, self.colorModifiedCategory, self.nameModifiedCategory, newName, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    updateNameCategory(space, self.colorModifiedCategory, self.nameModifiedCategory, newName)
+                    update_category_name(space, self.colorModifiedCategory, self.nameModifiedCategory, newName)
 
     def reloadColorCategories(self, newName):
         index = Category.getIndexByName(newName)

@@ -16,39 +16,26 @@ def create_category_in(space, category_name, parent, shortcut = False):
 
     space_category.double_buttons.append(new_double_buttons)
 
-def updateNameCategory(space, color, actualName, newName, shortcut = False):
+def update_category_name(space, color, actualName, newName, shortcut = False):
+    space_category = space
+
     if not shortcut:
+        space_category = space.category
+
         if space.category.color == color:
-            # Change the name of the button with the actual category to the new name for the category
-            for button in space.category.double_buttons:
-                if button.get_first_button_text() == actualName:
-                    button.set_first_button_text(newName)
-                    break
-
-            # Updates the name in the comboBox
-            for i in range(space.categorySelector.count()):
-                if space.categorySelector.itemText(i) == actualName:
-                    space.categorySelector.setItemText(i, newName)
-
             # Updates the name in the space
             space.category.name = newName
-        else:
-            # Change the name of the button with the actual category to the new name for the category
-            for button in space.category.double_buttons:
-                if button.get_first_button_text() == actualName:
-                    button.set_first_button_text(newName)
-                    break
-            
-            # Updates the name in the comboBox
-            for i in range(space.categorySelector.count()):
-                if space.categorySelector.itemText(i) == actualName:
-                    space.categorySelector.setItemText(i, newName)
 
-    else:
-        for button in space.double_buttons:
-            if button.get_first_button_text() == actualName:
-                button.set_first_button_text(newName)
-                break
+        # Updates the name in the comboBox of the space
+        for i in range(space.categorySelector.count()):
+            if space.categorySelector.itemText(i) == actualName:
+                space.categorySelector.setItemText(i, newName)
+
+    # Change the name of the button with the actual category to the new name for the category
+    for button in space_category.double_buttons:
+        if button.get_first_button_text() == actualName:
+            button.set_first_button_text(newName)
+            break
 
 def deleteCategoryFrom(space, indexButtonPressed, categoryName, shortcut = False):
     if not shortcut:
