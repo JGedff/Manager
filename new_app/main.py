@@ -91,7 +91,7 @@ class SpaceCategory(QLabel):
         posy = 25
 
         for category in CATEGORY_NAMES:
-            new_double_button = DoubleButton(category.capitalize(), "❌", self.editCategory, self.deleteCategory, parent)
+            new_double_button = DoubleButton(category.capitalize(), "❌", self.edit_category_function, self.delete_category_function, parent)
             new_double_button.setGeometry(posx - 12, posy - 12, 450, 69)
 
             posy += 69
@@ -189,7 +189,7 @@ class SpaceCategory(QLabel):
             self.categoryColor.setStyleSheet(get_style_sheet(color.name()))
             self.newColor = color.name()
     
-    def editCategory(self):
+    def edit_category_function(self):
         self.hideUI()
         self.newColor = ''
         self.showSpace.show()
@@ -371,7 +371,7 @@ class SpaceCategory(QLabel):
         self.newCategoryColorButton.move(posx + 100, posy - 50)
         self.cancelButtonAddCategory.move(posx, posy + 50)
     
-    def deleteCategory(self):
+    def delete_category_function(self):
         indexButtonPressed = 0
         
         # This time, like we want the index, something that is not inside the button, I made this to know which category is going to be deleted
