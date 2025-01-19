@@ -401,7 +401,7 @@ class Mongo:
 
                     spacesInfo.append(mongoSpaces)
                 
-                saveShelfInfo(SHELVES_FORMS)
+                save_shelves_info(SHELVES_FORMS)
                 
                 Store.createStore(store['name'], widget, store['image'])
 

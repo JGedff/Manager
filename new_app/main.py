@@ -13,8 +13,8 @@ from styles.color_functions import get_style_sheet
 
 from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAULT_IMAGE, SHELVES, CATEGORY_NAMES
 
-from utils.functions.globalFunctions import getMaxFloor
-from utils.functions.shelfFunctions import saveShelfInfo, updateShelfPosition
+from utils.functions.global_functions import get_max_floor
+from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
 from utils.functions.space_category_functions import setUnreachableCategory, setCategoryByName, updateNameCategory, deleteCategoryFrom, setEmptyCategory, getEmptyCategoryName
 
 from utils.mongoDb import Mongo
@@ -231,7 +231,7 @@ class SpaceCategory(QLabel):
             self.cancelAddCategory()
             window.goHome.show()
 
-    def saveInfo(self):
+    def save_info(self):
         newName = self.categoryName.text().capitalize()
 
         if newName != "":
@@ -786,7 +786,7 @@ class ShelfInfo():
         self.shelfNumber.setFont(FONT_TEXT)
 
     def initEvents(self):
-        updateShelfPosition(SHELVES_FORMS)
+        update_shelves_pos(SHELVES_FORMS)
         window.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalInfoPosition)
 
     def updateHorizontalInfoPosition(self, value):
@@ -811,7 +811,7 @@ class Store():
         shelvesInfo = []
         mongo_id = 0
 
-        storeFloors = getMaxFloor(SHELVES_FORMS)
+        storeFloors = get_max_floor(SHELVES_FORMS)
         emptyCategory = getEmptyCategoryName()
         unreachableCategory = getEmptyCategoryName()
         id_empty_category = Mongo.getMongoCategoryByName(emptyCategory, emptyCategory)
@@ -895,7 +895,7 @@ class Store():
     
     def setupStore(self, parent):
         self.indexShelves = SHELVES.__len__()
-        self.floor = getMaxFloor(SHELVES_FORMS)
+        self.floor = get_max_floor(SHELVES_FORMS)
         storeShelves = []
 
         for index, i in enumerate(SHELVES_FORMS):
@@ -1021,8 +1021,8 @@ class Shelf(QLabel):
 
     def initUI(self, name):
         # Config shelf
-        self.shelfLabel = QLabel(name, self)
-        self.shelfLabel.setGeometry(0, 10, 150, 35)
+        self.shelf_label = QLabel(name, self) # shelfLabel
+        self.shelf_label.setGeometry(0, 10, 150, 35)
 
         self.inputSpacesLabel = QLabel(Language.get("shelf_question_1"), self)
         self.inputSpacesLabel.setGeometry(0, 55, 500, 35)
@@ -1056,7 +1056,7 @@ class Shelf(QLabel):
             self.separator.setStyleSheet(BACKGROUND_BLACK)
 
         # Style
-        self.shelfLabel.setFont(FONT_TEXT)
+        self.shelf_label.setFont(FONT_TEXT)
 
         self.inputSpacesLabel.setFont(FONT_SMALL_TEXT)
         self.doubleShelfLabel.setFont(FONT_SMALL_TEXT)
@@ -1079,7 +1079,7 @@ class Shelf(QLabel):
         SHELVES_FORMS[shelfToDelete].hide()
         del SHELVES_FORMS[shelfToDelete]
 
-        updateShelfPosition(SHELVES_FORMS)
+        update_shelves_pos(SHELVES_FORMS)
         window.resizeHeightScroll()
 
     def showForm(self):
@@ -1288,7 +1288,7 @@ class MainWindow(QMainWindow):
         self.resizeHeightScroll()
 
     def saveStoreInfo(self):
-        saveShelfInfo(SHELVES_FORMS)
+        save_shelves_info(SHELVES_FORMS)
 
         storeName = self.store_name_input.text().strip()
 

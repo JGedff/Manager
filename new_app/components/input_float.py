@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QLineEdit, QPushButton
 from styles.style_sheets import INPUT_NUMBER, ADD_BUTTON, REST_BUTTON, NO_RIGHT_BORDER_BUTTON, NO_RIGHT_BORDER_BUTTON_INPUT
 from styles.fonts import FONT_SMALLEST_CHAR
 
-from utils.functions.checkFunctions import is_decimal
+from utils.functions.check_functions import is_decimal
 
 class InputFloat(QLabel):
     def __init__(self, min = 0.0, write_number = False, max_decimals = 2, parent = None):

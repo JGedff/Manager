@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QLabel, QHBoxLayout, QPushButton
 from styles.style_sheets import TRUE_BUTTON, FALSE_BUTTON, NO_RIGHT_BORDER_BUTTON
 from styles.fonts import FONT_SMALLEST_CHAR
 
-from utils.functions.globalFunctions import useless_function
+from utils.functions.global_functions import useless_function
 
 class InputBool(QLabel):
     def __init__(self, true_text: str, false_text: str, parent = None, true_action = useless_function, false_action = useless_function):
