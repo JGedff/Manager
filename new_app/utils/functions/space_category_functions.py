@@ -4,11 +4,8 @@ from utils.category import Category
 
 from components.double_button import DoubleButton
 
-def create_category_in(space, category_name, parent, shortcut = False):
+def create_category_in(space, category_name, parent):
     space_category = space
-
-    if not shortcut:
-        space_category = space.category
 
     # Create a button to acces the config of the category
     new_double_buttons = DoubleButton(category_name, "❌", space_category.edit_category_function, space_category.delete_category_function, parent)

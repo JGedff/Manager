@@ -159,9 +159,9 @@ class LogInWindow(QMainWindow):
         Category.add_category('Fill', 'green')
         Category.change_can_hold_product('Fill', True)
 
-        create_category_in(self.main_app.shortcut_category, 'Empty', self.main_app.widget, True)
-        create_category_in(self.main_app.shortcut_category, 'Unreachable', self.main_app.widget, True)
-        create_category_in(self.main_app.shortcut_category, 'Fill', self.main_app.widget, True)
+        create_category_in(self.main_app.shortcut_category, 'Empty', self.main_app.widget)
+        create_category_in(self.main_app.shortcut_category, 'Unreachable', self.main_app.widget)
+        create_category_in(self.main_app.shortcut_category, 'Fill', self.main_app.widget)
         update_button_pos(self.main_app.shortcut_category, True)
 
         # Manage language

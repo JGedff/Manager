@@ -344,13 +344,13 @@ class SpaceCategory(QLabel):
         if UserManager.getUserRole() != 'Offline':
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
-        createCategoryIn(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent, True)
+        create_category_in(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent)
         updateButtonsPosition(window.shortcut_category, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    createCategoryIn(space, self.newCategoryName.capitalize(), self.mainParent)
+                    create_category_in(space.category, self.newCategoryName.capitalize(), self.mainParent)
                     updateButtonsPosition(space)
 
         self.showUI()

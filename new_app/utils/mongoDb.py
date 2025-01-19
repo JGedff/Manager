@@ -339,7 +339,7 @@ class Mongo:
                 Category.add_category(category['name'], category['color'])
                 Category.change_can_hold_product(category['name'], category['hold'])
 
-                createCategoryIn(shortcut_category, category['name'], widget, True)
+                create_category_in(shortcut_category, category['name'], widget)
                 mongoCategories += 1
             
             mongoConnection = True
@@ -364,9 +364,9 @@ class Mongo:
             Category.add_category('Fill', 'green')
             Category.change_can_hold_product('Fill', True)
 
-            createCategoryIn(shortcut_category, 'Empty', widget, True)
-            createCategoryIn(shortcut_category, 'Unreachable', widget, True)
-            createCategoryIn(shortcut_category, 'Fill', widget, True)
+            create_category_in(shortcut_category, 'Empty', widget)
+            create_category_in(shortcut_category, 'Unreachable', widget)
+            create_category_in(shortcut_category, 'Fill', widget)
             updateButtonsPosition(shortcut_category, True)
 
         elif mongoCategories <= 0:
@@ -377,9 +377,9 @@ class Mongo:
             Category.add_category('Fill', 'green')
             Category.change_can_hold_product('Fill', True)
 
-            createCategoryIn(shortcut_category, 'Empty', widget, True)
-            createCategoryIn(shortcut_category, 'Unreachable', widget, True)
-            createCategoryIn(shortcut_category, 'Fill', widget, True)
+            create_category_in(shortcut_category, 'Empty', widget)
+            create_category_in(shortcut_category, 'Unreachable', widget)
+            create_category_in(shortcut_category, 'Fill', widget)
             updateButtonsPosition(shortcut_category, True)
             
         setEmptyCategory(shortcut_category)
