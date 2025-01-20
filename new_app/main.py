@@ -15,7 +15,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
-from utils.functions.space_category_functions import setUnreachableCategory, setCategoryByName, update_category_name, deleteCategoryFrom, setEmptyCategory, getEmptyCategoryName
+from utils.functions.space_category_functions import setUnreachableCategory, setCategoryByName, update_category_name, delete_category_from, setEmptyCategory, getEmptyCategoryName
 
 from utils.mongoDb import Mongo
 from utils.user_manager import UserManager
@@ -385,7 +385,7 @@ class SpaceCategory(QLabel):
         if UserManager.getUserRole() != 'Offline':
             Mongo.delMongoCategory(categoryName)
 
-        deleteCategoryFrom(window.shortcut_category, indexButtonPressed, categoryName, True)
+        delete_category_from(window.shortcut_category, indexButtonPressed, categoryName, True)
         updateButtonsPosition(window.shortcut_category, True)
 
         for store in SHELVES:
@@ -394,7 +394,7 @@ class SpaceCategory(QLabel):
                     if space.category.double_buttons.__len__() > CATEGORY_NAMES.__len__():
                         oldName = space.category.name
 
-                        deleteCategoryFrom(space, indexButtonPressed, categoryName)
+                        delete_category_from(space, indexButtonPressed, categoryName)
                         updateButtonsPosition(space)
 
                         if categoryName == oldName and UserManager.getUserRole() != 'Offline':
