@@ -284,7 +284,7 @@ class Product(QLabel):
         ProductManager.update_product(index, self.edit_product_name.text(), self.edit_price.get_value())
 
         if UserManager.get_user_role() != 'Offline':
-            Mongo.updateMongoProduct(self.name, self.edit_product_name.text(), self.edit_price.get_value())
+            Mongo.update_product(self.name, self.edit_product_name.text(), self.edit_price.get_value())
 
         # Update properties
         self.name = self.edit_product_name.text().capitalize()
@@ -299,7 +299,7 @@ class Product(QLabel):
         ProductManager.update_product_name(index, self.edit_product_name.text())
 
         if UserManager.get_user_role() != 'Offline':
-            Mongo.updateMongoProductName(self.name, self.edit_product_name.text())
+            Mongo.update_product_name(self.name, self.edit_product_name.text())
 
         # Update name property
         self.name = self.edit_product_name.text().capitalize()

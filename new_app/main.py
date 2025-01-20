@@ -237,16 +237,16 @@ class SpaceCategory(QLabel):
         if newName != "":
             self.reloadNameCategories(newName)
 
-            if UserManager.getUserRole() != 'Offline':
-                Mongo.updateMongoCategoryName(self.nameModifiedCategory, newName)
+            if UserManager.get_user_role() != 'Offline':
+                Mongo.update_category_name(self.nameModifiedCategory, newName)
 
             self.nameModifiedCategory = newName
 
         if self.newColor != "":
             self.reloadColorCategories(self.nameModifiedCategory)
 
-            if UserManager.getUserRole() != 'Offline':
-                Mongo.updateMongoCategoryColor(self.nameModifiedCategory, self.newColor)
+            if UserManager.get_user_role() != 'Offline':
+                Mongo.update_category_color(self.nameModifiedCategory, self.newColor)
 
     def reloadNameCategories(self, newName):
         index = Category.getIndexByName(self.nameModifiedCategory)
@@ -341,8 +341,8 @@ class SpaceCategory(QLabel):
     def createCategory(self):
         Category.add_category(self.newCategoryName.capitalize(), self.newCategoryColor)
 
-        if UserManager.getUserRole() != 'Offline':
-            Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
+        if UserManager.get_user_role() != 'Offline':
+            Mongo.add(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
         create_category_in(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent)
         update_category_buttons_pos(window.shortcut_category)
@@ -382,8 +382,8 @@ class SpaceCategory(QLabel):
         categoryName = Category.getNameByIndex(indexButtonPressed)
         Category.delCategory(indexButtonPressed)
 
-        if UserManager.getUserRole() != 'Offline':
-            Mongo.delMongoCategory(categoryName)
+        if UserManager.get_user_role() != 'Offline':
+            Mongo.delete_by_name(categoryName)
 
         delete_category_from(window.shortcut_category, indexButtonPressed, categoryName, True)
         update_category_buttons_pos(window.shortcut_category)
@@ -514,7 +514,7 @@ class Space(QLabel):
             self.product = Product(153, 165, self, self.parent())
             self.product.show()
 
-            Mongo.updateMongoCategoryHoldsProducts(self.category_selector.currentText(), True)
+            Mongo.update_category_holds_product(self.category_selector.currentText(), True)
             Mongo.update_space_product(self.mongo_id, self.product.select_product.currentText())
             Mongo.update_space_amount(self.mongo_id, 1)
         else:
@@ -536,7 +536,7 @@ class Space(QLabel):
 
             self.product = None
 
-            Mongo.updateMongoCategoryHoldsProducts(self.category_selector.currentText(), False)
+            Mongo.update_category_holds_product(self.category_selector.currentText(), False)
             Mongo.update_space_product(self.mongo_id, "")
             Mongo.update_space_amount(self.mongo_id, 0)
 
