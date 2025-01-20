@@ -382,7 +382,7 @@ class Mongo:
             create_category_in(shortcut_category, 'Fill', widget)
             update_category_buttons_pos(shortcut_category)
             
-        setEmptyCategory(shortcut_category)
+        set_empty_category(shortcut_category)
 
         try:
             for store in Mongo.STORES_COLLECTION.find({}):

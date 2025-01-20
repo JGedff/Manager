@@ -84,21 +84,21 @@ def update_category_buttons_pos(space):
     else:
         space.add_category_button.show()
 
-def setEmptyCategory(category):
-    if CATEGORY_NAMES.__len__() > 0:
+def set_empty_category(category):
+    if len(CATEGORY_NAMES) > 0:
         category.name = CATEGORY_NAMES[0]
         category.color = CATEGORY_COLORS[0]
 
-def setUnreachableCategory(category):
+def set_unreachable_category(category):
     category.name = CATEGORY_NAMES[1]
     category.color = CATEGORY_COLORS[1]
 
-def setCategoryByName(category, name):
+def set_category_by_name(category, name):
     category.name = name
-    category.color = Category.getColorByName(name)
+    category.color = Category.get_color_by_name(name)
 
-def getEmptyCategoryName():
+def get_empty_category_name():
     return CATEGORY_NAMES[0]
 
-def getUnreachableCategoryName():
+def get_unreachable_category_name():
     return CATEGORY_NAMES[1]

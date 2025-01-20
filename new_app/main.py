@@ -15,7 +15,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
-from utils.functions.space_category_functions import setUnreachableCategory, setCategoryByName, update_category_name, delete_category_from, setEmptyCategory, getEmptyCategoryName
+from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name
 
 from utils.mongoDb import Mongo
 from utils.user_manager import UserManager
@@ -41,7 +41,7 @@ class SpaceCategory(QLabel):
         self.initUI(parent)
         self.initEvents()
 
-        setEmptyCategory(self)
+        set_empty_category(self)
 
     def initVariables(self, storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut):
         self.name = ''
@@ -424,7 +424,7 @@ class Space(QLabel):
         update_category_buttons_pos(self.category)
 
         if actualFloor > floors:
-            setUnreachableCategory(self.category)
+            set_unreachable_category(self.category)
 
     def initUI(self, spaceIndex, parent, times5Space):
         nameSpace = str(times5Space * 5) if times5Space > 0 else ""
@@ -611,7 +611,7 @@ class Space(QLabel):
     def changeCategory(self, category):
         oldName = self.category.name
 
-        setCategoryByName(self.category, category)
+        set_category_by_name(self.category, category)
         self.updateSpaceColor()
 
         if Category.categoryCanHoldProduct(category):
@@ -812,8 +812,8 @@ class Store():
         mongo_id = 0
 
         storeFloors = get_max_floor(SHELVES_FORMS)
-        emptyCategory = getEmptyCategoryName()
-        unreachableCategory = getEmptyCategoryName()
+        emptyCategory = get_empty_category_name()
+        unreachableCategory = get_unreachable_category_name()
         id_empty_category = Mongo.getMongoCategoryByName(emptyCategory, emptyCategory)
         id_unreachable_category = Mongo.getMongoCategoryByName(unreachableCategory, unreachableCategory)
 
