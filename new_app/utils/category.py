@@ -3,7 +3,7 @@ from constants import CATEGORY_NAMES, CATEGORY_COLORS, CATEGORY_HOLDS_PRODUCT
 class Category():
     @staticmethod
     def del_all_categories():
-        while CATEGORY_NAMES.__len__() > 0:
+        while len(CATEGORY_NAMES) > 0:
             CATEGORY_NAMES.pop()
             CATEGORY_COLORS.pop()
             CATEGORY_HOLDS_PRODUCT.pop()

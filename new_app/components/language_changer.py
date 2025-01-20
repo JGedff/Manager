@@ -35,7 +35,7 @@ class LanguageChanger(QLabel):
         self.changer.currentTextChanged.connect(self.change_lang)
 
     def change_lang(self, language: str):
-        Language.changeTo(language)
+        Language.change_language(language)
 
         self.language = language
         self.update_ui()

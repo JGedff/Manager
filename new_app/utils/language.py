@@ -2,12 +2,12 @@ from utils.json import JsonManager
 
 class Language():
     lang = "English"
-    info = JsonManager.getLanguage("English")
+    info = JsonManager.get_language("English")
 
     @classmethod
-    def changeTo(cls, language):
+    def change_language(cls, language):
         cls.lang = language
-        cls.info = JsonManager.getLanguage(language)
+        cls.info = JsonManager.get_language(language)
 
         if language != "Español" and language != "Català":
             cls.lang = "English"
