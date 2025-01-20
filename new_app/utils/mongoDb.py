@@ -344,7 +344,7 @@ class Mongo:
             
             mongoConnection = True
 
-            updateButtonsPosition(shortcut_category, True)
+            update_category_button_pos(shortcut_category, True)
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
 
@@ -367,7 +367,7 @@ class Mongo:
             create_category_in(shortcut_category, 'Empty', widget)
             create_category_in(shortcut_category, 'Unreachable', widget)
             create_category_in(shortcut_category, 'Fill', widget)
-            updateButtonsPosition(shortcut_category, True)
+            update_category_button_pos(shortcut_category, True)
 
         elif mongoCategories <= 0:
             QMessageBox.warning(None, "You don't have connection to the database", "You'll use the default categories")
@@ -380,7 +380,7 @@ class Mongo:
             create_category_in(shortcut_category, 'Empty', widget)
             create_category_in(shortcut_category, 'Unreachable', widget)
             create_category_in(shortcut_category, 'Fill', widget)
-            updateButtonsPosition(shortcut_category, True)
+            update_category_button_pos(shortcut_category, True)
             
         setEmptyCategory(shortcut_category)
 
@@ -415,7 +415,7 @@ class Mongo:
                             category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
 
                             if category != None:
-                                SHELVES[store_index][shelfIndex].spaces[index].categorySelector.setCurrentText(category['name'])
+                                SHELVES[store_index][shelfIndex].spaces[index].category_selector.setCurrentText(category['name'])
                                 SHELVES[store_index][shelfIndex].spaces[index].category.name = category['name']
                                 SHELVES[store_index][shelfIndex].spaces[index].category.color = category['color']
 

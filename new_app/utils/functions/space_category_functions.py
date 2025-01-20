@@ -24,9 +24,9 @@ def update_category_name(space, color, actualName, newName, shortcut = False):
             space.category.name = newName
 
         # Updates the name in the comboBox of the space
-        for i in range(space.categorySelector.count()):
-            if space.categorySelector.itemText(i) == actualName:
-                space.categorySelector.setItemText(i, newName)
+        for i in range(space.category_selector.count()):
+            if space.category_selector.itemText(i) == actualName:
+                space.category_selector.setItemText(i, newName)
 
     # Change the name of the button with the actual category to the new name for the category
     for button in space_category.double_buttons:
@@ -41,9 +41,9 @@ def delete_category_from(space, indexButtonPressed, categoryName, shortcut = Fal
         space_category = space.category
 
         # Removes the category from the comboBox
-        for index in range(space.categorySelector.count()):
-            if space.categorySelector.itemText(index) == categoryName:
-                space.categorySelector.removeItem(index)
+        for index in range(space.category_selector.count()):
+            if space.category_selector.itemText(index) == categoryName:
+                space.category_selector.removeItem(index)
 
         # If the actual category is the same as the category that is going to be deleted
         if space_category.name == categoryName:
@@ -60,7 +60,7 @@ def delete_category_from(space, indexButtonPressed, categoryName, shortcut = Fal
     space_category.double_buttons[indexButtonPressed].hide()
     space_category.double_buttons.pop(indexButtonPressed)
 
-def update_button_pos(space, shortcut = False):
+def update_category_button_pos(space, shortcut = False):
     posx = 13
     posy = 24
 

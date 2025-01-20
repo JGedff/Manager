@@ -345,13 +345,13 @@ class SpaceCategory(QLabel):
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
         create_category_in(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent)
-        updateButtonsPosition(window.shortcut_category, True)
+        update_category_button_pos(window.shortcut_category, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
                     create_category_in(space.category, self.newCategoryName.capitalize(), self.mainParent)
-                    updateButtonsPosition(space)
+                    update_category_button_pos(space)
 
         self.showUI()
         self.cancelAddCategory()
@@ -386,7 +386,7 @@ class SpaceCategory(QLabel):
             Mongo.delMongoCategory(categoryName)
 
         delete_category_from(window.shortcut_category, indexButtonPressed, categoryName, True)
-        updateButtonsPosition(window.shortcut_category, True)
+        update_category_button_pos(window.shortcut_category, True)
 
         for store in SHELVES:
             for shelf in store:
@@ -395,7 +395,7 @@ class SpaceCategory(QLabel):
                         oldName = space.category.name
 
                         delete_category_from(space, indexButtonPressed, categoryName)
-                        updateButtonsPosition(space)
+                        update_category_button_pos(space)
 
                         if categoryName == oldName and UserManager.getUserRole() != 'Offline':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
@@ -421,7 +421,7 @@ class Space(QLabel):
         self.actualFloor = actualFloor
         self.shelfIndex = shelfIndex
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
-        updateButtonsPosition(self)
+        update_category_button_pos(self)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)
@@ -445,9 +445,9 @@ class Space(QLabel):
         self.labelCategory = QLabel(Language.get("category"), parent)
         self.labelCategory.setGeometry(152, 75, 100, 25)
 
-        self.categorySelector = QComboBox(parent)
-        self.categorySelector.setGeometry(250, 74, 125, 30)
-        self.categorySelector.addItem(self.category.name)
+        self.category_selector = QComboBox(parent)
+        self.category_selector.setGeometry(250, 74, 125, 30)
+        self.category_selector.addItem(self.category.name)
 
         self.editCategories = QPushButton("⚙️", parent)
 
@@ -466,7 +466,7 @@ class Space(QLabel):
 
         for category in CATEGORY_NAMES:
             if category != self.category.name:
-                self.categorySelector.addItem(category.capitalize())
+                self.category_selector.addItem(category.capitalize())
 
         if Category.categoryCanHoldProduct(self.category.name):
             self.category_can_hold_product.set_value(True)
@@ -485,15 +485,15 @@ class Space(QLabel):
         self.labelCategory.setFont(FONT_SMALL_TEXT)
         self.editCategories.setFont(FONT_SMALL_TEXT)
         self.openSpaceConfig.setFont(FONT_SMALL_TEXT)
-        self.categorySelector.setFont(FONT_SMALL_TEXT)
+        self.category_selector.setFont(FONT_SMALL_TEXT)
         self.labelCategoryHoldProduct.setFont(FONT_SMALL_TEXT)
         
         self.box.setFont(FONT_SMALLEST_CHAR)
         self.configBox.setFont(FONT_SMALLEST_CHAR)
 
         self.openSpaceConfig.setStyleSheet(DEFAULT_BUTTON)
+        self.category_selector.setStyleSheet(COMBO_BOX)
         self.editCategories.setStyleSheet(EDIT_BUTTON)
-        self.categorySelector.setStyleSheet(COMBO_BOX)
 
         self.updateSpaceColor()
 
@@ -505,16 +505,16 @@ class Space(QLabel):
         self.box.clicked.connect(self.configSpace)
         self.openSpaceConfig.clicked.connect(self.stopConfigSpace)
         self.editCategories.clicked.connect(self.openConfigCategories)
-        self.categorySelector.currentTextChanged.connect(self.changeCategory)
+        self.category_selector.currentTextChanged.connect(self.changeCategory)
     
     def categoryCanHoldProduct(self):
-        Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), True)
+        Category.changeCategoryCanHoldProduct(self.category_selector.currentText(), True)
 
         if not isinstance(self.product, Product):
             self.product = Product(153, 165, self, self.parent())
             self.product.show()
 
-            Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), True)
+            Mongo.updateMongoCategoryHoldsProducts(self.category_selector.currentText(), True)
             Mongo.update_space_product(self.mongo_id, self.product.select_product.currentText())
             Mongo.update_space_amount(self.mongo_id, 1)
         else:
@@ -524,7 +524,7 @@ class Space(QLabel):
                 self.product.showHideCreateProduct()
     
     def categoryCanNotHoldProduct(self):
-        Category.changeCategoryCanHoldProduct(self.categorySelector.currentText(), False)
+        Category.changeCategoryCanHoldProduct(self.category_selector.currentText(), False)
 
         if isinstance(self.product, Product):
             if self.product.editting_product:
@@ -536,7 +536,7 @@ class Space(QLabel):
 
             self.product = None
 
-            Mongo.updateMongoCategoryHoldsProducts(self.categorySelector.currentText(), False)
+            Mongo.updateMongoCategoryHoldsProducts(self.category_selector.currentText(), False)
             Mongo.update_space_product(self.mongo_id, "")
             Mongo.update_space_amount(self.mongo_id, 0)
 
@@ -552,9 +552,9 @@ class Space(QLabel):
         self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
+        self.category_selector.show()
         self.labelCategoryHoldProduct.show()
         self.category_can_hold_product.show()
-        self.categorySelector.show()
     
         if isinstance(self.product, Product):
             self.product.show()
@@ -572,13 +572,13 @@ class Space(QLabel):
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
-        self.shelfNumber.hide()
         self.configBox.hide()
+        self.shelfNumber.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.category_selector.hide()
         self.labelCategoryHoldProduct.hide()
         self.category_can_hold_product.hide()
-        self.categorySelector.hide()
 
         if isinstance(self.product, Product):
             self.product.hide()
@@ -599,9 +599,9 @@ class Space(QLabel):
         self.shelfNumber.show()
         self.labelCategory.show()
         self.editCategories.show()
+        self.category_selector.show()
         self.labelCategoryHoldProduct.show()
         self.category_can_hold_product.show()
-        self.categorySelector.show()
 
         if isinstance(self.product, Product):
             self.product.show()
@@ -646,14 +646,14 @@ class Space(QLabel):
 
     def hideSpace(self):
         self.box.hide()
-        self.shelfNumber.hide()
         self.configBox.hide()
+        self.shelfNumber.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.openSpaceConfig.hide()
+        self.category_selector.hide()
         self.labelCategoryHoldProduct.hide()
         self.category_can_hold_product.hide()
-        self.openSpaceConfig.hide()
-        self.categorySelector.hide()
 
         if isinstance(self.product, Product):
             self.product.hide()
@@ -665,14 +665,14 @@ class Space(QLabel):
 
         self.box.show()
 
-        self.shelfNumber.hide()
         self.configBox.hide()
+        self.shelfNumber.hide()
         self.labelCategory.hide()
         self.editCategories.hide()
+        self.openSpaceConfig.hide()
+        self.category_selector.hide()
         self.labelCategoryHoldProduct.hide()
         self.category_can_hold_product.hide()
-        self.openSpaceConfig.hide()
-        self.categorySelector.hide()
 
         if isinstance(self.product, Product):
             if self.product.creating_product:
