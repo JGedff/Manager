@@ -11,7 +11,7 @@ from utils.language import Language
 from utils.category import Category
 from utils.mongoDb import Mongo
 
-from utils.functions.space_category_functions import create_category_in, update_category_button_pos
+from utils.functions.space_category_functions import create_category_in, update_category_buttons_pos
 
 from components.language_changer import LanguageChanger
 
@@ -162,7 +162,7 @@ class LogInWindow(QMainWindow):
         create_category_in(self.main_app.shortcut_category, 'Empty', self.main_app.widget)
         create_category_in(self.main_app.shortcut_category, 'Unreachable', self.main_app.widget)
         create_category_in(self.main_app.shortcut_category, 'Fill', self.main_app.widget)
-        update_category_button_pos(self.main_app.shortcut_category, True)
+        update_category_buttons_pos(self.main_app.shortcut_category)
 
         # Manage language
         self.main_app.language_changer.change_lang(self.language_changer.language)

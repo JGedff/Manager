@@ -344,7 +344,7 @@ class Mongo:
             
             mongoConnection = True
 
-            update_category_button_pos(shortcut_category, True)
+            update_category_buttons_pos(shortcut_category)
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
 
@@ -367,7 +367,7 @@ class Mongo:
             create_category_in(shortcut_category, 'Empty', widget)
             create_category_in(shortcut_category, 'Unreachable', widget)
             create_category_in(shortcut_category, 'Fill', widget)
-            update_category_button_pos(shortcut_category, True)
+            update_category_buttons_pos(shortcut_category)
 
         elif mongoCategories <= 0:
             QMessageBox.warning(None, "You don't have connection to the database", "You'll use the default categories")
@@ -380,7 +380,7 @@ class Mongo:
             create_category_in(shortcut_category, 'Empty', widget)
             create_category_in(shortcut_category, 'Unreachable', widget)
             create_category_in(shortcut_category, 'Fill', widget)
-            update_category_button_pos(shortcut_category, True)
+            update_category_buttons_pos(shortcut_category)
             
         setEmptyCategory(shortcut_category)
 

@@ -345,13 +345,13 @@ class SpaceCategory(QLabel):
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
         create_category_in(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent)
-        update_category_button_pos(window.shortcut_category, True)
+        update_category_buttons_pos(window.shortcut_category)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
                     create_category_in(space.category, self.newCategoryName.capitalize(), self.mainParent)
-                    update_category_button_pos(space)
+                    update_category_buttons_pos(space.category)
 
         self.showUI()
         self.cancelAddCategory()
@@ -386,7 +386,7 @@ class SpaceCategory(QLabel):
             Mongo.delMongoCategory(categoryName)
 
         delete_category_from(window.shortcut_category, indexButtonPressed, categoryName, True)
-        update_category_button_pos(window.shortcut_category, True)
+        update_category_buttons_pos(window.shortcut_category)
 
         for store in SHELVES:
             for shelf in store:
@@ -395,7 +395,7 @@ class SpaceCategory(QLabel):
                         oldName = space.category.name
 
                         delete_category_from(space, indexButtonPressed, categoryName)
-                        update_category_button_pos(space)
+                        update_category_buttons_pos(space.category)
 
                         if categoryName == oldName and UserManager.getUserRole() != 'Offline':
                             Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
@@ -421,7 +421,7 @@ class Space(QLabel):
         self.actualFloor = actualFloor
         self.shelfIndex = shelfIndex
         self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
-        update_category_button_pos(self)
+        update_category_buttons_pos(self.category)
 
         if actualFloor > floors:
             setUnreachableCategory(self.category)

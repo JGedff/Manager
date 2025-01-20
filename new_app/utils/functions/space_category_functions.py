@@ -60,50 +60,29 @@ def delete_category_from(space, indexButtonPressed, categoryName, shortcut = Fal
     space_category.double_buttons[indexButtonPressed].hide()
     space_category.double_buttons.pop(indexButtonPressed)
 
-def update_category_button_pos(space, shortcut = False):
+def update_category_buttons_pos(space):
     posx = 13
     posy = 24
 
-    if not shortcut:
-        for index, _ in enumerate(CATEGORY_NAMES):
-            space.category.double_buttons[index].setGeometry(posx, posy, 450, 69)
+    for index in range(len(CATEGORY_NAMES)):
+        space.double_buttons[index].setGeometry(posx, posy, 450, 69)
 
-            if posy + 100 >= WINDOW_HEIGHT:
-                posx += 400
-                posy = 24
-            else:
-                posy += 50
-
-        if posy + 150 >= WINDOW_HEIGHT:
+        if posy + 100 >= WINDOW_HEIGHT:
             posx += 400
             posy = 24
-
-        space.category.addCategory.move(posx + 25, posy + 13)
-
-        if space.category.double_buttons.__len__() >= 37:
-            space.category.addCategory.hide()
         else:
-            space.category.addCategory.show()
+            posy += 50
+
+    if posy + 150 >= WINDOW_HEIGHT:
+        posx += 400
+        posy = 24
+
+    space.addCategory.move(posx + 25, posy + 13)
+
+    if len(space.double_buttons) >= 37:
+        space.addCategory.hide()
     else:
-        for index, _ in enumerate(CATEGORY_NAMES):
-            space.double_buttons[index].setGeometry(posx, posy, 450, 69)
-
-            if posy + 100 >= WINDOW_HEIGHT:
-                posx += 400
-                posy = 24
-            else:
-                posy += 50
-
-        if posy + 150 >= WINDOW_HEIGHT:
-            posx += 400
-            posy = 24
-
-        space.addCategory.move(posx + 25, posy + 13)
-
-        if space.double_buttons.__len__() >= 37:
-            space.addCategory.hide()
-        else:
-            space.addCategory.show()
+        space.addCategory.show()
 
 def setEmptyCategory(category):
     if CATEGORY_NAMES.__len__() > 0:
