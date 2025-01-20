@@ -77,12 +77,12 @@ def update_category_buttons_pos(space):
         posx += 400
         posy = 24
 
-    space.addCategory.move(posx + 25, posy + 13)
+    space.add_category_button.move(posx + 25, posy + 13)
 
     if len(space.double_buttons) >= 37:
-        space.addCategory.hide()
+        space.add_category_button.hide()
     else:
-        space.addCategory.show()
+        space.add_category_button.show()
 
 def setEmptyCategory(category):
     if CATEGORY_NAMES.__len__() > 0:

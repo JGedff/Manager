@@ -98,9 +98,9 @@ class SpaceCategory(QLabel):
             self.double_buttons.append(new_double_button)
 
         # Adding a new category
-        self.addCategory = QPushButton(Language.get("add_category"), parent)
-        self.addCategory.setGeometry(posx + 13, posy + 13, 200, 25)
-        self.addCategory.hide()
+        self.add_category_button = QPushButton(Language.get("add_category"), parent)
+        self.add_category_button.setGeometry(posx + 13, posy + 13, 200, 25)
+        self.add_category_button.hide()
 
         self.addCategoryName = QLineEdit(parent)
         self.addCategoryName.setGeometry(posx + 13, posy - 100, 250, 39)
@@ -126,20 +126,20 @@ class SpaceCategory(QLabel):
         self.saveCategory.setFont(FONT_SMALL_BOLD_TEXT)
 
         self.showSpace.setFont(FONT_SMALL_TEXT)
-        self.addCategory.setFont(FONT_SMALL_TEXT)
         self.categoryName.setFont(FONT_SMALL_TEXT)
         self.categoryColor.setFont(FONT_SMALL_TEXT)
         self.addCategoryName.setFont(FONT_SMALL_TEXT)
         self.categoryNameLabel.setFont(FONT_SMALL_TEXT)
         self.categoryColorLabel.setFont(FONT_SMALL_TEXT)
+        self.add_category_button.setFont(FONT_SMALL_TEXT)
         self.createCategoryButton.setFont(FONT_SMALL_TEXT)
         self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
         self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
 
-        self.addCategory.setStyleSheet(BLUE_BUTTON)
         self.categoryName.setStyleSheet(INPUT_TEXT)
         self.showSpace.setStyleSheet(DEFAULT_BUTTON)
         self.addCategoryName.setStyleSheet(INPUT_TEXT)
+        self.add_category_button.setStyleSheet(BLUE_BUTTON)
         self.cancelButtonAddCategory.setStyleSheet(OFF_BUTTON)
         self.saveCategory.setStyleSheet(IMPORTANT_ACTION_BUTTON)
         self.categoryColor.setStyleSheet(get_style_sheet("#FFFFFF"))
@@ -150,7 +150,7 @@ class SpaceCategory(QLabel):
         self.showSpace.clicked.connect(self.stopEditCategory)
         self.categoryColor.clicked.connect(self.selectColor)
         self.saveCategory.clicked.connect(self.saveInfo)
-        self.addCategory.clicked.connect(self.showAddCategory)
+        self.add_category_button.clicked.connect(self.showAddCategory)
         self.cancelButtonAddCategory.clicked.connect(self.cancelAddCategory)
         self.createCategoryButton.clicked.connect(self.createCategory)
         self.newCategoryColorButton.clicked.connect(self.selectColorNewCategory)
@@ -177,10 +177,10 @@ class SpaceCategory(QLabel):
             button.raise_()
 
         if self.double_buttons.__len__() < 37:
-            self.addCategory.show()
-            self.addCategory.raise_()
+            self.add_category_button.show()
+            self.add_category_button.raise_()
         else:
-            self.addCategory.hide()
+            self.add_category_button.hide()
 
     def selectColor(self):
         color = QColorDialog.getColor()
@@ -193,7 +193,7 @@ class SpaceCategory(QLabel):
         self.hideUI()
         self.newColor = ''
         self.showSpace.show()
-        self.addCategory.hide()
+        self.add_category_button.hide()
         self.cancelAddCategory()
 
         # I don't understand why, but this works to get the text of the category pressed
@@ -225,7 +225,7 @@ class SpaceCategory(QLabel):
         for button in self.double_buttons:
             button.hide()
         
-        self.addCategory.hide()
+        self.add_category_button.hide()
 
         if self.shortcut:
             self.cancelAddCategory()
@@ -275,13 +275,13 @@ class SpaceCategory(QLabel):
     def showAddCategory(self):
         self.creatingCategory = True
 
-        self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() + 100)
-        self.addCategoryName.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
-        self.cancelButtonAddCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 42)
-        self.createCategoryButton.move(self.addCategory.pos().x() + 275, self.addCategory.pos().y() - 42)
-        self.newCategoryColorButton.move(self.addCategory.pos().x() + 275, self.addCategory.pos().y() - 100)
+        self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() + 100)
+        self.addCategoryName.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
+        self.cancelButtonAddCategory.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 42)
+        self.createCategoryButton.move(self.add_category_button.pos().x() + 275, self.add_category_button.pos().y() - 42)
+        self.newCategoryColorButton.move(self.add_category_button.pos().x() + 275, self.add_category_button.pos().y() - 100)
 
-        self.addCategory.setDisabled(True)
+        self.add_category_button.setDisabled(True)
 
         self.addCategoryName.show()
         self.createCategoryButton.show()
@@ -306,12 +306,12 @@ class SpaceCategory(QLabel):
         self.newCategoryColor = ""
 
         self.addCategoryName.setText("")
-        self.addCategory.setDisabled(False)
+        self.add_category_button.setDisabled(False)
         self.createCategoryButton.setDisabled(True)
         self.newCategoryColorButton.setStyleSheet(get_style_sheet("#FFFFFF"))
 
         if self.creatingCategory:
-            self.addCategory.move(self.addCategory.pos().x(), self.addCategory.pos().y() - 100)
+            self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
             self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() - 100)
             self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() - 100)
             self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() - 100)
@@ -339,7 +339,7 @@ class SpaceCategory(QLabel):
             self.createCategoryButton.setDisabled(False)
 
     def createCategory(self):
-        Category.addCategory(self.newCategoryName.capitalize(), self.newCategoryColor)
+        Category.add_category(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         if UserManager.getUserRole() != 'Offline':
             Mongo.addMongoCategory(self.newCategoryName.capitalize(), self.newCategoryColor, False)
@@ -356,8 +356,8 @@ class SpaceCategory(QLabel):
         self.showUI()
         self.cancelAddCategory()
 
-        posx = self.addCategory.pos().x()
-        posy = self.addCategory.pos().y()
+        posx = self.add_category_button.pos().x()
+        posy = self.add_category_button.pos().y()
 
         if posy + 100 >= WINDOW_HEIGHT:
             posx += 450
@@ -365,7 +365,7 @@ class SpaceCategory(QLabel):
         else:
             posy += 100
 
-        self.addCategory.move(posx, posy)
+        self.add_category_button.move(posx, posy)
         self.addCategoryName.move(posx, posy - 50)
         self.createCategoryButton.move(posx + 100, posy + 50)
         self.newCategoryColorButton.move(posx + 100, posy - 50)

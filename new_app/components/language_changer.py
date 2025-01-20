@@ -55,7 +55,7 @@ class LanguageChanger(QLabel):
 
             self.main_window.categoryManager.showSpace.setText(Language.get("go_back"))
             self.main_window.categoryManager.saveCategory.setText(Language.get("save"))
-            self.main_window.categoryManager.addCategory.setText(Language.get("add_category"))
+            self.main_window.categoryManager.add_category_button.setText(Language.get("add_category"))
             self.main_window.categoryManager.categoryColor.setText(Language.get("select_color"))
             self.main_window.categoryManager.createCategoryButton.setText(Language.get("create"))
             self.main_window.categoryManager.cancelButtonAddCategory.setText(Language.get("cancel"))
@@ -97,7 +97,7 @@ class LanguageChanger(QLabel):
 
                         space.category.showSpace.setText(Language.get("go_back"))
                         space.category.saveCategory.setText(Language.get("save"))
-                        space.category.addCategory.setText(Language.get("add_category"))
+                        space.category.add_category_button.setText(Language.get("add_category"))
                         space.category.categoryColor.setText(Language.get("select_color"))
                         space.category.createCategoryButton.setText(Language.get("create"))
                         space.category.cancelButtonAddCategory.setText(Language.get("cancel"))
