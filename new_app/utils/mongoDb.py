@@ -61,7 +61,7 @@ class Mongo:
                 QMessageBox.warning(None, "The spaces were not created", "There was an issue with the network")
                 break
 
-            insert_shelf['spaces'] = cls.getLastSpacesCreated(len(local_shelf['spaces']))
+            insert_shelf['spaces'] = cls.get_last_spaces_created(len(local_shelf['spaces']))
 
             insert_shelves.append(insert_shelf)
 
@@ -72,78 +72,74 @@ class Mongo:
             QMessageBox.warning(None, "The shelves were not created", "There was an issue with the network")
 
     @classmethod
-    def getLastSpacesCreated(cls, num):
-        spacesId = []
+    def get_last_spaces_created(cls, num):
+        spaces = []
 
         try:
-            lastSpaces = cls.SPACES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+            db_spaces = cls.SPACES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
 
-            for doc in lastSpaces:
-                spacesId.append(doc['_id'])
+            for mongo_space in db_spaces:
+                spaces.append(mongo_space['_id'])
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            UserManager.setUser('Guest', 'Offline')
+            UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "Spaces not found", "There was an issue with the network")
 
-        return spacesId
+        return spaces
 
     @classmethod
-    def getLastShelvesCreated(cls, num):
-        shelvesId = []
+    def get_last_shelves_created(cls, num):
+        shelves = []
 
         try: 
-            lastShelves = cls.SHELVES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+            db_shelves = cls.SHELVES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
 
-            for doc in lastShelves:
-                shelvesId.insert(0, doc['_id'])
+            for mongo_shelf in db_shelves:
+                shelves.insert(0, mongo_shelf['_id'])
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            UserManager.setUser('Guest', 'Offline')
+            UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "Shelves not found", "There was an issue with the network")
 
-        return shelvesId
+        return shelves
 
     @classmethod
-    def addStoreToMongo(cls, arrayShelves, name, image):
-        cls.add_shelves(arrayShelves)
+    def add_store(cls, shelves, name, image):
+        cls.add_shelves(shelves)
 
-        idNewShelves = cls.getLastShelvesCreated(arrayShelves.__len__())
+        id_shelves = cls.get_last_shelves_created(len(shelves))
 
-        maxFloor = 0
+        max_floor = 0
 
-        for shelf in arrayShelves:
-            if shelf['floors'] > maxFloor:
-                maxFloor = shelf['floors']
+        for shelf in shelves:
+            if shelf['floors'] > max_floor:
+                max_floor = shelf['floors']
 
         try:
-            cls.STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": idNewShelves, "storeFloors": maxFloor })
+            cls.STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": id_shelves, "storeFloors": max_floor })
         except (ConnectionFailure, ServerSelectionTimeoutError):
-            UserManager.setUser('Guest', 'Offline')
+            UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The store was not created", "There was an issue with the network")
 
     @classmethod
-    def getMongoCategoryByName(cls, name, oldName):
+    def get_category_by_name(cls, name):
         try:
             file = cls.CATEGORIES_COLLECTION.find_one({ "name": name })
 
-            if file: return file['_id']
-            else:
-                file = cls.CATEGORIES_COLLECTION.find_one({ "name": oldName })
-
-                return file['_id']
+            return file['_id']
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            UserManager.setUser('Guest', 'Offline')
+            UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "Category not found", "There was an issue with the network")
 
             return name
 
     @classmethod
-    def updateMongoSpaceCategory(cls, spaceId, category, oldName = None):
-        if spaceId != None:
-            categoryId = cls.getMongoCategoryByName(category, oldName)
+    def update_category_space(cls, space_id, category_name = None):
+        if space_id != None:
+            category_id = cls.get_category_by_name(category_name)
 
             try:
-                cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
+                cls.SPACES_COLLECTION.update_one({ "mongo_id": space_id }, { "$set": { "category": category_id } })
             except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-                UserManager.setUser('Guest', 'Offline')
+                UserManager.set_user('Guest', 'Offline')
                 QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
             except (OperationFailure, WriteError) as e:
                 QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
@@ -192,7 +188,7 @@ class Mongo:
 
     @classmethod
     def updateMongoCategoryHoldsProducts(cls, category, holdsProduct):
-        categoryId = cls.getMongoCategoryByName(category, category)
+        categoryId = cls.get_category_by_name(category)
 
         try:
             cls.CATEGORIES_COLLECTION.update_one({ "_id": categoryId }, { "$set": { "hold": holdsProduct } })

@@ -633,7 +633,7 @@ class Space(QLabel):
             self.product = None
 
         if UserManager.getUserRole() != 'Offline':
-            Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
+            Mongo.updateMongoSpaceCategory(self.mongo_id, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)

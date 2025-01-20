@@ -15,7 +15,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
-from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name
+from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name, get_empty_category_name
 
 from utils.mongoDb import Mongo
 from utils.user_manager import UserManager
@@ -398,7 +398,7 @@ class SpaceCategory(QLabel):
                         update_category_buttons_pos(space.category)
 
                         if categoryName == oldName and UserManager.getUserRole() != 'Offline':
-                            Mongo.updateMongoSpaceCategory(space.mongo_id, space.category.name)
+                            Mongo.update_category_space(space.mongo_id, space.category.name)
 
         if self.double_buttons.__len__() <= 1:
             self.double_buttons[0].set_second_button_disabled(True)
@@ -633,7 +633,7 @@ class Space(QLabel):
             self.product = None
 
         if UserManager.getUserRole() != 'Offline':
-            Mongo.updateMongoSpaceCategory(self.mongo_id, category, oldName)
+            Mongo.update_category_space(self.mongo_id, oldName)
 
     def updateVerticalHeaderPosition(self, value):
         self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
@@ -814,8 +814,8 @@ class Store():
         storeFloors = get_max_floor(SHELVES_FORMS)
         emptyCategory = get_empty_category_name()
         unreachableCategory = get_unreachable_category_name()
-        id_empty_category = Mongo.getMongoCategoryByName(emptyCategory, emptyCategory)
-        id_unreachable_category = Mongo.getMongoCategoryByName(unreachableCategory, unreachableCategory)
+        id_empty_category = Mongo.get_category_by_name(emptyCategory)
+        id_unreachable_category = Mongo.get_category_by_name(unreachableCategory)
 
         for i in SHELVES_FORMS:
             spacesInfo = []
@@ -841,7 +841,7 @@ class Store():
                 "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             })
             
-        Mongo.addStoreToMongo(shelvesInfo, name, image_path)
+        Mongo.add_store(shelvesInfo, name, image_path)
 
     @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):

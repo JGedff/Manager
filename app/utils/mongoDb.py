@@ -135,9 +135,9 @@ class Mongo:
             return name
 
     @classmethod
-    def updateMongoSpaceCategory(cls, spaceId, category, oldName = None):
+    def updateMongoSpaceCategory(cls, spaceId, oldName = None):
         if spaceId != None:
-            categoryId = cls.getMongoCategoryByName(category, oldName)
+            categoryId = cls.getMongoCategoryByName(oldName)
 
             try:
                 cls.SPACES_COLLECTION.update_one({ "mongo_id": spaceId }, { "$set": { "category": categoryId } })
