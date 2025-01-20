@@ -1430,7 +1430,7 @@ class main():
 
     sys.exit(app.exec_())
 
-    Mongo.closeMongoConnection()
+    Mongo.close_connection()
 
 if __name__ == "__main__":
     main()

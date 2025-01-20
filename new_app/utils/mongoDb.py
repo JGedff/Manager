@@ -9,66 +9,66 @@ from utils.user_manager import UserManager
 from utils.category import Category
 
 class Mongo:
-    MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+    _MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 
-    DB = MONGO_CLIENT['manager']
+    _DB = _MONGO_CLIENT['manager']
 
-    STORES_COLLECTION = DB['stores']
-    SPACES_COLLECTION = DB['spaces']
-    SHELVES_COLLECTION = DB['shelfs']
-    PRODUCTS_COLLECTION = DB['products']
-    CATEGORIES_COLLECTION = DB['categorys']
+    STORES_COLLECTION = _DB['stores']
+    SPACES_COLLECTION = _DB['spaces']
+    SHELVES_COLLECTION = _DB['shelfs']
+    PRODUCTS_COLLECTION = _DB['products']
+    CATEGORIES_COLLECTION = _DB['categorys']
 
-    @staticmethod
-    def closeMongoConnection():
-        Mongo.MONGO_CLIENT.close()
+    @classmethod
+    def close_connection(cls):
+        cls._MONGO_CLIENT.close()
 
-    @staticmethod
-    def connectionIsOpen():
+    @classmethod
+    def is_connection_open(cls):
         try:
-            Mongo.MONGO_CLIENT.admin.command('ping')
+            cls._MONGO_CLIENT.admin.command('ping')
             return True
         except Exception:
             return False
         
-    @staticmethod
-    def reconnect():
-        Mongo.MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
+    @classmethod
+    def reconnect(cls):
+        cls._MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 
-        Mongo.DB = Mongo.MONGO_CLIENT['manager']
-        Mongo.STORES_COLLECTION = Mongo.DB['stores']
-        Mongo.SPACES_COLLECTION = Mongo.DB['spaces']
-        Mongo.SHELVES_COLLECTION = Mongo.DB['shelfs']
-        Mongo.PRODUCTS_COLLECTION = Mongo.DB['products']
-        Mongo.CATEGORIES_COLLECTION = Mongo.DB['categorys']
+        cls._DB = cls._MONGO_CLIENT['manager']
+        cls.STORES_COLLECTION = cls._DB['stores']
+        cls.SPACES_COLLECTION = cls._DB['spaces']
+        cls.SHELVES_COLLECTION = cls._DB['shelfs']
+        cls.PRODUCTS_COLLECTION = cls._DB['products']
+        cls.CATEGORIES_COLLECTION = cls._DB['categorys']
 
     @classmethod
-    def addShelvesToMongo(cls, arrayInfo = []):
-        arrayToInsert = []
+    def add_shelves(cls, shelves = []):
+        insert_shelves = []
 
-        for shelves in arrayInfo:
-            insertShelf = {
-                "floors": shelves['floors'],
+        for local_shelf in shelves:
+            insert_shelf = {
+                "floors": local_shelf['floors'],
                 "spaces": [],
-                "double_shelf": shelves['double_shelf'],
-                "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                "double_shelf": local_shelf['double_shelf'],
+                "creation_date": str(datetime.now())[:-3]
             }
 
             try:
-                cls.SPACES_COLLECTION.insert_many(shelves['spaces'])
+                cls.SPACES_COLLECTION.insert_many(local_shelf['spaces'])
             except (ConnectionFailure, ServerSelectionTimeoutError):
-                UserManager.setUser('Guest', 'Offline')
+                UserManager.set_user('Guest', 'Offline')
                 QMessageBox.warning(None, "The spaces were not created", "There was an issue with the network")
                 break
 
-            insertShelf['spaces'] = cls.getLastSpacesCreated(shelves['spaces'].__len__())
+            insert_shelf['spaces'] = cls.getLastSpacesCreated(len(local_shelf['spaces']))
 
-            arrayToInsert.append(insertShelf)
+            insert_shelves.append(insert_shelf)
 
         try:
-            cls.SHELVES_COLLECTION.insert_many(arrayToInsert)
+            cls.SHELVES_COLLECTION.insert_many(insert_shelves)
         except (ConnectionFailure, ServerSelectionTimeoutError):
-            UserManager.setUser('Guest', 'Offline')
+            UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The shelves were not created", "There was an issue with the network")
 
     @classmethod
@@ -103,7 +103,7 @@ class Mongo:
 
     @classmethod
     def addStoreToMongo(cls, arrayShelves, name, image):
-        cls.addShelvesToMongo(arrayShelves)
+        cls.add_shelves(arrayShelves)
 
         idNewShelves = cls.getLastShelvesCreated(arrayShelves.__len__())
 
