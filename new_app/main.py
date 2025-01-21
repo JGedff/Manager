@@ -7,7 +7,7 @@ from datetime import datetime
 from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt
 
-from styles.style_sheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, REST_BUTTON, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_BLACK, BACKGROUND_GREY
+from styles.style_sheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_GREY
 from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT
 from styles.color_functions import get_style_sheet
 
@@ -15,7 +15,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
-from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name, get_empty_category_name
+from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name, get_empty_category_name, create_category_in, update_category_buttons_pos
 
 from utils.mongo_db import Mongo
 from utils.user_manager import UserManager

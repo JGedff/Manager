@@ -28,9 +28,8 @@ class LogInWindow(QMainWindow):
 
     def init_variables(self, main_app):
         # Properties
-        self.logged = ""
-        self.log_in = True
-        self.main_app = main_app
+        self._log_in = True
+        self._main_app = main_app
 
         # Information
         self.setWindowTitle(Language.get("log_in"))
@@ -150,7 +149,7 @@ class LogInWindow(QMainWindow):
         else:
             QMessageBox.information(self, "Offline version", "You opened the offline version")
 
-        self.main_app.change_user_role('Offline')
+        self._main_app.change_user_role('Offline')
 
         UserManager.set_user('Guest', 'Offline')
 
@@ -160,23 +159,23 @@ class LogInWindow(QMainWindow):
         Category.add_category('Fill', 'green')
         Category.change_can_hold_product('Fill', True)
 
-        create_category_in(self.main_app.shortcut_category, 'Empty', self.main_app.widget)
-        create_category_in(self.main_app.shortcut_category, 'Unreachable', self.main_app.widget)
-        create_category_in(self.main_app.shortcut_category, 'Fill', self.main_app.widget)
-        update_category_buttons_pos(self.main_app.shortcut_category)
+        create_category_in(self._main_app.shortcut_category, 'Empty', self._main_app.widget)
+        create_category_in(self._main_app.shortcut_category, 'Unreachable', self._main_app.widget)
+        create_category_in(self._main_app.shortcut_category, 'Fill', self._main_app.widget)
+        update_category_buttons_pos(self._main_app.shortcut_category)
 
         # Manage language
-        self.main_app.language_changer.change_lang(self.language_changer.language)
-        self.main_app.language_changer.set_current_text(self.language_changer.language)
-        self.main_app.language_changer.update()
+        self._main_app.language_changer.change_lang(self.language_changer.get_language())
+        self._main_app.language_changer.set_current_text(self.language_changer.get_language())
+        self._main_app.language_changer.update()
 
         # Close log in window
         self.close()
 
         # Open main window
-        self.main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
-        self.main_app.re_open_home()
-        self.main_app.show()
+        self._main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
+        self._main_app.re_open_home()
+        self._main_app.show()
 
     def logged_successful(self, username):
         # Manage user and role
@@ -190,34 +189,34 @@ class LogInWindow(QMainWindow):
         else:
             QMessageBox.information(None, "Login successful", "Login successful")
 
-        self.main_app.change_user_role(role, username)
+        self._main_app.change_user_role(role, username)
 
         # Manage language
-        self.main_app.language_changer.change_lang(self.language_changer.language)
-        self.main_app.language_changer.set_current_text(self.language_changer.language)
-        self.main_app.language_changer.update()
+        self._main_app.language_changer.change_lang(self.language_changer.get_language())
+        self._main_app.language_changer.set_current_text(self.language_changer.get_language())
+        self._main_app.language_changer.update()
 
         # Download db information
-        get_information(self.main_app.widget, self.main_app.shortcut_category, self.main_app)
+        get_information(self._main_app.widget, self._main_app.shortcut_category, self._main_app)
 
         # Close log in window
         self.close()
 
         # Open main window
-        self.main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
-        self.main_app.re_open_home()
-        self.main_app.show()
+        self._main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
+        self._main_app.re_open_home()
+        self._main_app.show()
     
     def logged_unsuccessful(self):
         QMessageBox.warning(None, "Login Failed", "Incorrect username or password")
 
     def change_register_form(self):
-        self.log_in = not self.log_in
+        self._log_in = not self._log_in
 
         # Disconnect the function that executed when pressing from the button
         self.log_in_button.clicked.disconnect()
 
-        if self.log_in: # Change ui to show the log in
+        if self._log_in: # Change ui to show the log in
             # Change title
             self.register_title.hide()
             self.log_in_title.show()

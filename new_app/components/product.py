@@ -26,22 +26,22 @@ class Product(QLabel):
         self._space_id = space.mongo_id
         self.editting_product = False
         self.creating_product = False
-        self.pos_x = pos_x
-        self.pos_y = pos_y
-        self.price = 0
-        self.name = ''
+        self._pos_x = pos_x
+        self._pos_y = pos_y
+        self._price = 0
+        self._name = ''
 
-        self.products = list()
+        self._products = list()
 
-        if UserManager.get_user_role() != 'Offline':
+        if UserManager.get_role() != 'Offline':
             self.add_db_products()
         else:
             self.add_default_products()
 
     def add_db_products(self):
-        self.products = Mongo.get_products()
+        self._products = Mongo.get_products()
 
-        if len(self.products) < 1:
+        if len(self._products) < 1:
             QMessageBox.warning(None, "Products not found", "It will create the default products")
 
             self.add_default_products()
@@ -53,15 +53,15 @@ class Product(QLabel):
             Mongo.add_product('Sweater', 35)
 
         else:
-            for db_products in self.products:
+            for db_products in self._products:
                 ProductManager.add(db_products['name'], db_products['price'])            
 
     def add_default_products(self):
-        self.products.append({ "name": 'Sock', "price": 8 })
-        self.products.append({ "name": 'Dress', "price": 20 })
-        self.products.append({ "name": 'Shirt', "price": 30 })
-        self.products.append({ "name": 'Jacket', "price": 25 })
-        self.products.append({ "name": 'Sweater', "price": 35 })
+        self._products.append({ "name": 'Sock', "price": 8 })
+        self._products.append({ "name": 'Dress', "price": 20 })
+        self._products.append({ "name": 'Shirt', "price": 30 })
+        self._products.append({ "name": 'Jacket', "price": 25 })
+        self._products.append({ "name": 'Sweater', "price": 35 })
 
         ProductManager.add('Sock', 8)
         ProductManager.add('Dress', 20)
@@ -73,81 +73,81 @@ class Product(QLabel):
         ## INITIALIZE OBJECTS ##
         # Labels
         self.label_product = QLabel(Language.get('product'), parent)
-        self.label_product.setGeometry(self.pos_x, self.pos_y + 5, 150, 35)
+        self.label_product.setGeometry(self._pos_x, self._pos_y + 5, 150, 35)
 
         self.label_amount = QLabel(Language.get('amount'), parent)
-        self.label_amount.setGeometry(self.pos_x, self.pos_y + 60, 150, 35)
+        self.label_amount.setGeometry(self._pos_x, self._pos_y + 60, 150, 35)
 
         self.label_new_product = QLabel(Language.get('product_name'), parent)
-        self.label_new_product.setGeometry(self.pos_x, self.pos_y + 170, 212, 35)
+        self.label_new_product.setGeometry(self._pos_x, self._pos_y + 170, 212, 35)
 
         self.label_new_price = QLabel(Language.get('product_price'), parent)
-        self.label_new_price.setGeometry(self.pos_x, self.pos_y + 230, 150, 35)
+        self.label_new_price.setGeometry(self._pos_x, self._pos_y + 230, 150, 35)
 
         self.label_edit_product_name = QLabel(Language.get('edit_product_name'), parent)
-        self.label_edit_product_name.setGeometry(self.pos_x, self.pos_y + 170, 150, 35)
+        self.label_edit_product_name.setGeometry(self._pos_x, self._pos_y + 170, 150, 35)
         self.label_edit_product_name.hide()
 
         # Buttons
         self.cancel_add_product_button = QPushButton(Language.get("cancel"), parent)
-        self.cancel_add_product_button.setGeometry(self.pos_x, self.pos_y + 125, 100, 25)
+        self.cancel_add_product_button.setGeometry(self._pos_x, self._pos_y + 125, 100, 25)
         self.cancel_add_product_button.hide()
 
         self.add_product_button = QPushButton(Language.get("add_product"), parent)
-        self.add_product_button.setGeometry(self.pos_x, self.pos_y + 125, 200, 25)
+        self.add_product_button.setGeometry(self._pos_x, self._pos_y + 125, 200, 25)
 
         self.create_product_button = QPushButton(Language.get("create"), parent)
-        self.create_product_button.setGeometry(self.pos_x + 237, self.pos_y + 300, 100, 25)
+        self.create_product_button.setGeometry(self._pos_x + 237, self._pos_y + 300, 100, 25)
         self.create_product_button.hide()
 
         self.edit_product = QPushButton(Language.get('edit_product'), parent)
-        self.edit_product.setGeometry(self.pos_x + 237, self.pos_y + 125, 175, 25)
+        self.edit_product.setGeometry(self._pos_x + 237, self._pos_y + 125, 175, 25)
 
         self.edit_product_button = QPushButton(Language.get("save"), parent)
-        self.edit_product_button.setGeometry(self.pos_x + 237, self.pos_y + 300, 100, 25)
+        self.edit_product_button.setGeometry(self._pos_x + 237, self._pos_y + 300, 100, 25)
         self.edit_product_button.hide()
 
         self.cancel_button_edit_product = QPushButton(Language.get("cancel"), parent)
-        self.cancel_button_edit_product.setGeometry(self.pos_x + 237, self.pos_y + 125, 100, 25)
+        self.cancel_button_edit_product.setGeometry(self._pos_x + 237, self._pos_y + 125, 100, 25)
         self.cancel_button_edit_product.hide()
 
         self.delete_product = QPushButton(Language.get('del_product'), parent)
-        self.delete_product.setGeometry(self.pos_x + 450, self.pos_y + 125, 175, 25)
+        self.delete_product.setGeometry(self._pos_x + 450, self._pos_y + 125, 175, 25)
         self.delete_product.hide()
 
         # Inputs
         self.edit_amount = InputInteger(1, True, parent)
-        self.edit_amount.setGeometry(self.pos_x + 87, self.pos_y + 46, 175, 65)
+        self.edit_amount.setGeometry(self._pos_x + 87, self._pos_y + 46, 175, 65)
 
         self.edit_new_name = QLineEdit(parent)
         self.edit_new_name.setPlaceholderText(Language.get("product"))
-        self.edit_new_name.setGeometry(self.pos_x + 237, self.pos_y + 170, 150, 35)
+        self.edit_new_name.setGeometry(self._pos_x + 237, self._pos_y + 170, 150, 35)
 
         self.edit_new_price = InputFloat(1, True, 2, parent)
-        self.edit_new_price.setGeometry(self.pos_x + 87, self.pos_y + 215, 175, 65)
+        self.edit_new_price.setGeometry(self._pos_x + 87, self._pos_y + 215, 175, 65)
 
         self.edit_price = InputFloat(1, True, 2, parent)
-        self.edit_price.setGeometry(self.pos_x + 87, self.pos_y + 215, 175, 65)
+        self.edit_price.setGeometry(self._pos_x + 87, self._pos_y + 215, 175, 65)
         self.edit_price.hide()
 
         self.edit_product_name = QLineEdit(parent)
         self.edit_product_name.setPlaceholderText(Language.get("product"))
-        self.edit_product_name.setGeometry(self.pos_x + 237, self.pos_y + 170, 150, 35)
+        self.edit_product_name.setGeometry(self._pos_x + 237, self._pos_y + 170, 150, 35)
         self.edit_product_name.hide()
 
         # Others
         self.select_product = QComboBox(parent)
-        self.select_product.setGeometry(self.pos_x + 96, self.pos_y + 6, 125, 30)
+        self.select_product.setGeometry(self._pos_x + 96, self._pos_y + 6, 125, 30)
 
-        for item in self.products:
+        for item in self._products:
             self.select_product.addItem(item['name'])
 
-        self.name = self.select_product.currentText()
-        self.price = self.get_actual_product_price()
+        self._name = self.select_product.currentText()
+        self._price = self.get_actual_product_price()
 
         # This label is here, because needs the QComboBox initialized in order to get the price of the product
-        self.label_price = QLabel(str(self.price) + " €", parent)
-        self.label_price.setGeometry(self.pos_x + 252, self.pos_y + 5, 125, 30)
+        self.label_price = QLabel(str(self._price) + " €", parent)
+        self.label_price.setGeometry(self._pos_x + 252, self._pos_y + 5, 125, 30)
 
         ## STYLES ##
         # Labels
@@ -218,21 +218,21 @@ class Product(QLabel):
         self.show_hide_edit()
 
         # If the price saved is diferent than the price in the input AND the name saved is diferent from the name in the input and is not an empty string
-        if self.price != self.edit_price.get_value() and (self.name != self.edit_product_name.text().capitalize() and self.edit_product_name.text().strip() != ""):
-            index = ProductManager.get_index_by_name(self.name)
+        if self._price != self.edit_price.get_value() and (self._name != self.edit_product_name.text().capitalize() and self.edit_product_name.text().strip() != ""):
+            index = ProductManager.get_index_by_name(self._name)
 
             if index != -1:
                 self.update_name_price(index)
 
         # If the name saved is diferent from the name in the input and is not an empty string
-        elif self.name != self.edit_product_name.text().capitalize() and self.edit_product_name.text().strip() != "":
-            index = ProductManager.get_index_by_name(self.name)
+        elif self._name != self.edit_product_name.text().capitalize() and self.edit_product_name.text().strip() != "":
+            index = ProductManager.get_index_by_name(self._name)
 
             if index != -1:
                 self.update_name(index)
 
-        elif self.price != self.edit_price.get_value():
-            index = ProductManager.get_index_by_name(self.name)
+        elif self._price != self.edit_price.get_value():
+            index = ProductManager.get_index_by_name(self._name)
 
             if index != -1:
                 self.update_price(index)
@@ -249,7 +249,7 @@ class Product(QLabel):
             self.delete_product.setDisabled(False)
             self.edit_product.setDisabled(False)
 
-            self.edit_product.setGeometry(self.pos_x + 237, self.pos_y + 125, self.edit_product.width(), self.edit_product.height())
+            self.edit_product.setGeometry(self._pos_x + 237, self._pos_y + 125, self.edit_product.width(), self.edit_product.height())
 
             # Hide edit elements
             self.edit_price.hide()
@@ -265,8 +265,8 @@ class Product(QLabel):
             self.edit_product.setDisabled(True)
             self.delete_product.setDisabled(True)
 
-            self.edit_product.setGeometry(self.pos_x, self.pos_y + 300, self.edit_product.width(), self.edit_product.height())
-            self.edit_price.set_value(self.price)
+            self.edit_product.setGeometry(self._pos_x, self._pos_y + 300, self.edit_product.width(), self.edit_product.height())
+            self.edit_price.set_value(self._price)
 
             # Show edit elements
             self.edit_price.show()
@@ -283,42 +283,42 @@ class Product(QLabel):
         # Update the information in the db and local
         ProductManager.update_product(index, self.edit_product_name.text(), self.edit_price.get_value())
 
-        if UserManager.get_user_role() != 'Offline':
-            Mongo.update_product(self.name, self.edit_product_name.text(), self.edit_price.get_value())
+        if UserManager.get_role() != 'Offline':
+            Mongo.update_product(self._name, self.edit_product_name.text(), self.edit_price.get_value())
 
         # Update properties
-        self.name = self.edit_product_name.text().capitalize()
-        self.price = self.edit_price.get_value()
+        self._name = self.edit_product_name.text().capitalize()
+        self._price = self.edit_price.get_value()
 
         # Update labels and dropdown
-        self.select_product.setItemText(self.select_product.currentIndex(), self.name.capitalize())
-        self.label_price.setText(str(self.price) + " €")
+        self.select_product.setItemText(self.select_product.currentIndex(), self._name.capitalize())
+        self.label_price.setText(str(self._price) + " €")
 
     def update_name(self, index: int):
         # Update the information in the db and local
         ProductManager.update_product_name(index, self.edit_product_name.text())
 
-        if UserManager.get_user_role() != 'Offline':
-            Mongo.update_product_name(self.name, self.edit_product_name.text())
+        if UserManager.get_role() != 'Offline':
+            Mongo.update_product_name(self._name, self.edit_product_name.text())
 
         # Update name property
-        self.name = self.edit_product_name.text().capitalize()
+        self._name = self.edit_product_name.text().capitalize()
 
         # Update product dropdown
-        self.select_product.setItemText(self.select_product.currentIndex(), self.name.capitalize())
+        self.select_product.setItemText(self.select_product.currentIndex(), self._name.capitalize())
 
     def update_price(self, index: int):
         # Update the information in the db and local
         ProductManager.update_product_price(index, self.edit_price.get_value())
 
-        if UserManager.get_user_role() != 'Offline':
-            Mongo.updateMongoProductPrice(self.name, self.edit_price.get_value())
+        if UserManager.get_role() != 'Offline':
+            Mongo.update_product_price(self._name, self.edit_price.get_value())
 
         # Update price property
-        self.price = self.edit_price.get_value()
+        self._price = self.edit_price.get_value()
 
         # Update price label
-        self.label_price.setText(str(self.price) + " €")
+        self.label_price.setText(str(self._price) + " €")
 
     def del_product_function(self):
         # Disable delete button if there are two or less products
@@ -326,10 +326,10 @@ class Product(QLabel):
             self.delete_product.setDisabled(True)
 
         # Delete the actual product in db and local
-        if UserManager.get_user_role() != 'Offline':
-            Mongo.del_product(self.name)
+        if UserManager.get_role() != 'Offline':
+            Mongo.del_product(self._name)
 
-        ProductManager.delete_by_name(self.name)
+        ProductManager.delete_by_name(self._name)
 
         # Update all spaces with products
         for store in SHELVES:
@@ -337,53 +337,53 @@ class Product(QLabel):
                 for space in shelf.spaces:
                     # If the space has a product
                     if isinstance(space.product, Product):
-                        index = space.product.select_product.findText(self.name)
+                        index = space.product.select_product.findText(self._name)
 
                         if index != -1:
                             # Remove the product from the dropdown
                             space.product.select_product.removeItem(index)
 
                             # Update the name and price of the space product
-                            space.product.name = space.product.select_product.currentText()
-                            space.product.price = space.product.get_actual_product_price()
+                            space.product._name = space.product.select_product.currentText()
+                            space.product._price = space.product.get_actual_product_price()
 
     def enable_disable_update_button(self):
-        if self.price != self.edit_price.get_value():
+        if self._price != self.edit_price.get_value():
             self.edit_product_button.setDisabled(False)
-        elif self.name != self.edit_product_name.text().capitalize() and self.edit_product_name.text().strip() != "":
+        elif self._name != self.edit_product_name.text().capitalize() and self.edit_product_name.text().strip() != "":
             self.edit_product_button.setDisabled(False)
         else:
             self.edit_product_button.setDisabled(True)
 
     def update_db_product_space(self):
         # Update the space, so now, it holds the new product
-        if UserManager.get_user_role() != 'Offline':
+        if UserManager.get_role() != 'Offline':
             Mongo.update_space_product(self._space_id, self.select_product.currentText())
 
         # Update the name and price of the product
-        self.name = self.select_product.currentText()
-        self.price = self.get_actual_product_price()
+        self._name = self.select_product.currentText()
+        self._price = self.get_actual_product_price()
 
-        self.label_price.setText(str(self.price) + " €")
+        self.label_price.setText(str(self._price) + " €")
 
         if self.editting_product:
             self.show_hide_edit()
 
     def update_bd_space_amount(self):
         # Update the space amount
-        if UserManager.get_user_role() != 'Offline':
+        if UserManager.get_role() != 'Offline':
             Mongo.update_space_amount(self._space_id, self.edit_amount.get_value())
     
     def create_product_function(self):
         if ProductManager.count() > 1:
             self.delete_product.setDisabled(False)
 
-        if UserManager.get_user_role() != 'Offline':
+        if UserManager.get_role() != 'Offline':
             Mongo.add_product(self.edit_new_name.text(), self.edit_new_price.get_value())
         
         ProductManager.add(self.edit_new_name.text(), self.edit_new_price.get_value())
         
-        self.show_hide_create_product()
+        self.show_hide_create()
 
         # Add the new product in the dropdown of every space that has a product
         for store in SHELVES:
@@ -399,7 +399,7 @@ class Product(QLabel):
             self.delete_product.setDisabled(False)
             self.add_product_button.setDisabled(False)
 
-            self.add_product_button.setGeometry(self.pos_x, self.pos_y + 125, 200, 25)
+            self.add_product_button.setGeometry(self._pos_x, self._pos_y + 125, 200, 25)
 
             # Hide elements
             self.edit_new_name.hide()
@@ -415,7 +415,7 @@ class Product(QLabel):
             self.add_product_button.setDisabled(True)
             self.create_product_button.setDisabled(True)
 
-            self.add_product_button.setGeometry(self.pos_x, self.pos_y + 300, 200, 25)
+            self.add_product_button.setGeometry(self._pos_x, self._pos_y + 300, 200, 25)
 
             # Reset the edit product inputs
             self.edit_new_price.set_value(1.0)
@@ -447,7 +447,7 @@ class Product(QLabel):
         self.select_product.show()
 
         # If the user has not any of those roles, should be unable to see or press the next buttons
-        if UserManager.get_user_role() == 'Manager' or UserManager.get_user_role() == 'Product' or UserManager.get_user_role() == 'Offline':
+        if UserManager.get_role() == 'Manager' or UserManager.get_role() == 'Product' or UserManager.get_role() == 'Offline':
             self.add_product_button.show()
             self.delete_product.show()
             self.edit_product.show()
