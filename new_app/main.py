@@ -342,7 +342,7 @@ class SpaceCategory(QLabel):
         Category.add_category(self.newCategoryName.capitalize(), self.newCategoryColor)
 
         if UserManager.get_user_role() != 'Offline':
-            Mongo.add(self.newCategoryName.capitalize(), self.newCategoryColor, False)
+            Mongo.add_category(self.newCategoryName.capitalize(), self.newCategoryColor, False)
 
         create_category_in(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent)
         update_category_buttons_pos(window.shortcut_category)

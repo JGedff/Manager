@@ -197,7 +197,7 @@ class LogInWindow(QMainWindow):
         self.main_app.language_changer.update()
 
         # Download db information
-        Mongo.get_mongo_info(self.main_app.widget, self.main_app.shortcut_category)
+        Mongo.get_information(self.main_app.widget, self.main_app.shortcut_category)
 
         # Close log in window
         self.close()

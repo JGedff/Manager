@@ -6,18 +6,17 @@ from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, Opera
 from PyQt5.QtWidgets import QMessageBox
 
 from utils.user_manager import UserManager
-from utils.category import Category
 
 class Mongo:
     _MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 
     _DB = _MONGO_CLIENT['manager']
 
-    STORES_COLLECTION = _DB['stores']
-    SPACES_COLLECTION = _DB['spaces']
-    SHELVES_COLLECTION = _DB['shelfs']
-    PRODUCTS_COLLECTION = _DB['products']
-    CATEGORIES_COLLECTION = _DB['categorys']
+    _STORES_COLLECTION = _DB['stores']
+    _SPACES_COLLECTION = _DB['spaces']
+    _SHELVES_COLLECTION = _DB['shelfs']
+    _PRODUCTS_COLLECTION = _DB['products']
+    _CATEGORIES_COLLECTION = _DB['categorys']
 
     @classmethod
     def close_connection(cls):
@@ -36,11 +35,83 @@ class Mongo:
         cls._MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
 
         cls._DB = cls._MONGO_CLIENT['manager']
-        cls.STORES_COLLECTION = cls._DB['stores']
-        cls.SPACES_COLLECTION = cls._DB['spaces']
-        cls.SHELVES_COLLECTION = cls._DB['shelfs']
-        cls.PRODUCTS_COLLECTION = cls._DB['products']
-        cls.CATEGORIES_COLLECTION = cls._DB['categorys']
+        cls._STORES_COLLECTION = cls._DB['stores']
+        cls._SPACES_COLLECTION = cls._DB['spaces']
+        cls._SHELVES_COLLECTION = cls._DB['shelfs']
+        cls._PRODUCTS_COLLECTION = cls._DB['products']
+        cls._CATEGORIES_COLLECTION = cls._DB['categorys']
+
+    @classmethod
+    def get_many_stores(cls, filter = {}):
+        return cls._STORES_COLLECTION.find(filter)
+
+    @classmethod
+    def insert_one_store(cls, store):
+        cls._STORES_COLLECTION.insert_one(store)
+
+    @classmethod
+    def get_many_spaces(cls, filter = {}):
+        return cls._SPACES_COLLECTION.find(filter)
+
+    @classmethod
+    def insert_many_spaces(cls, spaces):
+        cls._STORES_COLLECTION.insert_many(spaces)
+
+    @classmethod
+    def update_one_space(cls, filter, new_info):
+        cls._STORES_COLLECTION.update_one(filter, new_info)
+
+    @classmethod
+    def get_many_shelves(cls, filter = {}):
+        return cls._SHELVES_COLLECTION.find(filter)
+
+    @classmethod
+    def get_one_shelf(cls, filter = {}):
+        return cls._SHELVES_COLLECTION.find_one(filter)
+
+    @classmethod
+    def insert_many_shelves(cls, shelves):
+        cls._SHELVES_COLLECTION.insert_many(shelves)
+
+    @classmethod
+    def get_many_products(cls, filter = {}):
+        return cls._PRODUCTS_COLLECTION.find(filter)
+
+    @classmethod
+    def get_one_product(cls, filter = {}):
+        return cls._PRODUCTS_COLLECTION.find_one(filter)
+
+    @classmethod
+    def insert_one_product(cls, product):
+        cls._PRODUCTS_COLLECTION.insert_one(product)
+
+    @classmethod
+    def update_one_product(cls, filter, new_info):
+        cls._PRODUCTS_COLLECTION.update_one(filter, new_info)
+
+    @classmethod
+    def delete_one_product(cls, filter):
+        cls._PRODUCTS_COLLECTION.delete_one(filter)
+
+    @classmethod
+    def get_many_categories(cls, filter = {}):
+        return cls._CATEGORIES_COLLECTION.find(filter)
+
+    @classmethod
+    def get_one_category(cls, filter = {}):
+        return cls._CATEGORIES_COLLECTION.find_one(filter)
+
+    @classmethod
+    def insert_one_category(cls, category):
+        cls._CATEGORIES_COLLECTION.insert_one(category)
+
+    @classmethod
+    def update_one_category(cls, filter, new_info):
+        cls._CATEGORIES_COLLECTION.update_one(filter, new_info)
+
+    @classmethod
+    def delete_one_category(cls, filter):
+        cls._CATEGORIES_COLLECTION.delete_one(filter)
 
     @classmethod
     def add_shelves(cls, shelves = []):
@@ -55,7 +126,7 @@ class Mongo:
             }
 
             try:
-                cls.SPACES_COLLECTION.insert_many(local_shelf['spaces'])
+                cls.insert_many_spaces(local_shelf['spaces'])
             except (ConnectionFailure, ServerSelectionTimeoutError):
                 UserManager.set_user('Guest', 'Offline')
                 QMessageBox.warning(None, "The spaces were not created", "There was an issue with the network")
@@ -66,7 +137,7 @@ class Mongo:
             insert_shelves.append(insert_shelf)
 
         try:
-            cls.SHELVES_COLLECTION.insert_many(insert_shelves)
+            cls.insert_many_shelves(insert_shelves)
         except (ConnectionFailure, ServerSelectionTimeoutError):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The shelves were not created", "There was an issue with the network")
@@ -76,7 +147,7 @@ class Mongo:
         spaces = []
 
         try:
-            db_spaces = cls.SPACES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+            db_spaces = cls.get_many_spaces().sort([('creation_date', -1)]).limit(num)
 
             for mongo_space in db_spaces:
                 spaces.append(mongo_space['_id'])
@@ -91,7 +162,7 @@ class Mongo:
         shelves = []
 
         try: 
-            db_shelves = cls.SHELVES_COLLECTION.find({}).sort([('creation_date', -1)]).limit(num)
+            db_shelves = cls.get_many_shelves().sort([('creation_date', -1)]).limit(num)
 
             for mongo_shelf in db_shelves:
                 shelves.insert(0, mongo_shelf['_id'])
@@ -114,7 +185,7 @@ class Mongo:
                 max_floor = shelf['floors']
 
         try:
-            cls.STORES_COLLECTION.insert_one({ "name": name, "image": image, "storeShelves": id_shelves, "storeFloors": max_floor })
+            cls.insert_one_store({ "name": name, "image": image, "storeShelves": id_shelves, "storeFloors": max_floor })
         except (ConnectionFailure, ServerSelectionTimeoutError):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The store was not created", "There was an issue with the network")
@@ -122,7 +193,7 @@ class Mongo:
     @classmethod
     def get_category_by_name(cls, name) -> str:
         try:
-            file = cls.CATEGORIES_COLLECTION.find_one({ "name": name })
+            file = cls.get_one_category({ "name": name })
 
             return file['_id']
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -137,7 +208,7 @@ class Mongo:
             category_id = cls.get_category_by_name(category_name)
 
             try:
-                cls.SPACES_COLLECTION.update_one({ "mongo_id": space_id }, { "$set": { "category": category_id } })
+                cls.update_one_space({ "mongo_id": space_id }, { "$set": { "category": category_id } })
             except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
                 UserManager.set_user('Guest', 'Offline')
                 QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
@@ -147,7 +218,7 @@ class Mongo:
     @classmethod
     def update_category_name(cls, old_name, new_name):
         try:
-            cls.CATEGORIES_COLLECTION.update_one({ "name": old_name }, { "$set": { "name": new_name } })
+            cls.update_one_category({ "name": old_name }, { "$set": { "name": new_name } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
@@ -157,7 +228,7 @@ class Mongo:
     @classmethod
     def update_category_color(cls, name, color):
         try:
-            cls.CATEGORIES_COLLECTION.update_one({ "name": name }, { "$set": { "color": color } })
+            cls.update_one_category({ "name": name }, { "$set": { "color": color } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
@@ -167,7 +238,7 @@ class Mongo:
     @classmethod
     def delete_by_name(cls, name):
         try:
-            cls.CATEGORIES_COLLECTION.delete_one({ "name": name })
+            cls.delete_one_category({ "name": name })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The user was not deleted", "There was an issue with the network")
@@ -175,9 +246,9 @@ class Mongo:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
     @classmethod
-    def add(cls, name, color, can_hold_product):
+    def add_category(cls, name, color, can_hold_product):
         try:
-            cls.CATEGORIES_COLLECTION.insert_one({
+            cls.insert_one_category({
                 "name": name,
                 "color": color,
                 "hold": can_hold_product
@@ -191,7 +262,7 @@ class Mongo:
         category_id = cls.get_category_by_name(category_name)
 
         try:
-            cls.CATEGORIES_COLLECTION.update_one({ "_id": category_id }, { "$set": { "hold": holds_product } })
+            cls.update_one_category({ "_id": category_id }, { "$set": { "hold": holds_product } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The category was not updated", "There was an issue with the network")
@@ -203,7 +274,7 @@ class Mongo:
         try:
             products = []
 
-            for db_product in cls.PRODUCTS_COLLECTION.find({}):
+            for db_product in cls.get_many_products():
                 products.append({ "name": db_product['name'].capitalize(), "price": db_product['price'] })
 
             return products
@@ -217,7 +288,7 @@ class Mongo:
     @classmethod
     def add_product(cls, product_name: str, price: float):
         try:
-            cls.PRODUCTS_COLLECTION.insert_one({
+            cls.insert_one_product({
                 "name": product_name.lower(),
                 "price": price
             })
@@ -230,7 +301,7 @@ class Mongo:
     def update_space_amount(cls, space_id, amount: int):
         if space_id != None:
             try:
-                cls.SPACES_COLLECTION.update_one({ "mongo_id": space_id }, { "$set": { "amount": amount } })
+                cls.update_one_space({ "mongo_id": space_id }, { "$set": { "amount": amount } })
             except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
                 UserManager.set_user('Guest', 'Offline')
                 QMessageBox.warning(None, "The space was not updated", "There was an issue with the network")
@@ -240,7 +311,7 @@ class Mongo:
     @classmethod
     def get_product_by_name(cls, name_product: str) -> str | None:
         try:
-            file = cls.PRODUCTS_COLLECTION.find_one({ "name": name_product.lower() })
+            file = cls.get_one_product({ "name": name_product.lower() })
 
             return file['_id']
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -257,11 +328,11 @@ class Mongo:
                     product_id = cls.get_product_by_name(new_product)
 
                     if product_id != None:
-                        cls.SPACES_COLLECTION.update_one({ "mongo_id": space_id }, { "$set": { "product": product_id } })
+                        cls.update_one_space({ "mongo_id": space_id }, { "$set": { "product": product_id } })
                     else:
                         QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
                 else:
-                    cls.SPACES_COLLECTION.update_one({ "mongo_id": space_id }, { "$unset": { "product": "" } })
+                    cls.update_one_space({ "mongo_id": space_id }, { "$unset": { "product": "" } })
 
             except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
                 UserManager.set_user('Guest', 'Offline')
@@ -275,7 +346,7 @@ class Mongo:
             product_id = cls.get_product_by_name(old_name)
 
             if product_id != None:
-                cls.PRODUCTS_COLLECTION.update_one({ "_id": product_id }, { "$set": { "name": new_name.lower(), "price": new_price } })
+                cls.update_one_product({ "_id": product_id }, { "$set": { "name": new_name.lower(), "price": new_price } })
             else:
                 QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -290,7 +361,7 @@ class Mongo:
             product_id = cls.get_product_by_name(old_name)
 
             if product_id != None:
-                cls.PRODUCTS_COLLECTION.update_one({ "_id": product_id }, { "$set": { "name": new_name.lower() } })
+                cls.update_one_product({ "_id": product_id }, { "$set": { "name": new_name.lower() } })
             else:
                 QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -305,7 +376,7 @@ class Mongo:
             product_id = cls.get_product_by_name(old_name)
 
             if product_id != None:
-                cls.PRODUCTS_COLLECTION.update_one({ "_id": product_id }, { "$set": { "price": new_price } })
+                cls.update_one_product({ "_id": product_id }, { "$set": { "price": new_price } })
             else:
                 QMessageBox.warning(None, "The product was not found", "Check if the name is correct")
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -317,108 +388,9 @@ class Mongo:
     @classmethod
     def del_product(cls, prduct_name: str):
         try:
-            cls.PRODUCTS_COLLECTION.delete_one({ "name": prduct_name.lower() })
+            cls.delete_one_product({ "name": prduct_name.lower() })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.warning(None, "The product was not deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the product", f"Write error: {e.details}")
-
-    @classmethod
-    def get_mongo_info(widget, shortcut_category):
-        store_index = 0
-        mongoCategories = 0
-        mongoConnection = False
-
-        try:
-            for category in Mongo.CATEGORIES_COLLECTION.find({}):
-                Category.add_category(category['name'], category['color'])
-                Category.change_can_hold_product(category['name'], category['hold'])
-
-                create_category_in(shortcut_category, category['name'], widget)
-                mongoCategories += 1
-            
-            mongoConnection = True
-
-            update_category_buttons_pos(shortcut_category)
-        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            UserManager.set_user('Guest', 'Offline')
-
-            QMessageBox.warning(None, "Categories not found", "There was an issue with the network")
-
-            mongoCategories = 0
-
-        if mongoConnection and mongoCategories <= 0:
-            QMessageBox.warning(None, "There aren't any categories in the database", "The default categories will be created")
-
-            Mongo.add('Empty', 'white', False)
-            Mongo.add('Unreachable', 'red', False)
-            Mongo.add('Fill', 'green', True)
-
-            Category.add_category('Empty', 'white')
-            Category.add_category('Unreachable', 'red')
-            Category.add_category('Fill', 'green')
-            Category.change_can_hold_product('Fill', True)
-
-            create_category_in(shortcut_category, 'Empty', widget)
-            create_category_in(shortcut_category, 'Unreachable', widget)
-            create_category_in(shortcut_category, 'Fill', widget)
-            update_category_buttons_pos(shortcut_category)
-
-        elif mongoCategories <= 0:
-            QMessageBox.warning(None, "You don't have connection to the database", "You'll use the default categories")
-
-            Category.add_category('Empty', 'white')
-            Category.add_category('Unreachable', 'red')
-            Category.add_category('Fill', 'green')
-            Category.change_can_hold_product('Fill', True)
-
-            create_category_in(shortcut_category, 'Empty', widget)
-            create_category_in(shortcut_category, 'Unreachable', widget)
-            create_category_in(shortcut_category, 'Fill', widget)
-            update_category_buttons_pos(shortcut_category)
-            
-        set_empty_category(shortcut_category)
-
-        try:
-            for store in Mongo.STORES_COLLECTION.find({}):
-                spacesInfo = []
-
-                for index, shelf_id in enumerate(store['storeShelves']):
-                    shelf = Mongo.SHELVES_COLLECTION.find_one({ "_id": shelf_id })
-                    mongoSpaces = Mongo.SPACES_COLLECTION.find({"_id": {"$in": shelf['spaces']}})
-                    
-                    Shelf.createShelf(widget)
-
-                    SHELVES_FORMS[index].input_spaces.set_value(shelf['spaces'].__len__() / store['storeFloors'])
-                    SHELVES_FORMS[index].input_shelf_floors.set_value(shelf['floors'])
-                    SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
-                    SHELVES_FORMS[index].hideForm()
-
-                    spacesInfo.append(mongoSpaces)
-                
-                save_shelves_info(SHELVES_FORMS)
-                
-                Store.createStore(store['name'], widget, store['image'])
-
-                STORES[store_index].goBackStore.hide()
-
-                for shelfIndex in range(store['storeShelves'].__len__()):
-                    for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
-                        SHELVES[store_index][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
-
-                        if mongoCategories > 0:
-                            category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
-
-                            if category != None:
-                                SHELVES[store_index][shelfIndex].spaces[index].category_selector.setCurrentText(category['name'])
-                                SHELVES[store_index][shelfIndex].spaces[index].category.name = category['name']
-                                SHELVES[store_index][shelfIndex].spaces[index].category.color = category['color']
-
-                                if isinstance(SHELVES[store_index][shelfIndex].spaces[index].product, Product):
-                                    SHELVES[store_index][shelfIndex].spaces[index].product.hide()
-                
-                store_index =+ 1
-        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            UserManager.setUser('Guest', 'Offline')
-            QMessageBox.warning(None, "Network error", "There was an issue with the network")
