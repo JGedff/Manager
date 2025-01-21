@@ -1,4 +1,4 @@
-from utils.mongoDb import Mongo
+from utils.mongo_db import Mongo
 from utils.user_manager import UserManager
 
 from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox

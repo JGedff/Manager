@@ -9,7 +9,7 @@ from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_BOLD_TI
 from utils.user_manager import UserManager
 from utils.language import Language
 from utils.category import Category
-from utils.mongoDb import Mongo
+from utils.mongo_db import Mongo
 
 from utils.functions.space_category_functions import create_category_in, update_category_buttons_pos
 
@@ -144,7 +144,7 @@ class LogInWindow(QMainWindow):
 
     def access_offline(self):
         # Manage user and role
-        if UserManager.username != 'Guest' and UserManager.role != 'Offline':
+        if UserManager.get_username() != 'Guest' and UserManager.get_role() != 'Offline':
             QMessageBox.information(self, "You don't have internet connection", "There was an issue with the network")
         else:
             QMessageBox.information(self, "Offline version", "You opened the offline version")
@@ -179,10 +179,10 @@ class LogInWindow(QMainWindow):
 
     def logged_successful(self, username):
         # Manage user and role
-        [_, role] = UserManager.findUser(username)
+        role = UserManager.find_user_role(username)
         UserManager.set_user(username, role)
 
-        if UserManager.username == 'Guest' and UserManager.role == 'Offline':
+        if UserManager.get_username() == 'Guest' and UserManager.get_role() == 'Offline':
             UserManager.set_user('Guest', 'Offline')
             QMessageBox.information(None, "You don't have internet connection", "There was an issue with the network")
 

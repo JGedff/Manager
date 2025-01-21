@@ -17,6 +17,7 @@ class Mongo:
     _SHELVES_COLLECTION = _DB['shelfs']
     _PRODUCTS_COLLECTION = _DB['products']
     _CATEGORIES_COLLECTION = _DB['categorys']
+    _USERS_COLLECTION = _DB['users']
 
     @classmethod
     def close_connection(cls):
@@ -40,6 +41,7 @@ class Mongo:
         cls._SHELVES_COLLECTION = cls._DB['shelfs']
         cls._PRODUCTS_COLLECTION = cls._DB['products']
         cls._CATEGORIES_COLLECTION = cls._DB['categorys']
+        cls._USERS_COLLECTION = cls._DB['users']
 
     @classmethod
     def get_many_stores(cls, filter = {}):
@@ -112,6 +114,18 @@ class Mongo:
     @classmethod
     def delete_one_category(cls, filter):
         cls._CATEGORIES_COLLECTION.delete_one(filter)
+
+    @classmethod
+    def get_one_user(cls, filter = {}):
+        return cls._USERS_COLLECTION.find_one(filter)
+
+    @classmethod
+    def insert_one_user(cls, user):
+        cls._USERS_COLLECTION.insert_one(user)
+
+    @classmethod
+    def delete_one_user(cls, filter):
+        cls._USERS_COLLECTION.delete_one(filter)
 
     @classmethod
     def add_shelves(cls, shelves = []):

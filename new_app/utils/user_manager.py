@@ -1,27 +1,21 @@
-from pymongo import MongoClient
 from pymongo.errors import DuplicateKeyError, ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout, WriteError, InvalidDocument
 
 from PyQt5.QtWidgets import QMessageBox
 
+from utils.mongo_db import Mongo
 from utils.encrypt import Encrypt
 
 class UserManager:
-    MONGO_CLIENT = MongoClient("mongodb://localhost:27017/")
-
-    DB = MONGO_CLIENT['manager']
-
-    USERS_COLLECTION = DB['users']
-
-    username = ''
-    role = ''
+    _username = ''
+    _role = ''
 
     @classmethod
-    def register(cls, username, password):
+    def register(cls, username, password) -> str:
         try:
-            [user, _] = cls.findUser(username)
+            user = cls.is_duplicated(username)
 
-            if user == 'New':
-                cls.USERS_COLLECTION.insert_one({
+            if not user:
+                Mongo.insert_one_user({
                     "username": username,
                     "password": Encrypt.hash(password),
                     "role": "User"
@@ -38,10 +32,10 @@ class UserManager:
         return username
 
     @classmethod
-    def authenticate(cls, username, password):
+    def authenticate(cls, username, password) -> str | None:
         try:
-            user = cls.USERS_COLLECTION.find_one({ "username": username })
-            
+            user = Mongo.get_one_user({ "username": username })
+
             if user != None:
 
                 if Encrypt.check(user['password'], password):
@@ -58,30 +52,43 @@ class UserManager:
     @classmethod
     def delete(cls, username):
         try:
-            cls.USERS_COLLECTION.delete_one({ "username": username })
+            Mongo.delete_one_user({ "username": username })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             QMessageBox.warning(None, "The user was deleted", "There was an issue with the network")
         except WriteError as e:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
     @classmethod
-    def find_user(cls, username):
+    def is_duplicated(cls, username) -> bool:
         try:
-            user = cls.USERS_COLLECTION.find_one({ "username": username })
+            user = Mongo.get_one_user({ "username": username })
 
-            return [user['username'], user['role']]
+            return user != None
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            return ['Guest', 'Offline']
+            return True
         except InvalidDocument:
-            return ['Guest', 'Offline']
+            return True
         except TypeError:
-            return ['New', 'User']
-        
+            return False
+    
+    @classmethod
+    def find_user_role(cls, username) -> str:
+        try:
+            user = Mongo.get_one_user({ "username": username })
+
+            return user['role']
+        except:
+            return 'Offline'
+
     @classmethod
     def set_user(cls, username, role):
-        cls.username = username
-        cls.role = role
+        cls._username = username
+        cls._role = role
 
     @classmethod
-    def get_user_role(cls):
-        return cls.role
+    def get_role(cls) -> str:
+        return cls._role
+
+    @classmethod
+    def get_username(cls) -> str:
+        return cls._username

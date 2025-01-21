@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMessageBox
 
 from constants import SHELVES_FORMS, STORES, SHELVES
 
-from utils.mongoDb import Mongo
+from utils.mongo_db import Mongo
 from utils.category import Category
 from utils.user_manager import UserManager
 
@@ -17,7 +17,7 @@ def get_information(widget, shortcut_category):
     connection_open = False
 
     try:
-        for category in Mongo.CATEGORIES_COLLECTION.find({}):
+        for category in Mongo.get_many_categories():
             Category.add_category(category['name'], category['color'])
             Category.change_can_hold_product(category['name'], category['hold'])
 
@@ -94,7 +94,7 @@ def get_information(widget, shortcut_category):
                         SHELVES[store_index][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
 
                         if num_categories > 0:
-                            category = Mongo.CATEGORIES_COLLECTION.find_one({ "_id": mongoSpace['category'] })
+                            category = Mongo.get_one_category({ "_id": mongoSpace['category'] })
 
                             if category != None:
                                 SHELVES[store_index][shelfIndex].spaces[index].category_selector.setCurrentText(category['name'])

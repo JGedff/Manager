@@ -17,7 +17,7 @@ from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
 from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name, get_empty_category_name
 
-from utils.mongoDb import Mongo
+from utils.mongo_db import Mongo
 from utils.user_manager import UserManager
 
 from utils.language import Language
@@ -397,7 +397,7 @@ class SpaceCategory(QLabel):
                         delete_category_from(space, indexButtonPressed, categoryName)
                         update_category_buttons_pos(space.category)
 
-                        if categoryName == oldName and UserManager.getUserRole() != 'Offline':
+                        if categoryName == oldName and UserManager.get_role() != 'Offline':
                             Mongo.update_category_space(space.mongo_id, space.category.name)
 
         if self.double_buttons.__len__() <= 1:
@@ -471,9 +471,9 @@ class Space(QLabel):
         if Category.categoryCanHoldProduct(self.category.name):
             self.category_can_hold_product.set_value(True)
 
-        if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
+        if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
             self.editCategories.setGeometry(390, 71, 35, 35)
-        elif UserManager.getUserRole() == 'Product':
+        elif UserManager.get_role() == 'Product':
             self.editCategories.setGeometry(0, 0, 0, 0)
         else:
             self.editCategories.setGeometry(0, 0, 0, 0)
@@ -632,7 +632,7 @@ class Space(QLabel):
 
             self.product = None
 
-        if UserManager.getUserRole() != 'Offline':
+        if UserManager.get_role() != 'Offline':
             Mongo.update_category_space(self.mongo_id, oldName)
 
     def updateVerticalHeaderPosition(self, value):
@@ -1296,7 +1296,7 @@ class MainWindow(QMainWindow):
             if storeName == "":
                 storeName = Language.get("store") + str(STORES.__len__() + 1)
 
-            if UserManager.getUserRole() != 'Offline':
+            if UserManager.get_role() != 'Offline':
                 Store.createMongoStore(storeName, self.image)
 
             Shelf.hideAllForms()
@@ -1407,7 +1407,7 @@ class MainWindow(QMainWindow):
         if role != 'Offline':
             UserManager.setUser(username, role)
 
-        if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
+        if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
             self.addStoreButton.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
             self.editCategories.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
         else:
@@ -1417,7 +1417,7 @@ class MainWindow(QMainWindow):
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    if UserManager.getUserRole() == 'Offline' or UserManager.getUserRole() == 'Manager':
+                    if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
                         space.editCategories.setGeometry(320, 26, 26, 26)
                     else:
                         space.editCategories.setGeometry(0, 0, 0, 0)
