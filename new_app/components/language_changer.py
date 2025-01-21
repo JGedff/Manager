@@ -65,13 +65,13 @@ class LanguageChanger(QLabel):
             self.main_window.categoryManager.newCategoryColorButton.setText(Language.get("select_color"))
             
             # Shelf forms
-            for shelfIndex, shelf in enumerate(SHELVES_FORMS):
-                shelf.shelfLabel.setText(Language.get("shelf") + str(shelfIndex + 1))
-                shelf.inputSpacesLabel.setText(Language.get("shelf_question_1"))
-                shelf.doubleShelfLabel.setText(Language.get("shelf_question_2"))
-                shelf.shelfFloorsLabel.setText(Language.get("shelf_question_4"))
-                shelf.double_shelf_input.set_true_text(Language.get("yes"))
-                shelf.double_shelf_input.set_false_text(Language.get("no"))
+            for index, form in enumerate(SHELVES_FORMS):
+                form.shelf_label.setText(Language.get("shelf") + str(index + 1))
+                form.input_number_spaces_label.setText(Language.get("shelf_question_1"))
+                form.input_double_shelf_label.setText(Language.get("shelf_question_2"))
+                form.input_number_floors_label.setText(Language.get("shelf_question_4"))
+                form.double_shelf_input.set_true_text(Language.get("yes"))
+                form.double_shelf_input.set_false_text(Language.get("no"))
 
             # Stores
             for store in STORES:

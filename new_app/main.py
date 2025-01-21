@@ -23,10 +23,10 @@ from utils.user_manager import UserManager
 from utils.language import Language
 from utils.category import Category
 
+from components.shelf import ShelfForm
 from components.product import Product
 from components.log_in import LogInWindow
 from components.input_bool import InputBool
-from components.input_integer import InputInteger
 from components.image_button import ImageButton
 from components.double_button import DoubleButton
 from components.language_changer import LanguageChanger
@@ -149,7 +149,7 @@ class SpaceCategory(QLabel):
     def initEvents(self):
         self.showSpace.clicked.connect(self.stopEditCategory)
         self.categoryColor.clicked.connect(self.selectColor)
-        self.saveCategory.clicked.connect(self.saveInfo)
+        self.saveCategory.clicked.connect(self.save_info)
         self.add_category_button.clicked.connect(self.showAddCategory)
         self.cancelButtonAddCategory.clicked.connect(self.cancelAddCategory)
         self.createCategoryButton.clicked.connect(self.createCategory)
@@ -559,7 +559,7 @@ class Space(QLabel):
         if isinstance(self.product, Product):
             self.product.show()
         
-        window.resizeHeightScroll()
+        window.resize_scroll_height()
             
     def openConfigCategories(self):
         if isinstance(self.product, Product):
@@ -817,14 +817,14 @@ class Store():
         id_empty_category = Mongo.get_category_by_name(emptyCategory)
         id_unreachable_category = Mongo.get_category_by_name(unreachableCategory)
 
-        for i in SHELVES_FORMS:
+        for form in SHELVES_FORMS:
             spacesInfo = []
 
             time.sleep(0.01)
 
             for floor in range(storeFloors):
-                for _ in range(i.spaces):
-                    id_category = id_unreachable_category if i.floors - 1 < floor else id_empty_category 
+                for _ in range(form.get_num_spaces()):
+                    id_category = id_unreachable_category if form.get_num_floors() - 1 < floor else id_empty_category 
 
                     spacesInfo.append({
                         "category": id_category,
@@ -835,9 +835,9 @@ class Store():
                     mongo_id += 1
             
             shelvesInfo.append({
-                "floors": i.floors,
+                "floors": form.get_num_floors(),
                 "spaces": spacesInfo,
-                "double_shelf": i.double_shelf,
+                "double_shelf": form.is_double_shelf(),
                 "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
             })
             
@@ -898,14 +898,14 @@ class Store():
         self.floor = get_max_floor(SHELVES_FORMS)
         storeShelves = []
 
-        for index, i in enumerate(SHELVES_FORMS):
-            storeShelves.append(ShelfInfo(25, 50 + (225 * index), i.floors, i.spaces, i.double_shelf, self.floor, (index + 1), STORES.__len__(), parent))
+        for index, form in enumerate(SHELVES_FORMS):
+            storeShelves.append(ShelfInfo(25, 50 + (225 * index), form.floors, form.spaces, form.double_shelf, self.floor, (index + 1), STORES.__len__(), parent))
         
         SHELVES.append(storeShelves)
         SHELVES_FORMS.clear()
         
-        Shelf.createShelf(parent)
-        Shelf.hideAllForms()
+        ShelfForm.create(parent, window)
+        ShelfForm.hide_all_forms()
 
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
@@ -944,7 +944,7 @@ class Store():
         self.goBackStore.hide()
 
         window.hideMainButtons()
-        window.resizeHeightScroll(amountShelves * 225 - 100)
+        window.resize_scroll_height(amountShelves * 225 - 100)
         window.resizeWidthScroll(amountSpaces * 75 + 25)
 
         self.changeFloorButton.show()
@@ -981,115 +981,6 @@ class Store():
     def configCategories(self):
         self.goBackStore.hide()
 
-class Shelf(QLabel):
-    @staticmethod
-    def createShelf(parent):
-        length = SHELVES_FORMS.__len__()
-
-        if length > 0:
-            newShelf = Shelf(Language.get("shelf") + str(length + 1), SHELVES_FORMS[length - 1].pos().x(), SHELVES_FORMS[length - 1].pos().y() + 200, parent)
-        else:
-            newShelf = Shelf(Language.get("shelf") + str(length + 1), 400, 300, parent)
-        
-        newShelf.showForm()
-
-        SHELVES_FORMS.append(newShelf)
-
-    @staticmethod
-    def hideAllForms():
-        for shelf in SHELVES_FORMS:
-            shelf.hideForm()
-
-    @staticmethod
-    def showAllForms():    
-        for shelf in SHELVES_FORMS:
-            shelf.showForm()
-
-    def __init__(self, name, posx, posy, parent = None):
-        super().__init__(parent)
-        
-        self.setGeometry(posx, posy, WINDOW_WIDTH, WINDOW_HEIGHT)
-
-        self.initVariables()
-        self.initUI(name)
-        self.hideForm()
-    
-    def initVariables(self):
-        self.double_shelf = False
-        self.spaces = 1
-        self.floors = 1
-
-    def initUI(self, name):
-        # Config shelf
-        self.shelf_label = QLabel(name, self) # shelfLabel
-        self.shelf_label.setGeometry(0, 10, 150, 35)
-
-        self.inputSpacesLabel = QLabel(Language.get("shelf_question_1"), self)
-        self.inputSpacesLabel.setGeometry(0, 55, 500, 35)
-
-        self.input_spaces = InputInteger(1, True, self)
-        self.input_spaces.setGeometry(480, 35, 175, 65)
-
-        self.doubleShelfLabel = QLabel(Language.get("shelf_question_2"), self)
-        self.doubleShelfLabel.setGeometry(0, 95, 500, 35)
-
-        self.double_shelf_input = InputBool(Language.get("yes"), Language.get("no"), self)
-        self.double_shelf_input.setGeometry(480, 92, 175, 34)
-
-        self.shelfFloorsLabel = QLabel(Language.get("shelf_question_4"), self)
-        self.shelfFloorsLabel.setGeometry(0, 135, 500, 35)
-
-        self.input_shelf_floors = InputInteger(1, True, self)
-        self.input_shelf_floors.setGeometry(480, 123, 175, 65)
-
-        # Option to delete shelf if there is more than one shelf
-        if SHELVES_FORMS.__len__() + 1 > 1:
-            self.delShelfButton = QPushButton("❌", self)
-            self.delShelfButton.setFont(FONT_SMALLEST_CHAR)
-            self.delShelfButton.setGeometry(150, 15, 50, 25)
-            self.delShelfButton.setStyleSheet(REST_BUTTON)
-
-            self.delShelfButton.clicked.connect(self.delShelf)
-
-            self.separator = QLabel(self)
-            self.separator.setGeometry(0, 0, 650, 3)
-            self.separator.setStyleSheet(BACKGROUND_BLACK)
-
-        # Style
-        self.shelf_label.setFont(FONT_TEXT)
-
-        self.inputSpacesLabel.setFont(FONT_SMALL_TEXT)
-        self.doubleShelfLabel.setFont(FONT_SMALL_TEXT)
-        self.shelfFloorsLabel.setFont(FONT_SMALL_TEXT)
-
-    def hideForm(self):
-        self.hide()
-
-    def delShelf(self):
-        shelfToDelete = 0
-        
-        for index, shelf in enumerate(SHELVES_FORMS):
-            try:
-                if self.sender() == shelf.delShelfButton:
-                    shelfToDelete = index
-                    break
-            except AttributeError:
-                continue
-        
-        SHELVES_FORMS[shelfToDelete].hide()
-        del SHELVES_FORMS[shelfToDelete]
-
-        update_shelves_pos(SHELVES_FORMS)
-        window.resizeHeightScroll()
-
-    def showForm(self):
-        self.show()
-
-    def saveInfo(self):
-        self.spaces = self.input_spaces.get_value()
-        self.floors = self.input_shelf_floors.get_value()
-        self.double_shelf = self.double_shelf_input.get_value()
-
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -1099,7 +990,7 @@ class MainWindow(QMainWindow):
         self.initEvents()
         
         self.setCentralWidget(self.scroll)
-        self.resizeHeightScroll()
+        self.resize_scroll_height()
 
     def initVariables(self):
         self.image = DEFAULT_IMAGE
@@ -1221,7 +1112,7 @@ class MainWindow(QMainWindow):
         self.goHome.move(value + 1300, self.goHome.pos().y())
 
     # Resize scroll functions
-    def resizeHeightScroll(self, height = 0):
+    def resize_scroll_height(self, height = 0):
         if height == 0:
             if SHELVES_FORMS.__len__() > 0 and SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 300 > WINDOW_HEIGHT:
                 self.widget.resize(WINDOW_WIDTH - 20, SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 300)
@@ -1258,7 +1149,7 @@ class MainWindow(QMainWindow):
         self.hideAddStoreForm()
         self.raiseMainButtons()
 
-        Shelf.hideAllForms()
+        ShelfForm.hide_all_forms()
         Store.hideAllStores()
         Store.showAllStoreIcons()
         ShelfInfo.hideAllSpaces()
@@ -1268,12 +1159,12 @@ class MainWindow(QMainWindow):
 
     def addStore(self):
         self.showAddStoreForm()
-        self.resizeHeightScroll()
+        self.resize_scroll_height()
         
         if SHELVES_FORMS.__len__() == 0:
             self.createShelf()
 
-        Shelf.showAllForms()
+        ShelfForm.show_all_forms()
         Store.hideAllStoreIcons()
 
         self.goHome.show()
@@ -1283,9 +1174,9 @@ class MainWindow(QMainWindow):
         self.languageChanger.hide()
 
     def createShelf(self):
-        Shelf.createShelf(self.widget)
+        ShelfForm.create(self.widget, self)
     
-        self.resizeHeightScroll()
+        self.resize_scroll_height()
 
     def saveStoreInfo(self):
         save_shelves_info(SHELVES_FORMS)
@@ -1299,7 +1190,7 @@ class MainWindow(QMainWindow):
             if UserManager.get_role() != 'Offline':
                 Store.createMongoStore(storeName, self.image)
 
-            Shelf.hideAllForms()
+            ShelfForm.hide_all_forms()
             Store.createStore(storeName, self.widget, self.image)
 
             self.store_name_input.setText("")

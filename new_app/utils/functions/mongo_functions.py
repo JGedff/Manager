@@ -11,7 +11,9 @@ from utils.user_manager import UserManager
 from utils.functions.space_category_functions import create_category_in, update_category_buttons_pos, set_empty_category
 from utils.functions.shelf_functions import save_shelves_info
 
-def get_information(widget, shortcut_category):
+from components.shelf import ShelfForm
+
+def get_information(widget, shortcut_category, main_window):
     store_index = 0
     num_categories = 0
     connection_open = False
@@ -74,12 +76,12 @@ def get_information(widget, shortcut_category):
                     shelf = Mongo.get_one_shelf({ "_id": shelf_id })
                     mongoSpaces = Mongo.get_many_spaces({"_id": {"$in": shelf['spaces']}})
                     
-                    Shelf.createShelf(widget)
+                    ShelfForm.create(widget, main_window)
 
                     SHELVES_FORMS[index].input_spaces.set_value(shelf['spaces'].__len__() / store['storeFloors'])
                     SHELVES_FORMS[index].input_shelf_floors.set_value(shelf['floors'])
                     SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
-                    SHELVES_FORMS[index].hideForm()
+                    SHELVES_FORMS[index].hide()
 
                     spacesInfo.append(mongoSpaces)
                 
