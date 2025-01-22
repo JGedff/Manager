@@ -2,7 +2,7 @@ from pymongo.errors import DuplicateKeyError, ConnectionFailure, ServerSelection
 
 from PyQt5.QtWidgets import QMessageBox
 
-from utils.mongo_db import Mongo
+from utils.db import DB
 from utils.encrypt import Encrypt
 
 class UserManager:
@@ -15,7 +15,7 @@ class UserManager:
             user = cls.is_duplicated(username)
 
             if not user:
-                Mongo.insert_one_user({
+                DB.insert_one_user({
                     "username": username,
                     "password": Encrypt.hash(password),
                     "role": "User"
@@ -34,7 +34,7 @@ class UserManager:
     @classmethod
     def authenticate(cls, username, password) -> str | None:
         try:
-            user = Mongo.get_one_user({ "username": username })
+            user = DB.get_one_user({ "username": username })
 
             if user != None:
 
@@ -52,7 +52,7 @@ class UserManager:
     @classmethod
     def delete(cls, username):
         try:
-            Mongo.delete_one_user({ "username": username })
+            DB.delete_one_user({ "username": username })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
             QMessageBox.warning(None, "The user was deleted", "There was an issue with the network")
         except WriteError as e:
@@ -61,7 +61,7 @@ class UserManager:
     @classmethod
     def is_duplicated(cls, username) -> bool:
         try:
-            user = Mongo.get_one_user({ "username": username })
+            user = DB.get_one_user({ "username": username })
 
             return user != None
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -74,7 +74,7 @@ class UserManager:
     @classmethod
     def find_user_role(cls, username) -> str:
         try:
-            user = Mongo.get_one_user({ "username": username })
+            user = DB.get_one_user({ "username": username })
 
             return user['role']
         except:

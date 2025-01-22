@@ -4,10 +4,10 @@ import time
 import shutil
 from datetime import datetime
 
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QColorDialog, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QLineEdit, QPushButton, QWidget, QScrollArea, QComboBox, QMessageBox, QFileDialog, QColorDialog
 from PyQt5.QtCore import Qt
 
-from styles.style_sheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, BLUE_BUTTON, EDIT_BUTTON, OFF_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_GREY
+from styles.style_sheets import INPUT_TEXT, DEFAULT_BUTTON, COMBO_BOX, BLUE_BUTTON, EDIT_BUTTON, IMPORTANT_ACTION_BUTTON, BACKGROUND_GREY, OFF_BUTTON
 from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR, FONT_SMALL_BOLD_TEXT
 from styles.color_functions import get_style_sheet
 
@@ -15,7 +15,7 @@ from constants import WINDOW_WIDTH, WINDOW_HEIGHT, SHELVES_FORMS, STORES, DEFAUL
 
 from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
-from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, update_category_name, delete_category_from, set_empty_category, get_unreachable_category_name, get_empty_category_name, create_category_in, update_category_buttons_pos
+from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, get_unreachable_category_name, get_empty_category_name, update_category_buttons_pos, set_empty_category, update_category_name, create_category_in, delete_category_from
 
 from utils.mongo_db import Mongo
 from utils.user_manager import UserManager
@@ -33,33 +33,29 @@ from components.language_changer import LanguageChanger
 
 app = QApplication(sys.argv)
 
-class SpaceCategory(QLabel):
-    def __init__(self, storeIndex = 0, shelfIndex = 0, spacesInFloorShelf = 0, floor = 0, spaceIndex = 0, parent = None, shortcut = False):
+class CategorySpace(QLabel):
+    def __init__(self, parent_space, parent = None, shortcut = False):
         super().__init__(parent)
 
-        self.initVariables(storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut)
+        self.init_variables(parent_space, parent, shortcut)
         self.initUI(parent)
         self.initEvents()
 
         set_empty_category(self)
 
-    def initVariables(self, storeIndex, shelfIndex, spacesInFloorShelf, floor, spaceIndex, parent, shortcut):
+    def init_variables(self, parent_space, parent, shortcut):
         self.name = ''
         self.color = ''
-        self.newColor = ''
-        self.floor = floor
+        self._updated_color = ''
         self.double_buttons = []
-        self.mainParent = parent
-        self.shortcut = shortcut
-        self.newCategoryName = ""
-        self.newCategoryColor = ""
-        self.storeIndex = storeIndex
-        self.shelfIndex = shelfIndex
-        self.spaceIndex = spaceIndex
-        self.creatingCategory = False
-        self.nameModifiedCategory = ''
-        self.colorModifiedCategory = ""
-        self.spacesInFloorShelf = spacesInFloorShelf
+        self._main_parent = parent
+        self._shortcut = shortcut
+        self._name_new_category = ""
+        self._color_new_category = ""
+        self._creating_category = False
+        self._name_modified_categoy = ''
+        self._color_modified_category = ""
+        self._parent_space = parent_space
 
     def initUI(self, parent):
         self.showSpace = QPushButton(Language.get("go_back"), parent)
@@ -166,10 +162,10 @@ class SpaceCategory(QLabel):
         self.categoryName.hide()
         self.categoryName.setText("")
 
-        if self.shortcut:
+        if self._shortcut:
             window.hideMainButtons()
         else:
-            SHELVES[self.storeIndex][self.shelfIndex].spaces[(self.floor - 1) * self.spacesInFloorShelf + self.spaceIndex].openSpaceConfig.show()
+            self._parent_space.openSpaceConfig.show()
 
     def showUI(self):
         for button in self.double_buttons:
@@ -187,20 +183,20 @@ class SpaceCategory(QLabel):
         
         if color.isValid():
             self.categoryColor.setStyleSheet(get_style_sheet(color.name()))
-            self.newColor = color.name()
+            self._updated_color = color.name()
     
     def edit_category_function(self):
         self.hideUI()
-        self.newColor = ''
+        self._updated_color = ''
         self.showSpace.show()
         self.add_category_button.hide()
         self.cancelAddCategory()
 
         # I don't understand why, but this works to get the text of the category pressed
-        self.nameModifiedCategory = self.double_buttons[0].get_first_button_sender_text()
+        self._name_modified_categoy = self.double_buttons[0].get_first_button_sender_text().strip()
 
-        color = Category.getColorByName(self.nameModifiedCategory)
-        self.colorModifiedCategory = color
+        color = Category.get_color_by_name(self._name_modified_categoy)
+        self._color_modified_category = color.stirp()
 
         self.categoryColor.setStyleSheet(get_style_sheet(color))
 
@@ -210,13 +206,13 @@ class SpaceCategory(QLabel):
         self.categoryColor.show()
         self.categoryName.show()
 
-        self.categoryName.setPlaceholderText(self.nameModifiedCategory)
+        self.categoryName.setPlaceholderText(self._name_modified_categoy)
 
         self.saveCategory.raise_()
         self.categoryColor.raise_()
         self.categoryName.raise_()
 
-        if self.shortcut:
+        if self._shortcut:
             window.hideAllButtons()
         else:
             Store.hideAllStores()
@@ -227,7 +223,7 @@ class SpaceCategory(QLabel):
         
         self.add_category_button.hide()
 
-        if self.shortcut:
+        if self._shortcut:
             self.cancelAddCategory()
             window.goHome.show()
 
@@ -238,42 +234,42 @@ class SpaceCategory(QLabel):
             self.reloadNameCategories(newName)
 
             if UserManager.get_user_role() != 'Offline':
-                Mongo.update_category_name(self.nameModifiedCategory, newName)
+                Mongo.update_category_name(self._name_modified_categoy, newName)
 
-            self.nameModifiedCategory = newName
+            self._name_modified_categoy = newName.strip()
 
-        if self.newColor != "":
-            self.reloadColorCategories(self.nameModifiedCategory)
+        if self._updated_color != "":
+            self.reloadColorCategories(self._name_modified_categoy)
 
             if UserManager.get_user_role() != 'Offline':
-                Mongo.update_category_color(self.nameModifiedCategory, self.newColor)
+                Mongo.update_category_color(self._name_modified_categoy, self._updated_color)
 
     def reloadNameCategories(self, newName):
-        index = Category.getIndexByName(self.nameModifiedCategory)
+        index = Category.getIndexByName(self._name_modified_categoy)
         Category.changeCategoryName(index, newName)
 
-        update_category_name(window.shortcut_category, self.colorModifiedCategory, self.nameModifiedCategory, newName, True)
+        update_category_name(window.shortcut_category, self._color_modified_category, self._name_modified_categoy, newName, True)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    update_category_name(space, self.colorModifiedCategory, self.nameModifiedCategory, newName)
+                    update_category_name(space, self._color_modified_category, self._name_modified_categoy, newName)
 
     def reloadColorCategories(self, newName):
         index = Category.getIndexByName(newName)
-        Category.changeCategoryColor(index, self.newColor)
+        Category.changeCategoryColor(index, self._updated_color)
 
         if window.shortcut_category.name == newName:
-            window.shortcut_category.color = self.newColor
+            window.shortcut_category.color = self._updated_color
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
                     if space.category.name == newName:
-                        space.category.color = self.newColor
+                        space.category.color = self._updated_color
 
     def showAddCategory(self):
-        self.creatingCategory = True
+        self._creating_category = True
 
         self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() + 100)
         self.addCategoryName.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
@@ -302,15 +298,15 @@ class SpaceCategory(QLabel):
         self.newCategoryColorButton.hide()
         self.cancelButtonAddCategory.hide()
 
-        self.newCategoryName = ""
-        self.newCategoryColor = ""
+        self._name_new_category = ""
+        self._color_new_category = ""
 
         self.addCategoryName.setText("")
         self.add_category_button.setDisabled(False)
         self.createCategoryButton.setDisabled(True)
         self.newCategoryColorButton.setStyleSheet(get_style_sheet("#FFFFFF"))
 
-        if self.creatingCategory:
+        if self._creating_category:
             self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
             self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() - 100)
             self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() - 100)
@@ -320,37 +316,37 @@ class SpaceCategory(QLabel):
         for button in self.double_buttons:
             button.set_second_button_disabled(False)
 
-        self.creatingCategory = False
+        self._creating_category = False
 
     def selectColorNewCategory(self):
         color = QColorDialog.getColor()
         
         if color.isValid():
             self.newCategoryColorButton.setStyleSheet(get_style_sheet(color.name()))
-            self.newCategoryColor = color.name()
+            self._color_new_category = color.name().strip()
         
-        if self.newCategoryColor != "" and self.newCategoryName != "":
+        if self._color_new_category != "" and self._name_new_category != "":
             self.createCategoryButton.setDisabled(False)
 
     def changeNewCategoryName(self):
-        self.newCategoryName = self.addCategoryName.text()
+        self._name_new_category = self.addCategoryName.text().strip()
 
-        if self.newCategoryColor != "" and self.newCategoryName != "":
+        if self._color_new_category != "" and self._name_new_category != "":
             self.createCategoryButton.setDisabled(False)
 
     def createCategory(self):
-        Category.add_category(self.newCategoryName.capitalize(), self.newCategoryColor)
+        Category.add_category(self._name_new_category.capitalize(), self._color_new_category)
 
         if UserManager.get_user_role() != 'Offline':
-            Mongo.add_category(self.newCategoryName.capitalize(), self.newCategoryColor, False)
+            Mongo.add_category(self._name_new_category.capitalize(), self._color_new_category, False)
 
-        create_category_in(window.shortcut_category, self.newCategoryName.capitalize(), self.mainParent)
+        create_category_in(window.shortcut_category, self._name_new_category.capitalize(), self._main_parent)
         update_category_buttons_pos(window.shortcut_category)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    create_category_in(space.category, self.newCategoryName.capitalize(), self.mainParent)
+                    create_category_in(space.category, self._name_new_category.capitalize(), self._main_parent)
                     update_category_buttons_pos(space.category)
 
         self.showUI()
@@ -420,7 +416,7 @@ class Space(QLabel):
         self.storeIndex = storeIndex
         self.actualFloor = actualFloor
         self.shelfIndex = shelfIndex
-        self.category = SpaceCategory(storeIndex, shelfIndex, spacesInFloorShelf, actualFloor, spaceIndex, parent)
+        self.category = CategorySpace(self, parent)
         update_category_buttons_pos(self.category)
 
         if actualFloor > floors:
@@ -1005,7 +1001,8 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
-        self.shortcut_category = SpaceCategory(0, 0, 0, 0, 0, self.widget, True)
+        shortcut = Space(0, 0, 0, 0, 0, 0, 0, 0)
+        self.shortcut_category = CategorySpace(shortcut, self.widget, True)
 
     def initUI(self, parent):
         # Main buttons
