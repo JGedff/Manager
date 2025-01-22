@@ -38,8 +38,8 @@ class CategorySpace(QLabel):
         super().__init__(parent)
 
         self.init_variables(parent_space, parent, shortcut)
-        self.initUI(parent)
-        self.initEvents()
+        self.init_ui(parent)
+        self.init_events()
 
         set_empty_category(self)
 
@@ -47,41 +47,39 @@ class CategorySpace(QLabel):
         self.name = ''
         self.color = ''
         self._updated_color = ''
-        self.double_buttons = []
-        self._main_parent = parent
         self._shortcut = shortcut
-        self._name_new_category = ""
-        self._color_new_category = ""
+        self._main_parent = parent
+        self._name_new_category = ''
+        self.categories_buttons = []
+        self._color_new_category = ''
         self._creating_category = False
         self._name_modified_categoy = ''
-        self._color_modified_category = ""
         self._parent_space = parent_space
+        self._color_modified_category = ''
 
-    def initUI(self, parent):
-        self.showSpace = QPushButton(Language.get("go_back"), parent)
-        self.showSpace.setGeometry(1260, 10, 140, 50)
-        self.showSpace.hide()
+    def init_ui(self, parent):
+        ## INITIALIZE OBJECTS ##
+        # Labels
+        self.label_input_edit_category_color = QLabel(Language.get("category_color"), parent)
+        self.label_input_edit_category_color.setGeometry(50, 110, 175, 25)
+        self.label_input_edit_category_color.hide()
 
-        # Edit existing category
-        self.categoryNameLabel = QLabel(Language.get("category_name"), parent)
-        self.categoryNameLabel.setGeometry(50, 60, 175, 25)
-        self.categoryNameLabel.hide()
+        self.label_input_edit_category_name = QLabel(Language.get("category_name"), parent)
+        self.label_input_edit_category_name.setGeometry(50, 60, 175, 25)
+        self.label_input_edit_category_name.hide()
 
-        self.categoryName = QLineEdit(parent)
-        self.categoryName.setGeometry(250, 50, 250, 39)
-        self.categoryName.hide()
-        
-        self.categoryColorLabel = QLabel(Language.get("category_color"), parent)
-        self.categoryColorLabel.setGeometry(50, 110, 175, 25)
-        self.categoryColorLabel.hide()
+        # Buttons
+        self.edit_category_color_selector = QPushButton(Language.get("select_color"), parent)
+        self.edit_category_color_selector.setGeometry(250, 100, 138, 39)
+        self.edit_category_color_selector.hide()
 
-        self.categoryColor = QPushButton(Language.get("select_color"), parent)
-        self.categoryColor.setGeometry(250, 100, 138, 39)
-        self.categoryColor.hide()
+        self.stop_editting_category = QPushButton(Language.get("go_back"), parent)
+        self.stop_editting_category.setGeometry(1260, 10, 140, 50)
+        self.stop_editting_category.hide()
 
-        self.saveCategory = QPushButton(Language.get("save"), parent)
-        self.saveCategory.setGeometry(250, 150, 125, 39)
-        self.saveCategory.hide()
+        self.update_category_button = QPushButton(Language.get("save"), parent)
+        self.update_category_button.setGeometry(250, 150, 125, 39)
+        self.update_category_button.hide()
 
         posx = 25
         posy = 25
@@ -91,253 +89,232 @@ class CategorySpace(QLabel):
             new_double_button.setGeometry(posx - 12, posy - 12, 450, 69)
 
             posy += 69
-            self.double_buttons.append(new_double_button)
+            self.categories_buttons.append(new_double_button)
 
-        # Adding a new category
+        self.new_category_color_selector = QPushButton(Language.get("select_color"), parent)
+        self.new_category_color_selector.setGeometry(posx + 238, posy - 175, 138, 39)
+        self.new_category_color_selector.hide()
+
+        self.cancel_add_category_button = QPushButton(Language.get("cancel"), parent)
+        self.cancel_add_category_button.setGeometry(posx + 13, posy, 100, 25)
+        self.cancel_add_category_button.hide()
+
         self.add_category_button = QPushButton(Language.get("add_category"), parent)
         self.add_category_button.setGeometry(posx + 13, posy + 13, 200, 25)
         self.add_category_button.hide()
 
-        self.addCategoryName = QLineEdit(parent)
-        self.addCategoryName.setGeometry(posx + 13, posy - 100, 250, 39)
-        self.addCategoryName.setPlaceholderText(Language.get("name"))
-        self.addCategoryName.hide()
+        self.create_category_button = QPushButton(Language.get("create"), parent)
+        self.create_category_button.setGeometry(posx + 438, posy, 100, 25)
+        self.create_category_button.setDisabled(True)
+        self.create_category_button.hide()
 
-        self.newCategoryColorButton = QPushButton(Language.get("select_color"), parent)
-        self.newCategoryColorButton.setGeometry(posx + 238, posy - 175, 138, 39)
-        self.newCategoryColorButton.hide()
+        # Inputs
+        self.input_edit_category_name = QLineEdit(parent)
+        self.input_edit_category_name.setGeometry(250, 50, 250, 39)
+        self.input_edit_category_name.hide()
 
-        self.cancelButtonAddCategory = QPushButton(Language.get("cancel"), parent)
-        self.cancelButtonAddCategory.setGeometry(posx + 13, posy, 100, 25)
-        self.cancelButtonAddCategory.hide()
+        self.input_new_category_name = QLineEdit(parent)
+        self.input_new_category_name.setGeometry(posx + 13, posy - 100, 250, 39)
+        self.input_new_category_name.setPlaceholderText(Language.get("name"))
+        self.input_new_category_name.hide()
 
-        self.createCategoryButton = QPushButton(Language.get("create"), parent)
-        self.createCategoryButton.setGeometry(posx + 438, posy, 100, 25)
-        self.createCategoryButton.setDisabled(True)
-        self.createCategoryButton.hide()
+        ## STYLES ##
+        # Labels
+        self.label_input_edit_category_name.setAlignment(Qt.AlignRight)
+        self.label_input_edit_category_name.setFont(FONT_SMALL_TEXT)
 
-        self.categoryNameLabel.setAlignment(Qt.AlignRight)
-        self.categoryColorLabel.setAlignment(Qt.AlignRight)
+        self.label_input_edit_category_color.setAlignment(Qt.AlignRight)
+        self.label_input_edit_category_color.setFont(FONT_SMALL_TEXT)
 
-        self.saveCategory.setFont(FONT_SMALL_BOLD_TEXT)
-
-        self.showSpace.setFont(FONT_SMALL_TEXT)
-        self.categoryName.setFont(FONT_SMALL_TEXT)
-        self.categoryColor.setFont(FONT_SMALL_TEXT)
-        self.addCategoryName.setFont(FONT_SMALL_TEXT)
-        self.categoryNameLabel.setFont(FONT_SMALL_TEXT)
-        self.categoryColorLabel.setFont(FONT_SMALL_TEXT)
+        # Buttons
         self.add_category_button.setFont(FONT_SMALL_TEXT)
-        self.createCategoryButton.setFont(FONT_SMALL_TEXT)
-        self.newCategoryColorButton.setFont(FONT_SMALL_TEXT)
-        self.cancelButtonAddCategory.setFont(FONT_SMALL_TEXT)
-
-        self.categoryName.setStyleSheet(INPUT_TEXT)
-        self.showSpace.setStyleSheet(DEFAULT_BUTTON)
-        self.addCategoryName.setStyleSheet(INPUT_TEXT)
         self.add_category_button.setStyleSheet(BLUE_BUTTON)
-        self.cancelButtonAddCategory.setStyleSheet(OFF_BUTTON)
-        self.saveCategory.setStyleSheet(IMPORTANT_ACTION_BUTTON)
-        self.categoryColor.setStyleSheet(get_style_sheet("#FFFFFF"))
-        self.createCategoryButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
-        self.newCategoryColorButton.setStyleSheet(get_style_sheet("#FFFFFF"))
 
-    def initEvents(self):
-        self.showSpace.clicked.connect(self.stopEditCategory)
-        self.categoryColor.clicked.connect(self.selectColor)
-        self.saveCategory.clicked.connect(self.save_info)
-        self.add_category_button.clicked.connect(self.showAddCategory)
-        self.cancelButtonAddCategory.clicked.connect(self.cancelAddCategory)
-        self.createCategoryButton.clicked.connect(self.createCategory)
-        self.newCategoryColorButton.clicked.connect(self.selectColorNewCategory)
-        self.addCategoryName.textChanged.connect(self.changeNewCategoryName)
+        self.stop_editting_category.setFont(FONT_SMALL_TEXT)
+        self.stop_editting_category.setStyleSheet(DEFAULT_BUTTON)
 
-    def stopEditCategory(self):
-        self.showUI()
-        self.showSpace.hide()
-        self.categoryNameLabel.hide()
-        self.categoryColorLabel.hide()
-        self.saveCategory.hide()
-        self.categoryColor.hide()
-        self.categoryName.hide()
-        self.categoryName.setText("")
+        self.create_category_button.setFont(FONT_SMALL_TEXT)
+        self.create_category_button.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
-        if self._shortcut:
-            window.hideMainButtons()
-        else:
-            self._parent_space.openSpaceConfig.show()
+        self.cancel_add_category_button.setFont(FONT_SMALL_TEXT)
+        self.cancel_add_category_button.setStyleSheet(OFF_BUTTON)
 
-    def showUI(self):
-        for button in self.double_buttons:
-            button.show()
-            button.raise_()
+        self.update_category_button.setFont(FONT_SMALL_BOLD_TEXT)
+        self.update_category_button.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
-        if self.double_buttons.__len__() < 37:
-            self.add_category_button.show()
-            self.add_category_button.raise_()
-        else:
-            self.add_category_button.hide()
+        self.edit_category_color_selector.setFont(FONT_SMALL_TEXT)
+        self.edit_category_color_selector.setStyleSheet(get_style_sheet("#FFFFFF"))
 
-    def selectColor(self):
-        color = QColorDialog.getColor()
-        
-        if color.isValid():
-            self.categoryColor.setStyleSheet(get_style_sheet(color.name()))
-            self._updated_color = color.name()
-    
+        self.new_category_color_selector.setFont(FONT_SMALL_TEXT)
+        self.new_category_color_selector.setStyleSheet(get_style_sheet("#FFFFFF"))
+
+        # Inputs
+        self.input_edit_category_name.setFont(FONT_SMALL_TEXT)
+        self.input_edit_category_name.setStyleSheet(INPUT_TEXT)
+
+        self.input_new_category_name.setFont(FONT_SMALL_TEXT)
+        self.input_new_category_name.setStyleSheet(INPUT_TEXT)
+
     def edit_category_function(self):
-        self.hideUI()
         self._updated_color = ''
-        self.showSpace.show()
+
+        self.hide_ui()
+
         self.add_category_button.hide()
-        self.cancelAddCategory()
+        self.stop_editting_category.show()
+
+        self.cancel_add_category()
 
         # I don't understand why, but this works to get the text of the category pressed
-        self._name_modified_categoy = self.double_buttons[0].get_first_button_sender_text().strip()
+        self._name_modified_categoy = self.categories_buttons[0].get_first_button_sender_text().strip()
 
         color = Category.get_color_by_name(self._name_modified_categoy)
         self._color_modified_category = color.stirp()
 
-        self.categoryColor.setStyleSheet(get_style_sheet(color))
+        self.edit_category_color_selector.setStyleSheet(get_style_sheet(color))
 
-        self.categoryNameLabel.show()
-        self.categoryColorLabel.show()
-        self.saveCategory.show()
-        self.categoryColor.show()
-        self.categoryName.show()
+        self.update_category_button.show()
+        self.input_edit_category_name.show()
+        self.edit_category_color_selector.show()
+        self.label_input_edit_category_name.show()
+        self.label_input_edit_category_color.show()
 
-        self.categoryName.setPlaceholderText(self._name_modified_categoy)
+        self.input_edit_category_name.setPlaceholderText(self._name_modified_categoy)
 
-        self.saveCategory.raise_()
-        self.categoryColor.raise_()
-        self.categoryName.raise_()
+        self.update_category_button.raise_()
+        self.input_edit_category_name.raise_()
+        self.edit_category_color_selector.raise_()
 
         if self._shortcut:
             window.hideAllButtons()
         else:
             Store.hideAllStores()
 
-    def hideUI(self):
-        for button in self.double_buttons:
-            button.hide()
-        
+    def hide_ui(self):
+        for category_button in self.categories_buttons:
+            category_button.hide()
+
         self.add_category_button.hide()
 
         if self._shortcut:
-            self.cancelAddCategory()
+            self.cancel_add_category()
             window.goHome.show()
 
-    def save_info(self):
-        newName = self.categoryName.text().capitalize()
+    def cancel_add_category(self):
+        self._creating_category = False
 
-        if newName != "":
-            self.reloadNameCategories(newName)
+        self.new_category_color_selector.hide()
+        self.cancel_add_category_button.hide()
+        self.input_new_category_name.hide()
+        self.create_category_button.hide()
 
-            if UserManager.get_user_role() != 'Offline':
-                Mongo.update_category_name(self._name_modified_categoy, newName)
+        self._name_new_category = ""
+        self._color_new_category = ""
 
-            self._name_modified_categoy = newName.strip()
+        self.create_category_button.setDisabled(True)
+        self.add_category_button.setDisabled(self._creating_category)
 
-        if self._updated_color != "":
-            self.reloadColorCategories(self._name_modified_categoy)
+        for category_button in self.categories_buttons:
+            category_button.set_second_button_disabled(self._creating_category)
 
-            if UserManager.get_user_role() != 'Offline':
-                Mongo.update_category_color(self._name_modified_categoy, self._updated_color)
+        self.input_new_category_name.setText("")
+        self.new_category_color_selector.setStyleSheet(get_style_sheet("#FFFFFF"))
 
-    def reloadNameCategories(self, newName):
-        index = Category.getIndexByName(self._name_modified_categoy)
-        Category.changeCategoryName(index, newName)
+        if self._creating_category:
+            self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
+            self.create_category_button.move(self.create_category_button.pos().x(), self.create_category_button.pos().y() - 100)
+            self.input_new_category_name.move(self.input_new_category_name.pos().x(), self.input_new_category_name.pos().y() - 100)
+            self.cancel_add_category_button.move(self.cancel_add_category_button.pos().x(), self.cancel_add_category_button.pos().y() - 100)
+            self.new_category_color_selector.move(self.new_category_color_selector.pos().x(), self.new_category_color_selector.pos().y() - 100)
 
-        update_category_name(window.shortcut_category, self._color_modified_category, self._name_modified_categoy, newName, True)
+    def delete_category_function(self):
+        button_pressed = 0
+
+        # This time, like we want the index, something that is not inside the button, I made this to know which category is going to be deleted
+        for index, sender_button in enumerate(self.categories_buttons):
+            if sender_button.get_second_button() == self.sender():
+                button_pressed = index
+
+        category_name = Category.get_name_by_index(button_pressed)
+
+        Category.del_category(button_pressed)
+
+        if UserManager.get_role() != 'Offline':
+            Mongo.delete_by_name(category_name)
+
+        delete_category_from(window.shortcut_category, button_pressed, category_name, True)
+        update_category_buttons_pos(window.shortcut_category)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    update_category_name(space, self._color_modified_category, self._name_modified_categoy, newName)
+                    if len(space.category.categories_buttons) > len(CATEGORY_NAMES):
+                        oldName = space.category.name
 
-    def reloadColorCategories(self, newName):
-        index = Category.getIndexByName(newName)
-        Category.changeCategoryColor(index, self._updated_color)
+                        delete_category_from(space, button_pressed, category_name)
+                        update_category_buttons_pos(space.category)
 
-        if window.shortcut_category.name == newName:
+                        if category_name == oldName and UserManager.get_role() != 'Offline':
+                            Mongo.update_category_space(space.mongo_id, space.category.name)
+
+        if len(self.categories_buttons) <= 1:
+            self.categories_buttons[0].set_second_button_disabled(True)
+
+    def init_events(self):
+        self.update_category_button.clicked.connect(self.save_info)
+        self.create_category_button.clicked.connect(self.create_category)
+        self.add_category_button.clicked.connect(self.show_add_category_ui)
+        self.stop_editting_category.clicked.connect(self.stop_edit_category)
+        self.new_category_color_selector.clicked.connect(self.select_new_color)
+        self.cancel_add_category_button.clicked.connect(self.cancel_add_category)
+        self.edit_category_color_selector.clicked.connect(self.select_updated_color)
+        self.input_new_category_name.textChanged.connect(self.update_new_category_name)
+
+    def save_info(self):
+        updated_name = self.input_edit_category_name.text().capitalize().strip()
+
+        if updated_name != "":
+            self.update_categories_name(updated_name)
+
+            if UserManager.get_role() != 'Offline':
+                Mongo.update_category_name(self._name_modified_categoy, updated_name)
+
+            self._name_modified_categoy = updated_name
+
+        if self._updated_color != "":
+            self.update_categories_color(self._name_modified_categoy)
+
+            if UserManager.get_role() != 'Offline':
+                Mongo.update_category_color(self._name_modified_categoy, self._updated_color)
+
+    def update_categories_name(self, updated_name):
+        index = Category.get_index_by_name(self._name_modified_categoy)
+        Category.change_category_name(index, updated_name)
+
+        update_category_name(window.shortcut_category, self._color_modified_category, self._name_modified_categoy, updated_name, True)
+
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    update_category_name(space, self._color_modified_category, self._name_modified_categoy, updated_name)
+
+    def update_categories_color(self, category_name):
+        index = Category.get_index_by_name(category_name)
+        Category.change_category_color(index, self._updated_color)
+
+        if window.shortcut_category.name == category_name:
             window.shortcut_category.color = self._updated_color
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    if space.category.name == newName:
+                    if space.category.name == category_name:
                         space.category.color = self._updated_color
 
-    def showAddCategory(self):
-        self._creating_category = True
-
-        self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() + 100)
-        self.addCategoryName.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
-        self.cancelButtonAddCategory.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 42)
-        self.createCategoryButton.move(self.add_category_button.pos().x() + 275, self.add_category_button.pos().y() - 42)
-        self.newCategoryColorButton.move(self.add_category_button.pos().x() + 275, self.add_category_button.pos().y() - 100)
-
-        self.add_category_button.setDisabled(True)
-
-        self.addCategoryName.show()
-        self.createCategoryButton.show()
-        self.newCategoryColorButton.show()
-        self.cancelButtonAddCategory.show()
-
-        self.addCategoryName.raise_()
-        self.createCategoryButton.raise_()
-        self.newCategoryColorButton.raise_()
-        self.cancelButtonAddCategory.raise_()
-
-        for button in self.double_buttons:
-            button.set_second_button_disabled(True)
-
-    def cancelAddCategory(self):
-        self.addCategoryName.hide()
-        self.createCategoryButton.hide()
-        self.newCategoryColorButton.hide()
-        self.cancelButtonAddCategory.hide()
-
-        self._name_new_category = ""
-        self._color_new_category = ""
-
-        self.addCategoryName.setText("")
-        self.add_category_button.setDisabled(False)
-        self.createCategoryButton.setDisabled(True)
-        self.newCategoryColorButton.setStyleSheet(get_style_sheet("#FFFFFF"))
-
-        if self._creating_category:
-            self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
-            self.addCategoryName.move(self.addCategoryName.pos().x(), self.addCategoryName.pos().y() - 100)
-            self.createCategoryButton.move(self.createCategoryButton.pos().x(), self.createCategoryButton.pos().y() - 100)
-            self.newCategoryColorButton.move(self.newCategoryColorButton.pos().x(), self.newCategoryColorButton.pos().y() - 100)
-            self.cancelButtonAddCategory.move(self.cancelButtonAddCategory.pos().x(), self.cancelButtonAddCategory.pos().y() - 100)
-
-        for button in self.double_buttons:
-            button.set_second_button_disabled(False)
-
-        self._creating_category = False
-
-    def selectColorNewCategory(self):
-        color = QColorDialog.getColor()
-        
-        if color.isValid():
-            self.newCategoryColorButton.setStyleSheet(get_style_sheet(color.name()))
-            self._color_new_category = color.name().strip()
-        
-        if self._color_new_category != "" and self._name_new_category != "":
-            self.createCategoryButton.setDisabled(False)
-
-    def changeNewCategoryName(self):
-        self._name_new_category = self.addCategoryName.text().strip()
-
-        if self._color_new_category != "" and self._name_new_category != "":
-            self.createCategoryButton.setDisabled(False)
-
-    def createCategory(self):
+    def create_category(self):
         Category.add_category(self._name_new_category.capitalize(), self._color_new_category)
 
-        if UserManager.get_user_role() != 'Offline':
+        if UserManager.get_role() != 'Offline':
             Mongo.add_category(self._name_new_category.capitalize(), self._color_new_category, False)
 
         create_category_in(window.shortcut_category, self._name_new_category.capitalize(), self._main_parent)
@@ -349,9 +326,22 @@ class CategorySpace(QLabel):
                     create_category_in(space.category, self._name_new_category.capitalize(), self._main_parent)
                     update_category_buttons_pos(space.category)
 
-        self.showUI()
-        self.cancelAddCategory()
+        self.show_ui()
+        self.cancel_add_category()
+        self.update_add_category_buttons_pos()
 
+    def show_ui(self):
+        for category_button in self.categories_buttons:
+            category_button.show()
+            category_button.raise_()
+
+        if len(self.categories_buttons) < 37:
+            self.add_category_button.show()
+            self.add_category_button.raise_()
+        else:
+            self.add_category_button.hide()
+
+    def update_add_category_buttons_pos(self):
         posx = self.add_category_button.pos().x()
         posy = self.add_category_button.pos().y()
 
@@ -362,42 +352,74 @@ class CategorySpace(QLabel):
             posy += 100
 
         self.add_category_button.move(posx, posy)
-        self.addCategoryName.move(posx, posy - 50)
-        self.createCategoryButton.move(posx + 100, posy + 50)
-        self.newCategoryColorButton.move(posx + 100, posy - 50)
-        self.cancelButtonAddCategory.move(posx, posy + 50)
-    
-    def delete_category_function(self):
-        indexButtonPressed = 0
+        self.input_new_category_name.move(posx, posy - 50)
+        self.cancel_add_category_button.move(posx, posy + 50)
+        self.create_category_button.move(posx + 100, posy + 50)
+        self.new_category_color_selector.move(posx + 100, posy - 50)
+
+    def show_add_category_ui(self):
+        self._creating_category = True
+
+        self.add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() + 100)
+        self.input_new_category_name.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 100)
+        self.cancel_add_category_button.move(self.add_category_button.pos().x(), self.add_category_button.pos().y() - 42)
+        self.create_category_button.move(self.add_category_button.pos().x() + 275, self.add_category_button.pos().y() - 42)
+        self.new_category_color_selector.move(self.add_category_button.pos().x() + 275, self.add_category_button.pos().y() - 100)
+
+        self.add_category_button.setDisabled(self._creating_category)
+
+        self.new_category_color_selector.show()
+        self.cancel_add_category_button.show()
+        self.input_new_category_name.show()
+        self.create_category_button.show()
+
+        self.create_category_button.raise_()
+        self.input_new_category_name.raise_()
+        self.cancel_add_category_button.raise_()
+        self.new_category_color_selector.raise_()
+
+        for button in self.categories_buttons:
+            button.set_second_button_disabled(self._creating_category)
+
+    def stop_edit_category(self):
+        self.input_edit_category_name.setText("")
+
+        self.show_ui()
+
+        self.stop_editting_category.hide()
+        self.update_category_button.hide()
+        self.input_edit_category_name.hide()
+        self.edit_category_color_selector.hide()
+        self.label_input_edit_category_name.hide()
+        self.label_input_edit_category_color.hide()
+
+        if self._shortcut:
+            window.hideMainButtons()
+        else:
+            self._parent_space.openSpaceConfig.show()
+
+    def select_new_color(self):
+        color = QColorDialog.getColor()
         
-        # This time, like we want the index, something that is not inside the button, I made this to know which category is going to be deleted
-        for index, send in enumerate(self.double_buttons):
-            if send.get_second_button() == self.sender():
-                indexButtonPressed = index
+        if color.isValid():
+            self.new_category_color_selector.setStyleSheet(get_style_sheet(color.name()))
+            self._color_new_category = color.name().strip()
+        
+        if self._color_new_category != "" and self._name_new_category != "":
+            self.create_category_button.setDisabled(False)
 
-        categoryName = Category.getNameByIndex(indexButtonPressed)
-        Category.delCategory(indexButtonPressed)
+    def select_updated_color(self):
+        color = QColorDialog.getColor()
 
-        if UserManager.get_user_role() != 'Offline':
-            Mongo.delete_by_name(categoryName)
+        if color.isValid():
+            self.edit_category_color_selector.setStyleSheet(get_style_sheet(color.name()))
+            self._updated_color = color.name()
 
-        delete_category_from(window.shortcut_category, indexButtonPressed, categoryName, True)
-        update_category_buttons_pos(window.shortcut_category)
+    def update_new_category_name(self):
+        self._name_new_category = self.input_new_category_name.text().strip()
 
-        for store in SHELVES:
-            for shelf in store:
-                for space in shelf.spaces:
-                    if space.category.double_buttons.__len__() > CATEGORY_NAMES.__len__():
-                        oldName = space.category.name
-
-                        delete_category_from(space, indexButtonPressed, categoryName)
-                        update_category_buttons_pos(space.category)
-
-                        if categoryName == oldName and UserManager.get_role() != 'Offline':
-                            Mongo.update_category_space(space.mongo_id, space.category.name)
-
-        if self.double_buttons.__len__() <= 1:
-            self.double_buttons[0].set_second_button_disabled(True)
+        if self._color_new_category != "" and self._name_new_category != "":
+            self.create_category_button.setDisabled(False)
 
 class Space(QLabel):
     def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
@@ -580,7 +602,7 @@ class Space(QLabel):
             self.product.hide()
 
         self.openSpaceConfig.show()
-        self.category.showUI()
+        self.category.show_ui()
 
     def stopConfigSpace(self):
         self.updateSpaceColor()
@@ -654,7 +676,7 @@ class Space(QLabel):
         if isinstance(self.product, Product):
             self.product.hide()
         
-        self.category.hideUI()
+        self.category.hide_ui()
 
     def showSpace(self):
         self.updateSpaceColor()
@@ -1140,7 +1162,7 @@ class MainWindow(QMainWindow):
 
     # UI functions
     def re_open_home(self):
-        self.shortcut_category.hideUI()
+        self.shortcut_category.hide_ui()
 
         self.showMainButtons()
         self.hideAddStoreForm()
@@ -1201,7 +1223,7 @@ class MainWindow(QMainWindow):
     def configCategories(self):
         Store.hideAllStoreIcons()
 
-        self.shortcut_category.showUI()
+        self.shortcut_category.show_ui()
 
         self.hideMainButtons()
 

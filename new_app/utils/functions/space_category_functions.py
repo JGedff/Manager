@@ -11,7 +11,7 @@ def create_category_in(space, category_name, parent):
     new_double_buttons = DoubleButton(category_name, "❌", space_category.edit_category_function, space_category.delete_category_function, parent)
     new_double_buttons.setGeometry(0, 0, 450, 69)
 
-    space_category.double_buttons.append(new_double_buttons)
+    space_category.categories_buttons.append(new_double_buttons)
 
 def update_category_name(space, color, actual_name, new_name, shortcut = False):
     space_category = space
@@ -29,7 +29,7 @@ def update_category_name(space, color, actual_name, new_name, shortcut = False):
                 space.category_selector.setItemText(i, new_name)
 
     # Change the name of the button with the actual category to the new name for the category
-    for button in space_category.double_buttons:
+    for button in space_category.categories_buttons:
         if button.get_first_button_text() == actual_name:
             button.set_first_button_text(new_name)
             break
@@ -50,22 +50,22 @@ def delete_category_from(space, index_button_pressed, category_name, shortcut = 
 
             # Change the actual category for another category
             if index_button_pressed > 0:
-                space_category.name = space_category.double_buttons[index_button_pressed - 1].get_first_button_text()
+                space_category.name = space_category.categories_buttons[index_button_pressed - 1].get_first_button_text()
             else:
-                space_category.name = space_category.double_buttons[index_button_pressed].get_first_button_text()
+                space_category.name = space_category.categories_buttons[index_button_pressed].get_first_button_text()
             
             space_category.color = Category.get_color_by_name(space_category.name)
 
     # Hide the buttons before removing them
-    space_category.double_buttons[index_button_pressed].hide()
-    space_category.double_buttons.pop(index_button_pressed)
+    space_category.categories_buttons[index_button_pressed].hide()
+    space_category.categories_buttons.pop(index_button_pressed)
 
 def update_category_buttons_pos(space):
     posx = 13
     posy = 24
 
     for index in range(len(CATEGORY_NAMES)):
-        space.double_buttons[index].setGeometry(posx, posy, 450, 69)
+        space.categories_buttons[index].setGeometry(posx, posy, 450, 69)
 
         if posy + 100 >= WINDOW_HEIGHT:
             posx += 400
@@ -79,7 +79,7 @@ def update_category_buttons_pos(space):
 
     space.add_category_button.move(posx + 25, posy + 13)
 
-    if len(space.double_buttons) >= 37:
+    if len(space.categories_buttons) >= 37:
         space.add_category_button.hide()
     else:
         space.add_category_button.show()
