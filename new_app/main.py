@@ -396,7 +396,7 @@ class CategorySpace(QLabel):
         if self._shortcut:
             window.hideMainButtons()
         else:
-            self._parent_space.openSpaceConfig.show()
+            self._parent_space.return_to_space_config.show()
 
     def select_new_color(self):
         color = QColorDialog.getColor()
@@ -422,113 +422,111 @@ class CategorySpace(QLabel):
             self.create_category_button.setDisabled(False)
 
 class Space(QLabel):
-    def __init__(self, posx, posy, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent = None, long = False, times5Space = 0):
+    def __init__(self, pos_x, pos_y, actual_floor, shelf_floors, store_i, shelf_i, space_i, parent = None, long = False):
         super().__init__(parent)
 
-        self.setGeometry(posx, posy, 75, 75)
+        self.setGeometry(pos_x, pos_y, 75, 75)
 
-        self.initVariables(actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long)
-        self.initUI(spaceIndex, parent, times5Space)
-        self.initEvents()
+        self.init_variables(actual_floor, shelf_floors, store_i, shelf_i, parent, long)
+        self.init_ui(space_i, parent)
+        self.init_events()
 
-    def initVariables(self, actualFloor, floors, storeIndex, shelfIndex, spacesInFloorShelf, spaceIndex, parent, long):
-        self.long = long
-        self.product = None
+    def init_variables(self, actual_floor, shelf_floors, store_i, shelf_i, parent, long):
+        self._long = long
         self.mongo_id = None
-        self.storeIndex = storeIndex
-        self.actualFloor = actualFloor
-        self.shelfIndex = shelfIndex
+        self._store_i = store_i
+        self._actual_floor = actual_floor
+        self.shelf_i = shelf_i
         self.category = CategorySpace(self, parent)
         update_category_buttons_pos(self.category)
 
-        if actualFloor > floors:
+        if actual_floor > shelf_floors:
             set_unreachable_category(self.category)
 
-    def initUI(self, spaceIndex, parent, times5Space):
-        nameSpace = str(times5Space * 5) if times5Space > 0 else ""
-        numberSpace = str(spaceIndex + 1)
-        
-        self.shelfNumber = QLabel(Language.get("shelf") + str(self.shelfIndex + 1), parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2) - int(125 / 2), 25, 125, 25)
+    def init_ui(self, space_i, parent):
+        ## INITIALIZE OBJECTS ##
+        # Labels
+        self.label_category_selected = QLabel(Language.get("category"), parent)
+        self.label_category_selected.setGeometry(152, 75, 100, 25)
 
-        self.box = QPushButton(nameSpace, parent)
+        self.shelf_number = QLabel(Language.get("shelf") + str(self.shelf_i + 1), parent)
+        self.shelf_number.setGeometry(int(WINDOW_WIDTH / 2) - int(125 / 2), 25, 125, 25)
+
+        self.label_can_hold_product = QLabel(Language.get("category_hold_product"), parent)
+        self.label_can_hold_product.setGeometry(152, 124, 260, 25)
+
+        # Buttons
+        num_space = space_i + 1
+        self.space_number = QPushButton(str(num_space), parent)
+        self.space_number.setGeometry(26, 75, 76, 76)
+
+        outside_num_space = str(num_space) if num_space % 5 == 0 else ""
+        self.box = QPushButton(outside_num_space, parent)
         self.box.setGeometry(self.pos().x() + 1, self.pos().y() + 1, 76, 151)
 
-        self.configBox = QPushButton(numberSpace, parent)
-        self.configBox.setGeometry(26, 75, 76, 76)
+        self.return_to_space_config = QPushButton(Language.get("go_back"), parent)
+        self.return_to_space_config.setGeometry(1260, 10, 140, 50)
 
-        self.openSpaceConfig = QPushButton(Language.get("go_back"), parent)
-        self.openSpaceConfig.setGeometry(1260, 10, 140, 50)
-        
-        self.labelCategory = QLabel(Language.get("category"), parent)
-        self.labelCategory.setGeometry(152, 75, 100, 25)
-
-        self.category_selector = QComboBox(parent)
-        self.category_selector.setGeometry(250, 74, 125, 30)
-        self.category_selector.addItem(self.category.name)
-
-        self.editCategories = QPushButton("⚙️", parent)
-
-        self.labelCategoryHoldProduct = QLabel(Language.get("category_hold_product"), parent)
-        self.labelCategoryHoldProduct.setGeometry(152, 124, 260, 25)
-        
-        self.category_can_hold_product = InputBool(Language.get('yes'), Language.get('no'), parent, self.categoryCanHoldProduct, self.categoryCanNotHoldProduct)
-        self.category_can_hold_product.setGeometry(425, 117, 175, 35)
-
-        if self.long:
-            self.box.setFixedHeight(151)
-            self.configBox.setFixedHeight(151)
-        else:
-            self.box.setFixedHeight(76)
-            self.configBox.setFixedHeight(76)
-
-        for category in CATEGORY_NAMES:
-            if category != self.category.name:
-                self.category_selector.addItem(category.capitalize())
-
-        if Category.categoryCanHoldProduct(self.category.name):
-            self.category_can_hold_product.set_value(True)
+        self.edit_categories_button = QPushButton("⚙️", parent)
+        self.edit_categories_button.setGeometry(0, 0, 0, 0)
 
         if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
-            self.editCategories.setGeometry(390, 71, 35, 35)
-        elif UserManager.get_role() == 'Product':
-            self.editCategories.setGeometry(0, 0, 0, 0)
+            self.edit_categories_button.setGeometry(390, 71, 35, 35)
         else:
-            self.editCategories.setGeometry(0, 0, 0, 0)
             self.category_can_hold_product.set_true_button_disabled(True)
             self.category_can_hold_product.set_false_button_disabled(True)
 
-        self.shelfNumber.setFont(FONT_TEXT)
-        
-        self.labelCategory.setFont(FONT_SMALL_TEXT)
-        self.editCategories.setFont(FONT_SMALL_TEXT)
-        self.openSpaceConfig.setFont(FONT_SMALL_TEXT)
-        self.category_selector.setFont(FONT_SMALL_TEXT)
-        self.labelCategoryHoldProduct.setFont(FONT_SMALL_TEXT)
-        
-        self.box.setFont(FONT_SMALLEST_CHAR)
-        self.configBox.setFont(FONT_SMALLEST_CHAR)
+        # Inputs
+        self.category_can_hold_product = InputBool(Language.get('yes'), Language.get('no'), parent, self.change_category_can_hold_product, self.change_category_can_not_hold_product)
+        self.category_can_hold_product.setGeometry(425, 117, 175, 35)
 
-        self.openSpaceConfig.setStyleSheet(DEFAULT_BUTTON)
+        # Other
+        self.category_selector = QComboBox(parent)
+        self.category_selector.setGeometry(250, 74, 125, 30)
+        self.category_selector.addItem(self.category.name)
+        
+        for category_name in CATEGORY_NAMES:
+            if category_name != self.category.name:
+                self.category_selector.addItem(category_name.capitalize())
+
+        ## STYLES ##
+        # Labels
+        self.shelf_number.setFont(FONT_TEXT)
+        self.label_can_hold_product.setFont(FONT_SMALL_TEXT)
+        self.label_category_selected.setFont(FONT_SMALL_TEXT)
+
+        # Buttons
+        self.box.setFont(FONT_SMALLEST_CHAR)
+        
+        self.space_number.setFont(FONT_SMALLEST_CHAR)
+        
+        self.edit_categories_button.setFont(FONT_SMALL_TEXT)
+        self.edit_categories_button.setStyleSheet(EDIT_BUTTON)
+        
+        self.return_to_space_config.setFont(FONT_SMALL_TEXT)
+        self.return_to_space_config.setStyleSheet(DEFAULT_BUTTON)
+
+        if self._long:
+            self.box.setFixedHeight(151)
+            self.space_number.setFixedHeight(151)
+        else:
+            self.box.setFixedHeight(76)
+            self.space_number.setFixedHeight(76)
+
+        # Other
+        self.category_selector.setFont(FONT_SMALL_TEXT)
         self.category_selector.setStyleSheet(COMBO_BOX)
-        self.editCategories.setStyleSheet(EDIT_BUTTON)
+
+        ## SET VALUES ##
+        if Category.can_hold_product(self.category.name):
+            self.category_can_hold_product.set_value(True)
 
         self.updateSpaceColor()
 
-    def updateSpaceColor(self):
-        self.box.setStyleSheet(get_style_sheet(self.category.color))
-        self.configBox.setStyleSheet(get_style_sheet(self.category.color))
+    def change_category_can_hold_product(self):
+        Category.change_can_hold_product(self.category_selector.currentText(), True)
 
-    def initEvents(self):
-        self.box.clicked.connect(self.configSpace)
-        self.openSpaceConfig.clicked.connect(self.stopConfigSpace)
-        self.editCategories.clicked.connect(self.openConfigCategories)
-        self.category_selector.currentTextChanged.connect(self.changeCategory)
-    
-    def categoryCanHoldProduct(self):
-        Category.changeCategoryCanHoldProduct(self.category_selector.currentText(), True)
-
-        if not isinstance(self.product, Product):
+        if not hasattr(self, "product"):
             self.product = Product(153, 165, self, self.parent())
             self.product.show()
 
@@ -539,69 +537,79 @@ class Space(QLabel):
             if self.product.editting_product:
                 self.product.show_hide_edit()
             elif self.product.creating_product:
-                self.product.showHideCreateProduct()
+                self.product.show_hide_create()
     
-    def categoryCanNotHoldProduct(self):
-        Category.changeCategoryCanHoldProduct(self.category_selector.currentText(), False)
+    def change_category_can_not_hold_product(self):
+        Category.change_can_hold_product(self.category_selector.currentText(), False)
 
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             if self.product.editting_product:
                 self.product.show_hide_edit()
             elif self.product.creating_product:
-                self.product.showHideCreateProduct()
+                self.product.show_hide_create()
 
             self.product.hide()
 
-            self.product = None
+            del self.product
 
             Mongo.update_category_holds_product(self.category_selector.currentText(), False)
             Mongo.update_space_product(self.mongo_id, "")
             Mongo.update_space_amount(self.mongo_id, 0)
 
+    def updateSpaceColor(self):
+        self.box.setStyleSheet(get_style_sheet(self.category.color))
+        self.space_number.setStyleSheet(get_style_sheet(self.category.color))
+
+    def init_events(self):
+        self.box.clicked.connect(self.configSpace)
+        self.return_to_space_config.clicked.connect(self.stopConfigSpace)
+        self.edit_categories_button.clicked.connect(self.openConfigCategories)
+        self.category_selector.currentTextChanged.connect(self.changeCategory)
+
     def configSpace(self):
         window.hideAllButtons()
 
         Store.hideAllStores()
-        Store.configSpace(self.storeIndex)
+        Store.configSpace(self._store_i)
 
         self.box.hide()
 
-        self.configBox.show()
-        self.shelfNumber.show()
-        self.labelCategory.show()
-        self.editCategories.show()
+        self.space_number.show()
+        self.shelf_number.show()
+        self.label_category_selected.show()
+        self.edit_categories_button.show()
         self.category_selector.show()
-        self.labelCategoryHoldProduct.show()
+        self.label_can_hold_product.show()
         self.category_can_hold_product.show()
     
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             self.product.show()
         
         window.resize_scroll_height()
             
     def openConfigCategories(self):
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             if self.product.editting_product:
                 self.product.show_hide_edit()
             elif self.product.creating_product:
                 self.product.showHideCreateProduct()
 
-        Store.configCategory(self.storeIndex)
+        Store.configCategory(self._store_i)
 
         window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
-        self.configBox.hide()
-        self.shelfNumber.hide()
-        self.labelCategory.hide()
-        self.editCategories.hide()
+        self.space_number.hide()
+        self.shelf_number.hide()
+        self.label_category_selected.hide()
+        self.edit_categories_button.hide()
         self.category_selector.hide()
-        self.labelCategoryHoldProduct.hide()
+        self.label_can_hold_product.hide()
         self.category_can_hold_product.hide()
 
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             self.product.hide()
 
-        self.openSpaceConfig.show()
+        self.return_to_space_config.show()
         self.category.show_ui()
 
     def stopConfigSpace(self):
@@ -611,20 +619,20 @@ class Space(QLabel):
 
         ShelfInfo.hideAllSpaces()
 
-        Store.stopConfigCategory(self.storeIndex)
+        Store.stopConfigCategory(self._store_i)
 
-        self.configBox.show()
-        self.shelfNumber.show()
-        self.labelCategory.show()
-        self.editCategories.show()
+        self.space_number.show()
+        self.shelf_number.show()
+        self.label_category_selected.show()
+        self.edit_categories_button.show()
         self.category_selector.show()
-        self.labelCategoryHoldProduct.show()
+        self.label_can_hold_product.show()
         self.category_can_hold_product.show()
 
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             self.product.show()
 
-        self.openSpaceConfig.hide()
+        self.return_to_space_config.hide()
     
     def changeCategory(self, category):
         oldName = self.category.name
@@ -635,7 +643,7 @@ class Space(QLabel):
         if Category.categoryCanHoldProduct(category):
             self.category_can_hold_product.set_value(True)
 
-            if not isinstance(self.product, Product):
+            if not hasattr(self, "product"):
                 self.product = Product(153, 165, self, self.parent())
                 self.product.show()
 
@@ -645,35 +653,35 @@ class Space(QLabel):
         else:
             self.category_can_hold_product.set_value(False)
 
-            if isinstance(self.product, Product):
+            if hasattr(self, "product"):
                 self.product.hide()
 
-            self.product = None
+                del self.product
 
         if UserManager.get_role() != 'Offline':
             Mongo.update_category_space(self.mongo_id, oldName)
 
     def updateVerticalHeaderPosition(self, value):
-        self.openSpaceConfig.move(self.openSpaceConfig.pos().x(), value + 15)
+        self.return_to_space_config.move(self.return_to_space_config.pos().x(), value + 15)
 
     def showFloor(self, number):
-        if number != self.actualFloor:
+        if number != self._actual_floor:
             self.hideSpace()
         else:
             self.showSpace()
 
     def hideSpace(self):
         self.box.hide()
-        self.configBox.hide()
-        self.shelfNumber.hide()
-        self.labelCategory.hide()
-        self.editCategories.hide()
-        self.openSpaceConfig.hide()
+        self.space_number.hide()
+        self.shelf_number.hide()
+        self.label_category_selected.hide()
+        self.edit_categories_button.hide()
+        self.return_to_space_config.hide()
         self.category_selector.hide()
-        self.labelCategoryHoldProduct.hide()
+        self.label_can_hold_product.hide()
         self.category_can_hold_product.hide()
 
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             self.product.hide()
         
         self.category.hide_ui()
@@ -683,16 +691,16 @@ class Space(QLabel):
 
         self.box.show()
 
-        self.configBox.hide()
-        self.shelfNumber.hide()
-        self.labelCategory.hide()
-        self.editCategories.hide()
-        self.openSpaceConfig.hide()
+        self.space_number.hide()
+        self.shelf_number.hide()
+        self.label_category_selected.hide()
+        self.edit_categories_button.hide()
+        self.return_to_space_config.hide()
         self.category_selector.hide()
-        self.labelCategoryHoldProduct.hide()
+        self.label_can_hold_product.hide()
         self.category_can_hold_product.hide()
 
-        if isinstance(self.product, Product):
+        if hasattr(self, "product"):
             if self.product.creating_product:
                 self.product.showHideCreateProduct()
 
@@ -772,23 +780,23 @@ class ShelfInfo():
 
                 for index in range(sideSpaces):
                     if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, False, times5))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent, False, times5))
 
                     indexSpace += 1
 
                 for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent))
+                    self.spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent))
                     indexSpace += 1
                 
                 if mod > 0:
                     if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True))
+                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent, True))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, indexSpace, parent, True, times5))
+                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent, True, times5))
 
                     indexSpace += 1
             else:
@@ -796,10 +804,10 @@ class ShelfInfo():
                     mod5 = (index + 1) % 5
 
                     if mod5 != 0:
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
                     else:
                         times5 += 1
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, self.spacesLength, index, parent, False, times5))
+                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
 
         self.shelfNumber.setFont(FONT_TEXT)
 
@@ -1033,7 +1041,7 @@ class MainWindow(QMainWindow):
         self.goHome.hide()
 
         self.addStoreButton = QPushButton(Language.get("add_store"), parent)
-        self.editCategories = QPushButton(Language.get("edit_categories"), parent)
+        self.edit_categories_button = QPushButton(Language.get("edit_categories"), parent)
 
         self.languageChanger = LanguageChanger(self, parent)
         self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
@@ -1084,13 +1092,13 @@ class MainWindow(QMainWindow):
         self.addShelfButton.setFont(FONT_TEXT)
 
         self.goHome.setFont(FONT_SMALL_TEXT)
-        self.editCategories.setFont(FONT_SMALL_TEXT)
+        self.edit_categories_button.setFont(FONT_SMALL_TEXT)
         self.store_name_input.setFont(FONT_SMALL_TEXT)
 
         self.goHome.setStyleSheet(DEFAULT_BUTTON)
         self.store_name_input.setStyleSheet(INPUT_TEXT)
         self.addStoreButton.setStyleSheet(BLUE_BUTTON)
-        self.editCategories.setStyleSheet(EDIT_BUTTON)
+        self.edit_categories_button.setStyleSheet(EDIT_BUTTON)
         self.addShelfButton.setStyleSheet(BLUE_BUTTON)
         self.createStoreButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
@@ -1104,7 +1112,7 @@ class MainWindow(QMainWindow):
         self.addStoreButton.clicked.connect(self.addStore)
         self.addShelfButton.clicked.connect(self.createShelf)
         self.createStoreButton.clicked.connect(self.saveStoreInfo)
-        self.editCategories.clicked.connect(self.configCategories)
+        self.edit_categories_button.clicked.connect(self.configCategories)
         self.icon_new_store.clicked.connect(self.uploadImage)
         self.setDefaultIcon.clicked.connect(self.setDefaultStoreIcon)
 
@@ -1115,7 +1123,7 @@ class MainWindow(QMainWindow):
     # Scroll functions
     def updateVerticalHeaderPosition(self, value):
         self.goHome.move(self.goHome.pos().x(), value + 10)
-        self.editCategories.move(self.editCategories.pos().x(), value + (WINDOW_HEIGHT - 115))
+        self.edit_categories_button.move(self.edit_categories_button.pos().x(), value + (WINDOW_HEIGHT - 115))
         self.store_name_input.move(self.store_name_input.pos().x(), value + 10)
         self.storeNameLabel.move(self.storeNameLabel.pos().x(), value + 20)
         self.headerFormBackground.move(self.headerFormBackground.pos().x(), value)
@@ -1189,7 +1197,7 @@ class MainWindow(QMainWindow):
         self.goHome.show()
         self.goHome.raise_()
         self.addStoreButton.hide()
-        self.editCategories.hide()
+        self.edit_categories_button.hide()
         self.languageChanger.hide()
 
     def createShelf(self):
@@ -1268,7 +1276,7 @@ class MainWindow(QMainWindow):
 
     def showMainButtons(self):
         self.languageChanger.show()
-        self.editCategories.show()
+        self.edit_categories_button.show()
         self.addStoreButton.show()
 
     # Hide objects
@@ -1286,14 +1294,14 @@ class MainWindow(QMainWindow):
     def hideAllButtons(self):
         self.goHome.hide()
         self.addStoreButton.hide()
-        self.editCategories.hide()
+        self.edit_categories_button.hide()
         self.languageChanger.hide()
 
     # Hide and show objects
     def hideMainButtons(self):
         self.goHome.show()
         self.addStoreButton.hide()
-        self.editCategories.hide()
+        self.edit_categories_button.hide()
         self.languageChanger.hide()
 
     # Raise objects
@@ -1311,7 +1319,7 @@ class MainWindow(QMainWindow):
     def raiseMainButtons(self):
         self.languageChanger.raise_()
         self.addStoreButton.raise_()
-        self.editCategories.raise_()
+        self.edit_categories_button.raise_()
 
     def change_user_role(self, role, username = ''):
         if role != 'Offline':
@@ -1319,18 +1327,18 @@ class MainWindow(QMainWindow):
 
         if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
             self.addStoreButton.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
-            self.editCategories.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
+            self.edit_categories_button.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
         else:
             self.addStoreButton.setGeometry(0, 0, 0, 0)
-            self.editCategories.setGeometry(0, 0, 0, 0)
+            self.edit_categories_button.setGeometry(0, 0, 0, 0)
 
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
                     if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
-                        space.editCategories.setGeometry(320, 26, 26, 26)
+                        space.edit_categories_button.setGeometry(320, 26, 26, 26)
                     else:
-                        space.editCategories.setGeometry(0, 0, 0, 0)
+                        space.edit_categories_button.setGeometry(0, 0, 0, 0)
 
 window = MainWindow()
 

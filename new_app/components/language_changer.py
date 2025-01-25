@@ -44,7 +44,7 @@ class LanguageChanger(QLabel):
         try:
             self._main_window.storeNameInput.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
             self._main_window.createStoreButton.setText(Language.get("create_store"))
-            self._main_window.editCategories.setText(Language.get("edit_categories"))
+            self._main_window.edit_categories_button.setText(Language.get("edit_categories"))
             self._main_window.setDefaultIcon.setText(Language.get("default_image"))
             self._main_window.icon_new_store.setText(Language.get("change_image"))
             self._main_window.storeNameLabel.setText(Language.get("name_store"))
@@ -88,12 +88,12 @@ class LanguageChanger(QLabel):
 
                     # Space
                     for space in shelf.spaces:
-                        space.shelfNumber.setText(Language.get("shelf") + str(space.shelfIndex + 1) + ":")
-                        space.labelCategoryHoldProduct.setText(Language.get("category_hold_product"))
+                        space.shelf_number.setText(Language.get("shelf") + str(space.shelf_i + 1) + ":")
+                        space.label_can_hold_product.setText(Language.get("category_hold_product"))
                         space.category_can_hold_product.set_true_text(Language.get("yes"))
                         space.category_can_hold_product.set_false_text(Language.get("no"))
-                        space.openSpaceConfig.setText(Language.get("go_back"))
-                        space.labelCategory.setText(Language.get("category"))
+                        space.return_to_space_config.setText(Language.get("go_back"))
+                        space.label_category_selected.setText(Language.get("category"))
 
                         space.category.stop_editting_category.setText(Language.get("go_back"))
                         space.category.update_category_button.setText(Language.get("save"))
