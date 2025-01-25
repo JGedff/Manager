@@ -51,22 +51,24 @@ class InputBool(QLabel):
         self._false_button.clicked.connect(self.false_function)
     
     def true_function(self):
-        self._value = True
+        if not self._value:
+            self._value = True
 
-        # Change style, so user knows which button is on
-        self._true_button.setStyleSheet(TRUE_BUTTON + NO_RIGHT_BORDER_BUTTON)
-        self._false_button.setStyleSheet(FALSE_BUTTON)
+            # Change style, so user knows which button is on
+            self._true_button.setStyleSheet(TRUE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+            self._false_button.setStyleSheet(FALSE_BUTTON)
 
-        self._true_action()
+            self._true_action()
 
     def false_function(self):
-        self._value = False
+        if self._value:
+            self._value = False
 
-        # Change style, so user knows which button is on
-        self._false_button.setStyleSheet(TRUE_BUTTON)
-        self._true_button.setStyleSheet(FALSE_BUTTON + NO_RIGHT_BORDER_BUTTON)
+            # Change style, so user knows which button is on
+            self._false_button.setStyleSheet(TRUE_BUTTON)
+            self._true_button.setStyleSheet(FALSE_BUTTON + NO_RIGHT_BORDER_BUTTON)
 
-        self._false_action()
+            self._false_action()
 
     def get_value(self):
         return self._value
