@@ -287,7 +287,7 @@ class CategorySpace(QLabel):
             if UserManager.get_role() != 'Offline':
                 Mongo.update_category_color(self._name_modified_categoy, self._updated_color)
 
-    def update_categories_name(self, updated_name):
+    def update_categories_name(self, updated_name: str):
         index = Category.get_index_by_name(self._name_modified_categoy)
         Category.change_category_name(index, updated_name)
 
@@ -298,7 +298,7 @@ class CategorySpace(QLabel):
                 for space in shelf.spaces:
                     update_category_name(space, self._color_modified_category, self._name_modified_categoy, updated_name)
 
-    def update_categories_color(self, category_name):
+    def update_categories_color(self, category_name: str):
         index = Category.get_index_by_name(category_name)
         Category.change_category_color(index, self._updated_color)
 
@@ -422,7 +422,7 @@ class CategorySpace(QLabel):
             self.create_category_button.setDisabled(False)
 
 class Space(QLabel):
-    def __init__(self, pos_x, pos_y, actual_floor, shelf_floors, store_i, shelf_i, space_i, parent = None, long = False):
+    def __init__(self, pos_x: int, pos_y: int, actual_floor: int, shelf_floors: int, store_i: int, shelf_i: int, space_i: int, parent = None, long = False):
         super().__init__(parent)
 
         self.setGeometry(pos_x, pos_y, 75, 75)
@@ -431,7 +431,7 @@ class Space(QLabel):
         self.init_ui(space_i, parent)
         self.init_events()
 
-    def init_variables(self, actual_floor, shelf_floors, store_i, shelf_i, parent, long):
+    def init_variables(self, actual_floor: int, shelf_floors: int, store_i: int, shelf_i: int, parent, long: bool):
         self._long = long
         self.mongo_id = None
         self._store_i = store_i
@@ -443,7 +443,7 @@ class Space(QLabel):
         if actual_floor > shelf_floors:
             set_unreachable_category(self.category)
 
-    def init_ui(self, space_i, parent):
+    def init_ui(self, space_i: int, parent):
         ## INITIALIZE OBJECTS ##
         # Labels
         self.label_category_selected = QLabel(Language.get("category"), parent)
@@ -521,7 +521,7 @@ class Space(QLabel):
         if Category.can_hold_product(self.category.name):
             self.category_can_hold_product.set_value(True)
 
-        self.updateSpaceColor()
+        self.update_space_boxes_style()
 
     def change_category_can_hold_product(self):
         Category.change_can_hold_product(self.category_selector.currentText(), True)
@@ -556,17 +556,17 @@ class Space(QLabel):
             Mongo.update_space_product(self.mongo_id, "")
             Mongo.update_space_amount(self.mongo_id, 0)
 
-    def updateSpaceColor(self):
+    def update_space_boxes_style(self):
         self.box.setStyleSheet(get_style_sheet(self.category.color))
         self.space_number.setStyleSheet(get_style_sheet(self.category.color))
 
     def init_events(self):
-        self.box.clicked.connect(self.configSpace)
-        self.return_to_space_config.clicked.connect(self.stopConfigSpace)
-        self.edit_categories_button.clicked.connect(self.openConfigCategories)
-        self.category_selector.currentTextChanged.connect(self.changeCategory)
+        self.box.clicked.connect(self.show_space_config)
+        self.category_selector.currentTextChanged.connect(self.change_category)
+        self.edit_categories_button.clicked.connect(self.open_categories_config)
+        self.return_to_space_config.clicked.connect(self.stop_editting_categories)
 
-    def configSpace(self):
+    def show_space_config(self):
         window.hideAllButtons()
 
         Store.hideAllStores()
@@ -576,71 +576,23 @@ class Space(QLabel):
 
         self.space_number.show()
         self.shelf_number.show()
-        self.label_category_selected.show()
-        self.edit_categories_button.show()
         self.category_selector.show()
+        self.edit_categories_button.show()
         self.label_can_hold_product.show()
+        self.label_category_selected.show()
         self.category_can_hold_product.show()
-    
+
         if hasattr(self, "product"):
             self.product.show()
-        
+
         window.resize_scroll_height()
-            
-    def openConfigCategories(self):
-        if hasattr(self, "product"):
-            if self.product.editting_product:
-                self.product.show_hide_edit()
-            elif self.product.creating_product:
-                self.product.showHideCreateProduct()
 
-        Store.configCategory(self._store_i)
+    def change_category(self, category_name: str):
+        set_category_by_name(self.category, category_name)
 
-        window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
+        self.update_space_boxes_style()
 
-        self.space_number.hide()
-        self.shelf_number.hide()
-        self.label_category_selected.hide()
-        self.edit_categories_button.hide()
-        self.category_selector.hide()
-        self.label_can_hold_product.hide()
-        self.category_can_hold_product.hide()
-
-        if hasattr(self, "product"):
-            self.product.hide()
-
-        self.return_to_space_config.show()
-        self.category.show_ui()
-
-    def stopConfigSpace(self):
-        self.updateSpaceColor()
-
-        self.category.cancelAddCategory()
-
-        ShelfInfo.hideAllSpaces()
-
-        Store.stopConfigCategory(self._store_i)
-
-        self.space_number.show()
-        self.shelf_number.show()
-        self.label_category_selected.show()
-        self.edit_categories_button.show()
-        self.category_selector.show()
-        self.label_can_hold_product.show()
-        self.category_can_hold_product.show()
-
-        if hasattr(self, "product"):
-            self.product.show()
-
-        self.return_to_space_config.hide()
-    
-    def changeCategory(self, category):
-        oldName = self.category.name
-
-        set_category_by_name(self.category, category)
-        self.updateSpaceColor()
-
-        if Category.categoryCanHoldProduct(category):
+        if Category.can_hold_product(category_name):
             self.category_can_hold_product.set_value(True)
 
             if not hasattr(self, "product"):
@@ -659,50 +611,95 @@ class Space(QLabel):
                 del self.product
 
         if UserManager.get_role() != 'Offline':
-            Mongo.update_category_space(self.mongo_id, oldName)
+            Mongo.update_category_space(self.mongo_id, category_name)
 
-    def updateVerticalHeaderPosition(self, value):
-        self.return_to_space_config.move(self.return_to_space_config.pos().x(), value + 15)
+    def open_categories_config(self):
+        if hasattr(self, "product"):
+            if self.product.editting_product:
+                self.product.show_hide_edit()
+            elif self.product.creating_product:
+                self.product.show_hide_create()
 
-    def showFloor(self, number):
-        if number != self._actual_floor:
-            self.hideSpace()
-        else:
-            self.showSpace()
+        Store.configCategory(self._store_i)
 
-    def hideSpace(self):
-        self.box.hide()
+        window.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
+
         self.space_number.hide()
         self.shelf_number.hide()
-        self.label_category_selected.hide()
-        self.edit_categories_button.hide()
-        self.return_to_space_config.hide()
         self.category_selector.hide()
+        self.edit_categories_button.hide()
         self.label_can_hold_product.hide()
+        self.label_category_selected.hide()
         self.category_can_hold_product.hide()
 
         if hasattr(self, "product"):
             self.product.hide()
-        
-        self.category.hide_ui()
 
-    def showSpace(self):
-        self.updateSpaceColor()
+        self.return_to_space_config.show()
 
-        self.box.show()
+        self.category.show_ui()
 
+    def stop_editting_categories(self):
+        self.update_space_boxes_style()
+
+        self.category.cancel_add_category()
+
+        ShelfInfo.hideAllSpaces()
+
+        Store.stopConfigCategory(self._store_i)
+
+        self.return_to_space_config.hide()
+
+        self.space_number.show()
+        self.shelf_number.show()
+        self.category_selector.show()
+        self.edit_categories_button.show()
+        self.label_can_hold_product.show()
+        self.label_category_selected.show()
+        self.category_can_hold_product.show()
+
+        if hasattr(self, "product"):
+            self.product.show()
+
+    def show_floor(self, floor_num: int):
+        if floor_num != self._actual_floor:
+            self.hide_space()
+        else:
+            self.show_space()
+
+    def hide_space(self):
+        self.box.hide()
         self.space_number.hide()
         self.shelf_number.hide()
-        self.label_category_selected.hide()
+        self.category_selector.hide()
         self.edit_categories_button.hide()
         self.return_to_space_config.hide()
-        self.category_selector.hide()
         self.label_can_hold_product.hide()
+        self.label_category_selected.hide()
         self.category_can_hold_product.hide()
 
         if hasattr(self, "product"):
+            self.product.hide()
+
+        self.category.hide_ui()
+
+    def show_space(self):
+        self.update_space_boxes_style()
+
+        self.space_number.hide()
+        self.shelf_number.hide()
+        self.category_selector.hide()
+        self.edit_categories_button.hide()
+        self.return_to_space_config.hide()
+        self.label_can_hold_product.hide()
+        self.label_category_selected.hide()
+        self.category_can_hold_product.hide()
+
+        self.box.show()
+
+        if hasattr(self, "product"):
             if self.product.creating_product:
-                self.product.showHideCreateProduct()
+                self.product.show_hide_create()
 
             self.product.hide()
 
@@ -714,7 +711,7 @@ class ShelfInfo():
         shelf.shelfNumber.hide()
 
         for space in shelf.spaces:
-            space.hideSpace()
+            space.hide_space()
 
     @staticmethod
     def hideAllSpaces():
@@ -723,7 +720,7 @@ class ShelfInfo():
                 shelf.shelfNumber.hide()
 
                 for space in shelf.spaces:
-                    space.hideSpace()
+                    space.hide_space()
     
     @staticmethod
     def changeFloor(index, number):
@@ -731,7 +728,7 @@ class ShelfInfo():
             shelf.shelfNumber.show()
 
             for space in shelf.spaces:
-                space.showFloor(number)
+                space.show_floor(number)
     
     @staticmethod
     def getMaxSpaces(index):
