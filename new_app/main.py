@@ -1,6 +1,5 @@
 import os
 import sys
-import time
 import shutil
 from datetime import datetime
 
@@ -422,6 +421,26 @@ class CategorySpace(QLabel):
             self.create_category_button.setDisabled(False)
 
 class Space(QLabel):
+    @staticmethod
+    def create_mongo_spaces(store_name: str, store_floors: int, form, id_empty_category: str, id_unreachable_category: str) -> list:
+        spaces = []
+        mongo_id = 0
+
+        for floor in range(store_floors):
+            for _ in range(form.get_num_spaces()):
+                id_category = id_unreachable_category if form.get_num_floors() - 1 < floor else id_empty_category 
+
+                spaces.append({
+                    "category": id_category,
+                    "mongo_id": store_name + "_" + str(mongo_id),
+                    "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+                })
+
+                mongo_id += 1
+
+        return spaces
+
+
     def __init__(self, pos_x: int, pos_y: int, actual_floor: int, shelf_floors: int, store_i: int, shelf_i: int, space_i: int, parent = None, long = False):
         super().__init__(parent)
 
@@ -707,6 +726,23 @@ class Space(QLabel):
 
 class Shelf():
     @staticmethod
+    def create_mongo_shelves(store_name: str, array_forms, id_empty_category: str, id_unreachable_category: str) -> list:
+        shelves = []
+        store_floors = get_max_floor(array_forms)
+
+        for form in array_forms:
+            new_spaces = Space.create_mongo_spaces(store_name, store_floors, form, id_empty_category, id_unreachable_category)
+
+            shelves.append({
+                "floors": form.get_num_floors(),
+                "spaces": new_spaces,
+                "double_shelf": form.is_double_shelf(),
+                "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+            })
+
+        return shelves
+
+    @staticmethod
     def hide_all_spaces(array_stores):
         for stores in array_stores:
             for shelf in stores:
@@ -802,54 +838,30 @@ class Shelf():
 
 class Store():
     @staticmethod
-    def createMongoStore(name, image = DEFAULT_IMAGE):
+    def create_mongo_store(name, image = DEFAULT_IMAGE):
+        # Save the uploaded image locally
         image_path = image
 
         if image != DEFAULT_IMAGE:
-            # Copy the uploaded image to the save directory
             save_dir = "img"
             os.makedirs(save_dir, exist_ok=True)  # Create the directory if it doesn't exist
 
+            # Create path of the copy
             file_name = os.path.basename(image)
             save_path = os.path.join(save_dir, file_name)
             image_path = save_path
 
-            shutil.copy(image, save_path)
+            shutil.copy(image, save_path) # Copy image to the new path
 
-        shelvesInfo = []
-        mongo_id = 0
 
-        storeFloors = get_max_floor(SHELVES_FORMS)
-        emptyCategory = get_empty_category_name()
-        unreachableCategory = get_unreachable_category_name()
-        id_empty_category = Mongo.get_category_by_name(emptyCategory)
-        id_unreachable_category = Mongo.get_category_by_name(unreachableCategory)
+        empty_category_name = get_empty_category_name()
+        unreachable_category_name = get_unreachable_category_name()
+        id_empty_category = Mongo.get_category_by_name(empty_category_name)
+        id_unreachable_category = Mongo.get_category_by_name(unreachable_category_name)
 
-        for form in SHELVES_FORMS:
-            spacesInfo = []
-
-            time.sleep(0.01)
-
-            for floor in range(storeFloors):
-                for _ in range(form.get_num_spaces()):
-                    id_category = id_unreachable_category if form.get_num_floors() - 1 < floor else id_empty_category 
-
-                    spacesInfo.append({
-                        "category": id_category,
-                        "mongo_id": name + "_" + str(mongo_id),
-                        "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-                    })
-
-                    mongo_id += 1
+        new_shelves = Shelf.create_mongo_shelves(name, SHELVES_FORMS, id_empty_category, id_unreachable_category)
             
-            shelvesInfo.append({
-                "floors": form.get_num_floors(),
-                "spaces": spacesInfo,
-                "double_shelf": form.is_double_shelf(),
-                "creation_date": datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-            })
-            
-        Mongo.add_store(shelvesInfo, name, image_path)
+        Mongo.add_store(new_shelves, name, image_path)
 
     @staticmethod
     def createStore(storeName, parent, image = DEFAULT_IMAGE):
@@ -1199,7 +1211,7 @@ class MainWindow(QMainWindow):
                 storeName = Language.get("store") + str(STORES.__len__() + 1)
 
             if UserManager.get_role() != 'Offline':
-                Store.createMongoStore(storeName, self.image)
+                Store.create_mongo_store(storeName, self.image)
 
             ShelfForm.hide_all_forms(SHELVES_FORMS)
             Store.createStore(storeName, self.widget, self.image)
