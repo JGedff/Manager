@@ -644,7 +644,7 @@ class Space(QLabel):
 
         self.category.cancel_add_category()
 
-        ShelfInfo.hideAllSpaces()
+        Shelf.hide_all_spaces(SHELVES)
 
         Store.stopConfigCategory(self._store_i)
 
@@ -705,115 +705,100 @@ class Space(QLabel):
 
         self.box.raise_()
 
-class ShelfInfo():
+class Shelf():
     @staticmethod
-    def hideSpaces(shelf):
-        shelf.shelfNumber.hide()
-
-        for space in shelf.spaces:
-            space.hide_space()
-
-    @staticmethod
-    def hideAllSpaces():
-        for stores in SHELVES:
+    def hide_all_spaces(array_stores):
+        for stores in array_stores:
             for shelf in stores:
-                shelf.shelfNumber.hide()
+                shelf.label_shelf_number.hide()
 
                 for space in shelf.spaces:
                     space.hide_space()
     
     @staticmethod
-    def changeFloor(index, number):
-        for shelf in SHELVES[index]:
-            shelf.shelfNumber.show()
+    def change_floor(array_shelves, number: int):
+        for shelf in array_shelves:
+            shelf.label_shelf_number.show()
 
             for space in shelf.spaces:
                 space.show_floor(number)
     
     @staticmethod
-    def getMaxSpaces(index):
-        maxSpaces = 1
+    def get_max_amount_spaces_in_shelf_from_store(array_shelves):
+        maximum = 1
 
-        for shelf in SHELVES[index]:
-            numSpaces = shelf.spaces.__len__()
+        for shelf in array_shelves:
+            num_spaces = len(shelf.spaces)
 
             if shelf.double_shelf:
-                numSpaces = int(numSpaces / 2)
+                num_spaces = int(num_spaces / 2)
 
-            if numSpaces > maxSpaces:
-                maxSpaces = numSpaces
+            if num_spaces > maximum:
+                maximum = num_spaces
 
-        return maxSpaces
+        return maximum
 
-    def __init__(self, posx, posy, floors, spaces, double_shelf, storeFloors, shelfNumber = 1, storeIndex = 1, parent = None):
-        self.initVariables(posx, floors, spaces, double_shelf, storeFloors, shelfNumber, storeIndex)
-        self.initUI(posx, posy, parent)
-        self.initEvents()
+    @staticmethod
+    def generate_spaces(pos_x: int, pos_y: int, store_floors: int, double_shelf: bool, amount_spaces: int, shelf_floors: int, store_i: int, shelf_num: int, parent):
+        spaces = []
+
+        pos_y += 35
+
+        for floor_i in range(store_floors):
+            if double_shelf:
+                space_i = 0
+                long_spaces = amount_spaces % 2
+                side_spaces = (amount_spaces / 2).__trunc__()
+
+                for index_pos in range(side_spaces):
+                    spaces.append(Space(pos_x + (75 * index_pos), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent))
+
+                    space_i += 1
+
+                for index_pos in range(side_spaces):
+                    spaces.append(Space(pos_x + (75 * index_pos), pos_y + 75, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent))
+
+                    space_i += 1
+
+                if long_spaces > 0:
+                    spaces.append(Space(pos_x + (75 * side_spaces), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent, True))
+
+            else:
+                for index_pos in range(amount_spaces):
+                    spaces.append(Space(pos_x + (75 * index_pos), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, index_pos, parent))
+
+        return spaces
+
+    def __init__(self, pos_x: int, pos_y: int, shelf_floors: int, amount_spaces: int, double_shelf: bool, store_floors: int, shelf_num = 1, store_i = 1, parent = None):
+        self.init_variables(shelf_floors, double_shelf, shelf_num)
+        self.init_ui(pos_x, pos_y, amount_spaces, store_floors, store_i, parent)
+        self.init_events()
     
-    def initVariables(self, posx, floors, spaces, double_shelf, storeFloors, shelfNumber, storeIndex):
+    def init_variables(self, shelf_floors: int, double_shelf: bool, shelf_num: int):
         self.spaces = []
-        self.posx = posx
-        self.floors = floors
-        self.spacesLength = spaces
-        self.storeIndex = storeIndex
-        self.storeFloors = storeFloors
-        self.actualNumber = shelfNumber
+        self.shelf_num = shelf_num
+        self._amount_floors = shelf_floors
         self.double_shelf = double_shelf
 
-    def initUI(self, posx, posy, parent):
-        self.shelfNumber = QLabel(Language.get("shelf") + str(self.actualNumber) + ":", parent)
-        self.shelfNumber.setGeometry(int(WINDOW_WIDTH / 2 - 125 / 2), posy, 125, 25)
-        self.shelfNumber.hide()
+    def init_ui(self, pos_x: int, pos_y: int, amount_spaces: int, store_floors: int, store_i: int, parent):
+        ## INITIALIZE OBJECTS ##
+        # Labels
+        self.label_shelf_number = QLabel(Language.get("shelf") + str(self.shelf_num) + ":", parent)
+        self.label_shelf_number.setGeometry(int(WINDOW_WIDTH / 2 - 125 / 2), pos_y, 125, 25)
+        self.label_shelf_number.hide()
 
-        posy += 35
+        ## STYLE ##
+        # Labels
+        self.label_shelf_number.setFont(FONT_TEXT)
 
-        for actualFloor in range(self.storeFloors):
-            times5 = 0
+        ## SET VALUES ##
+        self.spaces = self.generate_spaces(pos_x, pos_y, store_floors, self.double_shelf, amount_spaces, self._amount_floors, store_i, self.shelf_num, parent)
 
-            if self.double_shelf:
-                indexSpace = 0
-                mod = self.spacesLength % 2
-                sideSpaces = (self.spacesLength / 2).__trunc__()
+    def init_events(self):
+        window.scroll.horizontalScrollBar().valueChanged.connect(self.update_ui_horizontal_pos)
 
-                for index in range(sideSpaces):
-                    if (index + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent))
-                    else:
-                        times5 += 1
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent, False, times5))
-
-                    indexSpace += 1
-
-                for index in range(sideSpaces):
-                    self.spaces.append(Space(posx + (75 * index), posy + 75, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent))
-                    indexSpace += 1
-                
-                if mod > 0:
-                    if (sideSpaces + 1) % 5 != 0:
-                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent, True))
-                    else:
-                        times5 += 1
-                        self.spaces.append(Space(posx + (75 * sideSpaces), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, indexSpace, parent, True, times5))
-
-                    indexSpace += 1
-            else:
-                for index in range(self.spacesLength):
-                    mod5 = (index + 1) % 5
-
-                    if mod5 != 0:
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent))
-                    else:
-                        times5 += 1
-                        self.spaces.append(Space(posx + (75 * index), posy, actualFloor + 1, self.floors, self.storeIndex, self.actualNumber - 1, index, parent, False, times5))
-
-        self.shelfNumber.setFont(FONT_TEXT)
-
-    def initEvents(self):
-        update_shelves_pos(SHELVES_FORMS)
-        window.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalInfoPosition)
-
-    def updateHorizontalInfoPosition(self, value):
-        self.shelfNumber.move(value + int(WINDOW_WIDTH / 2 - self.shelfNumber.width() / 2), self.shelfNumber.pos().y())
+    def update_ui_horizontal_pos(self, value):
+        self.label_shelf_number.move(value + int(WINDOW_WIDTH / 2 - self.label_shelf_number.width() / 2), self.label_shelf_number.pos().y())
 
 class Store():
     @staticmethod
@@ -915,6 +900,8 @@ class Store():
         self.setupStore(parent)
         self.initUI(name, image, posx, posy, parent)
         self.initEvents()
+
+        update_shelves_pos(SHELVES_FORMS)
     
     def setupStore(self, parent):
         self.indexShelves = SHELVES.__len__()
@@ -922,13 +909,13 @@ class Store():
         storeShelves = []
 
         for index, form in enumerate(SHELVES_FORMS):
-            storeShelves.append(ShelfInfo(25, 50 + (225 * index), form.floors, form.spaces, form.double_shelf, self.floor, (index + 1), STORES.__len__(), parent))
+            storeShelves.append(Shelf(25, 50 + (225 * index), form.floors, form.spaces, form.double_shelf, self.floor, (index + 1), STORES.__len__(), parent))
         
         SHELVES.append(storeShelves)
         SHELVES_FORMS.clear()
         
         ShelfForm.create(parent, window)
-        ShelfForm.hide_all_forms()
+        ShelfForm.hide_all_forms(SHELVES_FORMS)
 
     def initUI(self, name, image, posx, posy, parent):
         self.goBackStore = QPushButton(Language.get("go_back"), parent)
@@ -960,7 +947,7 @@ class Store():
 
     def openStore(self):
         amountShelves = SHELVES[self.indexShelves].__len__()
-        amountSpaces = ShelfInfo.getMaxSpaces(self.indexShelves)
+        amountSpaces = Shelf.get_max_amount_spaces_in_shelf_from_store(SHELVES[self.indexShelves])
 
         self.hideAllStoreIcons()
 
@@ -975,7 +962,7 @@ class Store():
 
     def changeFloor(self, floor):
         if floor.strip() != "":
-            ShelfInfo.changeFloor(self.indexShelves, int(floor.split(' ')[1]))
+            Shelf.change_floor(SHELVES[self.indexShelves], int(floor.split(' ')[1]))
 
     def updateVerticalHeaderPosition(self, value):
         self.changeFloorButton.move(self.changeFloorButton.pos().x(), value + 15)
@@ -988,7 +975,7 @@ class Store():
         self.changeFloorButton.raise_()
 
     def hideStore(self):
-        ShelfInfo.hideAllSpaces()
+        Shelf.hide_all_spaces(SHELVES)
 
         self.changeFloorButton.hide()
 
@@ -1173,10 +1160,10 @@ class MainWindow(QMainWindow):
         self.hideAddStoreForm()
         self.raiseMainButtons()
 
-        ShelfForm.hide_all_forms()
+        ShelfForm.hide_all_forms(SHELVES_FORMS)
         Store.hideAllStores()
         Store.showAllStoreIcons()
-        ShelfInfo.hideAllSpaces()
+        Shelf.hide_all_spaces(SHELVES)
 
         self.raiseMainButtons()
         self.resizeMain()
@@ -1188,7 +1175,7 @@ class MainWindow(QMainWindow):
         if SHELVES_FORMS.__len__() == 0:
             self.createShelf()
 
-        ShelfForm.show_all_forms()
+        ShelfForm.show_all_forms(SHELVES_FORMS)
         Store.hideAllStoreIcons()
 
         self.goHome.show()
@@ -1214,7 +1201,7 @@ class MainWindow(QMainWindow):
             if UserManager.get_role() != 'Offline':
                 Store.createMongoStore(storeName, self.image)
 
-            ShelfForm.hide_all_forms()
+            ShelfForm.hide_all_forms(SHELVES_FORMS)
             Store.createStore(storeName, self.widget, self.image)
 
             self.store_name_input.setText("")

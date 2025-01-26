@@ -84,7 +84,7 @@ class LanguageChanger(QLabel):
             # Shelf
             for storage in SHELVES:
                 for shelf in storage:
-                    shelf.shelfNumber.setText(Language.get("shelf") + str(shelf.actualNumber) + ":")
+                    shelf.label_shelf_number.setText(Language.get("shelf") + str(shelf.shelf_num) + ":")
 
                     # Space
                     for space in shelf.spaces:

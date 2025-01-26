@@ -28,13 +28,13 @@ class ShelfForm(QLabel):
         SHELVES_FORMS.append(new_form)
 
     @staticmethod
-    def hide_all_forms():
-        for shelf in SHELVES_FORMS:
+    def hide_all_forms(array_forms):
+        for shelf in array_forms:
             shelf.hide()
 
     @staticmethod
-    def show_all_forms():    
-        for shelf in SHELVES_FORMS:
+    def show_all_forms(array_forms):    
+        for shelf in array_forms:
             shelf.show()
 
     def __init__(self, name, posx, posy, main_window, parent = None):
