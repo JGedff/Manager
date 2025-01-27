@@ -87,9 +87,9 @@ def get_information(widget, shortcut_category, main_window):
                 
                 save_shelves_info(SHELVES_FORMS)
                 
-                Store.createStore(store['name'], widget, store['image'])
+                Store.create_store(store['name'], widget, store['image'])
 
-                STORES[store_index].goBackStore.hide()
+                STORES[store_index].return_to_store_button.hide()
 
                 for shelfIndex in range(store['storeShelves'].__len__()):
                     for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):

@@ -75,11 +75,11 @@ class LanguageChanger(QLabel):
 
             # Stores
             for store in STORES:
-                store.goBackStore.setText(Language.get("go_back"))
-                store.changeFloorButton.clear()
+                store.return_to_store_button.setText(Language.get("go_back"))
+                store.floor_selector.clear()
 
-                for index in range(store.floor):
-                    store.changeFloorButton.addItem(Language.get("floor") + str(index + 1))
+                for index in range(store.amount_floors):
+                    store.floor_selector.addItem(Language.get("floor") + str(index + 1))
 
             # Shelf
             for storage in SHELVES:
