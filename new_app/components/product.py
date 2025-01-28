@@ -389,7 +389,7 @@ class Product(QLabel):
         for store in SHELVES:
             for shelf in store:
                 for space in shelf.spaces:
-                    if isinstance(space.product, Product):
+                    if hasattr(space, "product") and isinstance(space.product, Product):
                         space.product.select_product.addItem(self.edit_new_name.text().capitalize())
 
     def show_hide_create(self):

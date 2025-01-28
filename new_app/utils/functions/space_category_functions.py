@@ -83,8 +83,6 @@ def update_category_buttons_pos(space):
 
     if len(space.categories_buttons) >= 37:
         space.add_category_button.hide()
-    else:
-        space.add_category_button.show()
 
 def set_empty_category(category):
     if len(CATEGORY_NAMES) > 0:

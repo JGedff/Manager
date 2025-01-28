@@ -127,8 +127,7 @@ class LanguageChanger(QLabel):
                             space.product.label_amount.setText(Language.get('amount'))
 
             self._main_window.reopen_home()
-        except Exception as e:
-            print(e)
+        except:
             self._main_window.setWindowTitle(Language.get("log_in"))
             self._main_window.log_in_title.setText(Language.get("log_in"))
             self._main_window.user_label.setText(Language.get("user_name"))

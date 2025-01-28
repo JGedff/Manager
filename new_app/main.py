@@ -473,7 +473,7 @@ class CategorySpace(QLabel):
         self._name_modified_categoy = self.categories_buttons[0].get_first_button_sender_text().strip()
 
         color = Category.get_color_by_name(self._name_modified_categoy)
-        self._color_modified_category = color.stirp()
+        self._color_modified_category = color.strip()
 
         self.edit_category_color_selector.setStyleSheet(get_style_sheet(color))
 
@@ -788,12 +788,12 @@ class Shelf():
                 side_spaces = (amount_spaces / 2).__trunc__()
 
                 for index_pos in range(side_spaces):
-                    spaces.append(Space(pos_x + (75 * index_pos), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent, main_window))
+                    spaces.append(Space(pos_x + (75 * index_pos), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent, main_window=main_window))
 
                     space_i += 1
 
                 for index_pos in range(side_spaces):
-                    spaces.append(Space(pos_x + (75 * index_pos), pos_y + 75, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent, main_window))
+                    spaces.append(Space(pos_x + (75 * index_pos), pos_y + 75, floor_i + 1, shelf_floors, store_i, shelf_num - 1, space_i, parent, main_window=main_window))
 
                     space_i += 1
 
@@ -802,7 +802,7 @@ class Shelf():
 
             else:
                 for index_pos in range(amount_spaces):
-                    spaces.append(Space(pos_x + (75 * index_pos), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, index_pos, parent, main_window))
+                    spaces.append(Space(pos_x + (75 * index_pos), pos_y, floor_i + 1, shelf_floors, store_i, shelf_num - 1, index_pos, parent, main_window=main_window))
 
         return spaces
 
