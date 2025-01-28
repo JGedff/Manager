@@ -87,7 +87,7 @@ def get_information(widget: QWidget | None, shortcut_category, main_window):
                 
                 save_shelves_info(SHELVES_FORMS)
                 
-                Store.create_store(store['name'], widget, store['image'])
+                Store.create_store(store['name'], widget, store['image'], main_window)
 
                 STORES[store_index].return_to_store_button.hide()
 

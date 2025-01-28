@@ -28,7 +28,7 @@ class LogInWindow(QMainWindow):
 
     def init_variables(self, main_app: MainWindow):
         # Properties
-        self._log_in = True
+        self.log_in = True
         self._main_app = main_app
 
         # Information
@@ -165,9 +165,9 @@ class LogInWindow(QMainWindow):
         update_category_buttons_pos(self._main_app.shortcut_category)
 
         # Manage language
-        self._main_app.language_changer.change_lang(self.language_changer.get_language())
-        self._main_app.language_changer.set_current_text(self.language_changer.get_language())
-        self._main_app.language_changer.update()
+        self._main_app.language_selector.change_lang(self.language_changer.get_language())
+        self._main_app.language_selector.set_current_text(self.language_changer.get_language())
+        self._main_app.language_selector.update()
 
         # Close log in window
         self.close()
@@ -192,12 +192,12 @@ class LogInWindow(QMainWindow):
         self._main_app.change_user_role(role, username)
 
         # Manage language
-        self._main_app.language_changer.change_lang(self.language_changer.get_language())
-        self._main_app.language_changer.set_current_text(self.language_changer.get_language())
-        self._main_app.language_changer.update()
+        self._main_app.language_selector.change_lang(self.language_changer.get_language())
+        self._main_app.language_selector.set_current_text(self.language_changer.get_language())
+        self._main_app.language_selector.update()
 
         # Download db information
-        get_information(self._main_app.widget, self._main_app.shortcut_category, self._main_app)
+        # get_information(self._main_app.widget, self._main_app.shortcut_category, self._main_app)
 
         # Close log in window
         self.close()
@@ -211,12 +211,12 @@ class LogInWindow(QMainWindow):
         QMessageBox.warning(None, "Login Failed", "Incorrect username or password")
 
     def change_register_form(self):
-        self._log_in = not self._log_in
+        self.log_in = not self.log_in
 
         # Disconnect the function that executed when pressing from the button
         self.log_in_button.clicked.disconnect()
 
-        if self._log_in: # Change ui to show the log in
+        if self.log_in: # Change ui to show the log in
             # Change title
             self.register_title.hide()
             self.log_in_title.show()

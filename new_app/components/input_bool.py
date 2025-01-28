@@ -13,7 +13,7 @@ class InputBool(QLabel):
         self.init_ui(true_text, false_text)
         self.init_events()
 
-    def init_variables(self, true_action: function, false_action: function):
+    def init_variables(self, true_action, false_action):
         self._value = False
 
         self._true_action = true_action
