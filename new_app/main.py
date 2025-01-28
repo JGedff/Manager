@@ -16,6 +16,7 @@ from utils.functions.global_functions import get_max_floor
 from utils.functions.shelf_functions import save_shelves_info, update_shelves_pos
 from utils.functions.space_category_functions import set_unreachable_category, set_category_by_name, get_unreachable_category_name, get_empty_category_name, update_category_buttons_pos, set_empty_category, update_category_name, create_category_in, delete_category_from
 
+from utils.db import DB
 from utils.mongo_db import Mongo
 from utils.user_manager import UserManager
 
@@ -185,7 +186,7 @@ class CategorySpace(QLabel):
         self.edit_category_color_selector.raise_()
 
         if self._shortcut:
-            window.hideAllButtons()
+            window.hide_all_buttons()
         else:
             Store.hide_all_stores()
 
@@ -197,7 +198,7 @@ class CategorySpace(QLabel):
 
         if self._shortcut:
             self.cancel_add_category()
-            window.goHome.show()
+            window.reopen_home_button.show()
 
     def cancel_add_category(self):
         self._creating_category = False
@@ -393,7 +394,7 @@ class CategorySpace(QLabel):
         self.label_input_edit_category_color.hide()
 
         if self._shortcut:
-            window.hideMainButtons()
+            window.hide_main_buttons()
         else:
             self._parent_space.return_to_space_config.show()
 
@@ -586,7 +587,7 @@ class Space(QLabel):
         self.return_to_space_config.clicked.connect(self.stop_editting_categories)
 
     def show_space_config(self):
-        window.hideAllButtons()
+        window.hide_all_buttons()
 
         Store.hide_all_stores()
         Store.open_config_space(STORES[self._store_i])
@@ -971,17 +972,17 @@ class Store():
 
         self.return_to_store_button.hide()
 
-        window.hideMainButtons()
+        window.hide_main_buttons()
 
         self.floor_selector.show()
 
         # Resize the scroll, so all shelves fit in the window (update vertical scroll)
-        amount_shelves = SHELVES[self.store_index].__len__()
+        amount_shelves = len(SHELVES[self.store_index])
         window.resize_scroll_height(amount_shelves * 225 - 100)
 
         # Resize the scroll, so all spaces fit in the window (update horizontal scroll)
         max_amount_spaces_in_shelf = Shelf.get_max_amount_spaces_in_shelf_from_store(SHELVES[self.store_index])
-        window.resizeWidthScroll(max_amount_spaces_in_shelf * 75 + 25)
+        window.resize_horizontal_scroll(max_amount_spaces_in_shelf * 75 + 25)
 
         self.change_floor(self.floor_selector.currentText())
 
@@ -1017,15 +1018,19 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.initVariables()
-        self.initUI(self.widget)
-        self.initEvents()
-        
+        self.init_variables()
+        self.init_ui(self.widget)
+        self.init_events()
+
+        Store.show_all_store_icons(STORES)
+
+        self.raise_main_buttons()
+
         self.setCentralWidget(self.scroll)
         self.resize_scroll_height()
 
-    def initVariables(self):
-        self.image = DEFAULT_IMAGE
+    def init_variables(self):
+        self._image = DEFAULT_IMAGE
 
         # Window config
         self.setWindowTitle(Language.get("window_title"))
@@ -1037,122 +1042,157 @@ class MainWindow(QMainWindow):
         self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
         self.scroll.setWidget(self.widget)
 
-        shortcut = Space(0, 0, 0, 0, 0, 0, 0, 0)
-        self.shortcut_category = CategorySpace(shortcut, self.widget, True)
+        shortcut_space = Space(0, 0, 0, 0, 0, 0, 0, 0)
+        self.shortcut_category = CategorySpace(shortcut_space, self.widget, True)
 
-    def initUI(self, parent):
-        # Main buttons
-        self.goHome = QPushButton(Language.get("go_back"), parent)
-        self.goHome.setGeometry(1260, 10, 140, 50)
-        self.goHome.hide()
+    def init_ui(self, parent):
+        ## INITIALIZE OBJECTS ##
+        # Generic labels in form create store
+        self.background_header_form = QLabel("", parent)
+        self.background_header_form.setGeometry(0, 0, WINDOW_WIDTH, 75)
+        self.background_header_form.hide()
 
-        self.addStoreButton = QPushButton(Language.get("add_store"), parent)
+        self.background_footer_form = QLabel("", parent)
+        self.background_footer_form.setGeometry(0, WINDOW_HEIGHT - 75, WINDOW_WIDTH, 75)
+        self.background_footer_form.hide()
+
+        self.label_input_store_name = QLabel(Language.get("name_store"), parent)
+        self.label_input_store_name.setGeometry(400, 20, 200, 35)
+        self.label_input_store_name.hide()
+
+        # Buttons
+        self.reopen_home_button = QPushButton(Language.get("go_back"), parent)
+        self.reopen_home_button.setGeometry(1260, 10, 140, 50)
+        self.reopen_home_button.hide()
+
+        self.button_open_new_store_form = QPushButton(Language.get("add_store"), parent)
+
         self.edit_categories_button = QPushButton(Language.get("edit_categories"), parent)
 
-        self.languageChanger = LanguageChanger(self, parent)
-        self.languageChanger.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
-        
-        # Header Form
-        self.headerFormBackground = QLabel("", parent)
-        self.headerFormBackground.setGeometry(0, 0, WINDOW_WIDTH, 75)
-        self.headerFormBackground.setStyleSheet(BACKGROUND_GREY)
-        self.headerFormBackground.hide()
+        # Generic buttons in form create store
+        self.add_shelf_button = QPushButton(Language.get("add_shelf"), parent)
+        self.add_shelf_button.setGeometry(400, WINDOW_HEIGHT - 62, 200, 50)
+        self.add_shelf_button.hide()
 
-        self.storeNameLabel = QLabel(Language.get("name_store"), parent)
-        self.storeNameLabel.setGeometry(400, 20, 200, 35)
-        self.storeNameLabel.hide()
-        
+        self.create_store_button = QPushButton(Language.get("create_store"), parent)
+        self.create_store_button.setGeometry(845, WINDOW_HEIGHT - 62, 200, 50)
+        self.create_store_button.hide()
+
+        # Generic inputs in form create store
         self.store_name_input = QLineEdit(parent)
         self.store_name_input.setGeometry(690, 10, 355, 50)
         self.store_name_input.setPlaceholderText(Language.get("store") + str(1))
         self.store_name_input.hide()
 
-        # Body form
-        self.icon_new_store = ImageButton(Language.get("change_image"), DEFAULT_IMAGE, parent)
-        self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
-        self.icon_new_store.hide()
+        self.icon_new_store_button = ImageButton(Language.get("change_image"), DEFAULT_IMAGE, parent)
+        self.icon_new_store_button.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+        self.icon_new_store_button.hide()
 
-        self.setDefaultIcon = ImageButton(Language.get("default_image"), DEFAULT_IMAGE, parent)
-        self.setDefaultIcon.setGeometry(int(WINDOW_WIDTH / 2) + 25, 115, 225, 150)
-        self.setDefaultIcon.hide()
+        self.set_default_icon_button = ImageButton(Language.get("default_image"), DEFAULT_IMAGE, parent)
+        self.set_default_icon_button.setGeometry(int(WINDOW_WIDTH / 2) + 25, 115, 225, 150)
+        self.set_default_icon_button.hide()
 
-        # Footer form
-        self.footerFormBackground = QLabel("", parent)
-        self.footerFormBackground.setGeometry(0, WINDOW_HEIGHT - 75, WINDOW_WIDTH, 75)
-        self.footerFormBackground.setStyleSheet(BACKGROUND_GREY)
-        self.footerFormBackground.hide()
+        # Others
+        self.language_selector = LanguageChanger(self, parent)
+        self.language_selector.setGeometry(15, WINDOW_HEIGHT - 50, 100, 30)
 
-        self.addShelfButton = QPushButton(Language.get("add_shelf"), parent)
-        self.addShelfButton.setGeometry(400, WINDOW_HEIGHT - 62, 200, 50)
-        self.addShelfButton.hide()
+        ## STYLE ##
+        # Generic labels in form create store
+        self.label_input_store_name.setFont(FONT_TEXT)
 
-        self.createStoreButton = QPushButton(Language.get("create_store"), parent)
-        self.createStoreButton.setGeometry(845, WINDOW_HEIGHT - 62, 200, 50)
-        self.createStoreButton.hide()
+        self.background_footer_form.setStyleSheet(BACKGROUND_GREY)
 
-        # Style
-        self.createStoreButton.setFont(FONT_BIG_TEXT)
+        self.background_header_form.setStyleSheet(BACKGROUND_GREY)
 
-        self.addStoreButton.setFont(FONT_TEXT)
-        self.storeNameLabel.setFont(FONT_TEXT)
-        self.addShelfButton.setFont(FONT_TEXT)
+        # Buttons
+        self.button_open_new_store_form.setFont(FONT_TEXT)
+        self.button_open_new_store_form.setStyleSheet(BLUE_BUTTON)
 
-        self.goHome.setFont(FONT_SMALL_TEXT)
+        self.reopen_home_button.setFont(FONT_SMALL_TEXT)
+        self.reopen_home_button.setStyleSheet(DEFAULT_BUTTON)
+
         self.edit_categories_button.setFont(FONT_SMALL_TEXT)
-        self.store_name_input.setFont(FONT_SMALL_TEXT)
-
-        self.goHome.setStyleSheet(DEFAULT_BUTTON)
-        self.store_name_input.setStyleSheet(INPUT_TEXT)
-        self.addStoreButton.setStyleSheet(BLUE_BUTTON)
         self.edit_categories_button.setStyleSheet(EDIT_BUTTON)
-        self.addShelfButton.setStyleSheet(BLUE_BUTTON)
-        self.createStoreButton.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
-        Store.show_all_store_icons(STORES)
+        # Generic buttons in form create store
+        self.add_shelf_button.setFont(FONT_TEXT)
+        self.add_shelf_button.setStyleSheet(BLUE_BUTTON)
 
-        self.raiseMainButtons()
+        self.create_store_button.setFont(FONT_BIG_TEXT)
+        self.create_store_button.setStyleSheet(IMPORTANT_ACTION_BUTTON)
 
-    def initEvents(self):
+        # Generic inputs in form create store
+        self.store_name_input.setFont(FONT_SMALL_TEXT)
+        self.store_name_input.setStyleSheet(INPUT_TEXT)
+
+    def init_events(self):
         # Click buttons
-        self.goHome.clicked.connect(self.re_open_home)
-        self.addStoreButton.clicked.connect(self.addStore)
-        self.addShelfButton.clicked.connect(self.createShelf)
-        self.createStoreButton.clicked.connect(self.saveStoreInfo)
-        self.edit_categories_button.clicked.connect(self.configCategories)
-        self.icon_new_store.clicked.connect(self.uploadImage)
-        self.setDefaultIcon.clicked.connect(self.setDefaultStoreIcon)
+        self.reopen_home_button.clicked.connect(self.reopen_home)
+        self.add_shelf_button.clicked.connect(self.create_shelf_form)
+        self.icon_new_store_button.clicked.connect(self.upload_image)
+        self.create_store_button.clicked.connect(self.save_store_form_info)
+        self.edit_categories_button.clicked.connect(self.open_config_categories)
+        self.button_open_new_store_form.clicked.connect(self.open_add_store_form)
+        self.set_default_icon_button.clicked.connect(self.set_default_store_icon)
 
         # Do scroll
-        self.scroll.verticalScrollBar().valueChanged.connect(self.updateVerticalHeaderPosition)
-        self.scroll.horizontalScrollBar().valueChanged.connect(self.updateHorizontalHeaderPosition)
+        self.scroll.verticalScrollBar().valueChanged.connect(self.update_vertical_pos)
+        self.scroll.horizontalScrollBar().valueChanged.connect(self.update_horizontal_pos)
+
+    def reopen_home(self):
+        self.shortcut_category.hide_ui()
+
+        self.hide_add_store_form()
+        self.show_main_buttons()
+
+        Store.hide_all_stores()
+        Shelf.hide_all_spaces(SHELVES)
+        Store.show_all_store_icons(STORES)
+        ShelfForm.hide_all_forms(SHELVES_FORMS)
+
+        self.raise_main_buttons()
+        self.resize_main()
+
+    def hide_add_store_form(self):
+        self.set_default_icon_button.hide()
+        self.background_header_form.hide()
+        self.background_footer_form.hide()
+        self.label_input_store_name.hide()
+        self.icon_new_store_button.hide()
+        self.create_store_button.hide()
+        self.reopen_home_button.hide()
+        self.store_name_input.hide()
+        self.add_shelf_button.hide()
     
-    # Scroll functions
-    def updateVerticalHeaderPosition(self, value):
-        self.goHome.move(self.goHome.pos().x(), value + 10)
-        self.edit_categories_button.move(self.edit_categories_button.pos().x(), value + (WINDOW_HEIGHT - 115))
-        self.store_name_input.move(self.store_name_input.pos().x(), value + 10)
-        self.storeNameLabel.move(self.storeNameLabel.pos().x(), value + 20)
-        self.headerFormBackground.move(self.headerFormBackground.pos().x(), value)
-        self.addStoreButton.move(self.addStoreButton.pos().x(), value + (WINDOW_HEIGHT - 75))
-        self.addShelfButton.move(self.addShelfButton.pos().x(), value + (WINDOW_HEIGHT - 62))
-        self.createStoreButton.move(self.createStoreButton.pos().x(), value + (WINDOW_HEIGHT - 62))
-        self.languageChanger.move(self.languageChanger.pos().x() + 15, value + (WINDOW_HEIGHT - 50))
-        self.footerFormBackground.move(self.footerFormBackground.pos().x(), value + (WINDOW_HEIGHT - 75))
+    def show_main_buttons(self):
+        self.language_selector.show()
+        self.edit_categories_button.show()
+        self.button_open_new_store_form.show()
 
-        self.raiseShelfHeaderForm()
+    def raise_main_buttons(self):
+        self.language_selector.raise_()
+        self.button_open_new_store_form.raise_()
+        self.edit_categories_button.raise_()
 
-    def updateHorizontalHeaderPosition(self, value):
-        self.goHome.move(value + 1300, self.goHome.pos().y())
+    def resize_main(self):
+        if len(STORES) < 25:
+            self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
+        else:
+            self.widget.resize(WINDOW_WIDTH - 20, STORES[len(STORES) - 1].store_icon.pos().y() + 290)
 
-    # Resize scroll functions
+    def create_shelf_form(self):
+        ShelfForm.create(self.widget, self)
+    
+        self.resize_scroll_height()
+    
     def resize_scroll_height(self, height = 0):
         if height == 0:
-            if SHELVES_FORMS.__len__() > 0 and SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 300 > WINDOW_HEIGHT:
-                self.widget.resize(WINDOW_WIDTH - 20, SHELVES_FORMS[SHELVES_FORMS.__len__() - 1].pos().y() + 300)
+            if len(SHELVES_FORMS) > 0 and SHELVES_FORMS[len(SHELVES_FORMS) - 1].pos().y() + 300 > WINDOW_HEIGHT:
+                self.widget.resize(WINDOW_WIDTH - 20, SHELVES_FORMS[len(SHELVES_FORMS) - 1].pos().y() + 300)
             else:
                 self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
 
-            self.raiseShelfFooterForm()
+            self.raise_shelf_footer_form()
         else:
             width = WINDOW_WIDTH - 5
             aux = height + 175
@@ -1161,174 +1201,151 @@ class MainWindow(QMainWindow):
                 width -= 15
 
             self.widget.resize(width, aux)
-
-    def resizeWidthScroll(self, width = WINDOW_WIDTH):
-        if width < WINDOW_WIDTH:
-            self.widget.resize(self.widget.width(), self.widget.height())
-        else:
-            self.widget.resize(width + 125, self.widget.height())
-
-    def resizeMain(self):
-        if STORES.__len__() < 25:
-            self.widget.resize(WINDOW_WIDTH - 5, WINDOW_HEIGHT - 5)
-        else:
-            self.widget.resize(WINDOW_WIDTH - 20, STORES[STORES.__len__() - 1].store_icon.pos().y() + 290)
-
-    # UI functions
-    def re_open_home(self):
-        self.shortcut_category.hide_ui()
-
-        self.showMainButtons()
-        self.hideAddStoreForm()
-        self.raiseMainButtons()
-
-        ShelfForm.hide_all_forms(SHELVES_FORMS)
-        Store.hide_all_stores()
-        Store.show_all_store_icons(STORES)
-        Shelf.hide_all_spaces(SHELVES)
-
-        self.raiseMainButtons()
-        self.resizeMain()
-
-    def addStore(self):
-        self.showAddStoreForm()
-        self.resize_scroll_height()
-        
-        if SHELVES_FORMS.__len__() == 0:
-            self.createShelf()
-
-        ShelfForm.show_all_forms(SHELVES_FORMS)
-        Store.hide_all_store_icons(STORES)
-
-        self.goHome.show()
-        self.goHome.raise_()
-        self.addStoreButton.hide()
-        self.edit_categories_button.hide()
-        self.languageChanger.hide()
-
-    def createShelf(self):
-        ShelfForm.create(self.widget, self)
     
-        self.resize_scroll_height()
+    def raise_shelf_footer_form(self):
+        self.background_footer_form.raise_()
+        self.create_store_button.raise_()
+        self.add_shelf_button.raise_()
 
-    def saveStoreInfo(self):
-        save_shelves_info(SHELVES_FORMS)
-
-        storeName = self.store_name_input.text().strip()
-
-        if storeName.__len__() <= 15:
-            if storeName == "":
-                storeName = Language.get("store") + str(STORES.__len__() + 1)
-
-            if UserManager.get_role() != 'Offline':
-                Store.create_mongo_store(storeName, self.image)
-
-            ShelfForm.hide_all_forms(SHELVES_FORMS)
-            Store.create_store(storeName, self.widget, self.image)
-
-            self.store_name_input.setText("")
-            self.store_name_input.setPlaceholderText(Language.get("store") + str(STORES.__len__() + 1))
-
-            self.re_open_home()
-            self.goHome.raise_()
-        else:
-            QMessageBox.warning(None, "Name too long", "The store name must be maximum 15 digits long")
-
-    def uploadImage(self):
+    def upload_image(self):
         # Open a file dialog to select an image file
         file_path, _ = QFileDialog.getOpenFileName(self, "Open Image File", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
         
         # Check if a file was selected
         if file_path:
-            self.image = file_path
-            self.icon_new_store.setPixmap(self.image)
+            self._image = file_path
+            self.icon_new_store_button.setPixmap(self._image)
 
-            if self.image != DEFAULT_IMAGE:
-                self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 150, 115, 150, 150)
-                self.setDefaultIcon.show()
+            if self._image != DEFAULT_IMAGE:
+                self.icon_new_store_button.setGeometry(int(WINDOW_WIDTH / 2) - 150, 115, 150, 150)
+                self.set_default_icon_button.show()
             else:
-                self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
-                self.setDefaultIcon.hide()
+                self.icon_new_store_button.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+                self.set_default_icon_button.hide()
 
-    def setDefaultStoreIcon(self):
-        self.image = DEFAULT_IMAGE
-        self.icon_new_store.setPixmap(self.image)
-        self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
-        self.setDefaultIcon.hide()
+    def save_store_form_info(self):
+        save_shelves_info(SHELVES_FORMS)
 
-    # Show objects
-    def showAddStoreForm(self):
-        self.headerFormBackground.show()
-        self.footerFormBackground.show()
-        self.createStoreButton.show()
-        self.store_name_input.show()
-        self.storeNameLabel.show()
-        self.addShelfButton.show()
-        self.icon_new_store.show()
+        store_name = self.store_name_input.text().strip()
 
-        if self.image != DEFAULT_IMAGE:
-            self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 175, 115, 150, 150)
-            self.setDefaultIcon.show()
+        if len(store_name) <= 15:
+            if store_name == "":
+                store_name = Language.get("store") + str(len(STORES) + 1)
+
+            if UserManager.get_role() != 'Offline':
+                Store.create_mongo_store(store_name, self._image)
+
+            ShelfForm.hide_all_forms(SHELVES_FORMS)
+            Store.create_store(store_name, self.widget, self._image)
+
+            self.store_name_input.setText("")
+            self.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
+
+            self.reopen_home()
+            self.reopen_home_button.raise_()
         else:
-            self.icon_new_store.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
-            self.setDefaultIcon.hide()
+            QMessageBox.warning(None, "Name too long", "The store name must be maximum 15 digits long")
 
-    def showMainButtons(self):
-        self.languageChanger.show()
-        self.edit_categories_button.show()
-        self.addStoreButton.show()
+    def open_config_categories(self):
+        Store.hide_all_store_icons()
 
-    # Hide objects
-    def hideAddStoreForm(self):
-        self.headerFormBackground.hide()
-        self.footerFormBackground.hide()
-        self.createStoreButton.hide()
-        self.store_name_input.hide()
-        self.storeNameLabel.hide()
-        self.addShelfButton.hide()
-        self.setDefaultIcon.hide()
-        self.icon_new_store.hide()
-        self.goHome.hide()
+        self.shortcut_category.show_ui()
 
-    def hideAllButtons(self):
-        self.goHome.hide()
-        self.addStoreButton.hide()
+        self.hide_main_buttons()
+
+    def hide_main_buttons(self):
+        self.button_open_new_store_form.hide()
         self.edit_categories_button.hide()
-        self.languageChanger.hide()
+        self.language_selector.hide()
 
-    # Hide and show objects
-    def hideMainButtons(self):
-        self.goHome.show()
-        self.addStoreButton.hide()
+        self.reopen_home_button.show()
+
+    def open_add_store_form(self):
+        self.show_add_store_form()
+        self.resize_scroll_height()
+        
+        if len(SHELVES_FORMS) == 0:
+            self.create_shelf_form()
+
+        ShelfForm.show_all_forms(SHELVES_FORMS)
+        Store.hide_all_store_icons(STORES)
+
+        self.button_open_new_store_form.hide()
         self.edit_categories_button.hide()
-        self.languageChanger.hide()
+        self.language_selector.hide()
 
-    # Raise objects
-    def raiseShelfFooterForm(self):
-        self.footerFormBackground.raise_()
-        self.createStoreButton.raise_()
-        self.addShelfButton.raise_()
+        self.reopen_home_button.show()
 
-    def raiseShelfHeaderForm(self):
-        self.headerFormBackground.raise_()
-        self.store_name_input.raise_()
-        self.storeNameLabel.raise_()
-        self.goHome.raise_()
+        self.reopen_home_button.raise_()
     
-    def raiseMainButtons(self):
-        self.languageChanger.raise_()
-        self.addStoreButton.raise_()
-        self.edit_categories_button.raise_()
+    def show_add_store_form(self):
+        self.background_header_form.show()
+        self.background_footer_form.show()
+        self.label_input_store_name.show()
+        self.icon_new_store_button.show()
+        self.create_store_button.show()
+        self.store_name_input.show()
+        self.add_shelf_button.show()
+
+        if self._image != DEFAULT_IMAGE:
+            self.icon_new_store_button.setGeometry(int(WINDOW_WIDTH / 2) - 175, 115, 150, 150)
+            self.set_default_icon_button.show()
+        else:
+            self.icon_new_store_button.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+            self.set_default_icon_button.hide()
+
+    def set_default_store_icon(self):
+        self._image = DEFAULT_IMAGE
+
+        self.icon_new_store_button.setPixmap(self._image)
+        self.icon_new_store_button.setGeometry(int(WINDOW_WIDTH / 2) - 75, 115, 150, 150)
+
+        self.set_default_icon_button.hide()
+
+    def update_vertical_pos(self, value):
+        self.store_name_input.move(self.store_name_input.pos().x(), value + 10)
+        self.reopen_home_button.move(self.reopen_home_button.pos().x(), value + 10)
+        self.background_header_form.move(self.background_header_form.pos().x(), value)
+        self.label_input_store_name.move(self.label_input_store_name.pos().x(), value + 20)
+        self.add_shelf_button.move(self.add_shelf_button.pos().x(), value + (WINDOW_HEIGHT - 62))
+        self.create_store_button.move(self.create_store_button.pos().x(), value + (WINDOW_HEIGHT - 62))
+        self.language_selector.move(self.language_selector.pos().x() + 15, value + (WINDOW_HEIGHT - 50))
+        self.background_footer_form.move(self.background_footer_form.pos().x(), value + (WINDOW_HEIGHT - 75))
+        self.edit_categories_button.move(self.edit_categories_button.pos().x(), value + (WINDOW_HEIGHT - 115))
+        self.button_open_new_store_form.move(self.button_open_new_store_form.pos().x(), value + (WINDOW_HEIGHT - 75))
+
+        self.raise_store_header_form()
+
+    def raise_store_header_form(self):
+        self.background_header_form.raise_()
+        self.label_input_store_name.raise_()
+        self.reopen_home_button.raise_()
+        self.store_name_input.raise_()
+
+    def update_horizontal_pos(self, value):
+        self.reopen_home_button.move(value + 1300, self.reopen_home_button.pos().y())
+
+    def resize_horizontal_scroll(self, width = WINDOW_WIDTH):
+        if width < WINDOW_WIDTH:
+            self.widget.resize(self.widget.width(), self.widget.height())
+        else:
+            self.widget.resize(width + 125, self.widget.height())
+
+    def hide_all_buttons(self):
+        self.button_open_new_store_form.hide()
+        self.edit_categories_button.hide()
+        self.reopen_home_button.hide()
+        self.language_selector.hide()
 
     def change_user_role(self, role, username = ''):
         if role != 'Offline':
-            UserManager.setUser(username, role)
+            UserManager.set_user(username, role)
 
         if UserManager.get_role() == 'Offline' or UserManager.get_role() == 'Manager':
-            self.addStoreButton.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
+            self.button_open_new_store_form.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 75, 190, 50)
             self.edit_categories_button.setGeometry(WINDOW_WIDTH - 220, WINDOW_HEIGHT - 115, 190, 30)
         else:
-            self.addStoreButton.setGeometry(0, 0, 0, 0)
+            self.button_open_new_store_form.setGeometry(0, 0, 0, 0)
             self.edit_categories_button.setGeometry(0, 0, 0, 0)
 
         for store in SHELVES:
@@ -1342,12 +1359,12 @@ class MainWindow(QMainWindow):
 window = MainWindow()
 
 class main():
-    logInWindow = LogInWindow(window)
-    logInWindow.show()
+    log_in_window = LogInWindow(window)
+    log_in_window.show()
 
     sys.exit(app.exec_())
 
-    Mongo.close_connection()
+    DB.close_connection()
 
 if __name__ == "__main__":
     main()

@@ -174,7 +174,7 @@ class LogInWindow(QMainWindow):
 
         # Open main window
         self._main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
-        self._main_app.re_open_home()
+        self._main_app.reopen_home()
         self._main_app.show()
 
     def logged_successful(self, username):
@@ -204,7 +204,7 @@ class LogInWindow(QMainWindow):
 
         # Open main window
         self._main_app.store_name_input.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
-        self._main_app.re_open_home()
+        self._main_app.reopen_home()
         self._main_app.show()
     
     def logged_unsuccessful(self):

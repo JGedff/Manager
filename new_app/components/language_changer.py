@@ -43,15 +43,15 @@ class LanguageChanger(QLabel):
     def update_ui(self):
         try:
             self._main_window.storeNameInput.setPlaceholderText(Language.get("store") + str(len(STORES) + 1))
-            self._main_window.createStoreButton.setText(Language.get("create_store"))
+            self._main_window.create_store_button.setText(Language.get("create_store"))
             self._main_window.edit_categories_button.setText(Language.get("edit_categories"))
-            self._main_window.setDefaultIcon.setText(Language.get("default_image"))
-            self._main_window.icon_new_store.setText(Language.get("change_image"))
-            self._main_window.storeNameLabel.setText(Language.get("name_store"))
-            self._main_window.addStoreButton.setText(Language.get("add_store"))
-            self._main_window.addShelfButton.setText(Language.get("add_shelf"))
+            self._main_window.set_default_icon_button.setText(Language.get("default_image"))
+            self._main_window.icon_new_store_button.setText(Language.get("change_image"))
+            self._main_window.label_input_store_name.setText(Language.get("name_store"))
+            self._main_window.button_open_new_store_form.setText(Language.get("add_store"))
+            self._main_window.add_shelf_button.setText(Language.get("add_shelf"))
             self._main_window.setWindowTitle(Language.get("window_title"))
-            self._main_window.goHome.setText(Language.get("go_back"))
+            self._main_window.reopen_home_button.setText(Language.get("go_back"))
 
             self._main_window.categoryManager.stop_editting_category.setText(Language.get("go_back"))
             self._main_window.categoryManager.update_category_button.setText(Language.get("save"))
