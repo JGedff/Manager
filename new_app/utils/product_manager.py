@@ -48,3 +48,7 @@ class ProductManager():
     @staticmethod
     def count():
         return len(PRODUCTS_INFO)
+
+    @staticmethod
+    def get_all_products():
+        return PRODUCTS_INFO

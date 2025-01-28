@@ -15,6 +15,16 @@ from components.input_integer import InputInteger
 from components.input_float import InputFloat
 
 class Product(QLabel):
+    @staticmethod
+    def update_all_product_selector_name(old_name: str, new_name: str):
+        for store in SHELVES:
+            for shelf in store:
+                for space in shelf.spaces:
+                    if hasattr(space, "product") and isinstance(space.product, Product):
+                        for i in range(space.product.select_product.count()):
+                            if space.product.select_product.itemText(i) == old_name:
+                                space.product.select_product.setItemText(i, new_name)
+
     def __init__(self, pos_x: int, pos_y: int, space, parent: QWidget | None = None):
         super().__init__(parent)
 
@@ -57,17 +67,23 @@ class Product(QLabel):
                 ProductManager.add(db_products['name'], db_products['price'])            
 
     def add_default_products(self):
-        self._products.append({ "name": 'Sock', "price": 8 })
-        self._products.append({ "name": 'Dress', "price": 20 })
-        self._products.append({ "name": 'Shirt', "price": 30 })
-        self._products.append({ "name": 'Jacket', "price": 25 })
-        self._products.append({ "name": 'Sweater', "price": 35 })
+        if ProductManager.count() < 1:
+            self._products.append({ "name": 'Sock', "price": 8 })
+            self._products.append({ "name": 'Dress', "price": 20 })
+            self._products.append({ "name": 'Shirt', "price": 30 })
+            self._products.append({ "name": 'Jacket', "price": 25 })
+            self._products.append({ "name": 'Sweater', "price": 35 })
 
-        ProductManager.add('Sock', 8)
-        ProductManager.add('Dress', 20)
-        ProductManager.add('Shirt', 30)
-        ProductManager.add('Jacket', 25)
-        ProductManager.add('Sweater', 35)
+            ProductManager.add('Sock', 8)
+            ProductManager.add('Dress', 20)
+            ProductManager.add('Shirt', 30)
+            ProductManager.add('Jacket', 25)
+            ProductManager.add('Sweater', 35)
+        else:
+            product_list = ProductManager.get_all_products()
+
+            for prod in product_list:
+                self._products.append({ "name": prod[0], "price": prod[1] })
 
     def init_ui(self, parent: QWidget | None):
         ## INITIALIZE OBJECTS ##
@@ -283,6 +299,8 @@ class Product(QLabel):
         # Update the information in the db and local
         ProductManager.update_product(index, self.edit_product_name.text(), self.edit_price.get_value())
 
+        Product.update_all_product_selector_name(self._name, self.edit_product_name.text())
+
         if UserManager.get_role() != 'Offline':
             Mongo.update_product(self._name, self.edit_product_name.text(), self.edit_price.get_value())
 
@@ -297,6 +315,8 @@ class Product(QLabel):
     def update_name(self, index: int):
         # Update the information in the db and local
         ProductManager.update_product_name(index, self.edit_product_name.text())
+
+        Product.update_all_product_selector_name(self._name, self.edit_product_name.text())
 
         if UserManager.get_role() != 'Offline':
             Mongo.update_product_name(self._name, self.edit_product_name.text())
@@ -336,7 +356,7 @@ class Product(QLabel):
             for shelf in store:
                 for space in shelf.spaces:
                     # If the space has a product
-                    if isinstance(space.product, Product):
+                    if hasattr(space, "product") and isinstance(space.product, Product):
                         index = space.product.select_product.findText(self._name)
 
                         if index != -1:
@@ -445,6 +465,9 @@ class Product(QLabel):
         self.label_amount.show()
         self.label_product.show()
         self.select_product.show()
+
+        self._name = self.select_product.currentText()
+        self._price = self.get_actual_product_price()
 
         # If the user has not any of those roles, should be unable to see or press the next buttons
         if UserManager.get_role() == 'Manager' or UserManager.get_role() == 'Product' or UserManager.get_role() == 'Offline':
