@@ -17,9 +17,15 @@ from components.shelf import ShelfForm
 from main import Store, MainWindow, CategorySpace
 
 def get_db_information(widget: QWidget | None, shortcut_category: CategorySpace, main_window: MainWindow):
-    store_index = 0
+    get_db_categories(widget, shortcut_category)
+
+    set_empty_category(shortcut_category)
+
+    if DB.is_connection_open():
+        get_db_stores(widget, main_window)
+
+def get_db_categories(widget: QWidget | None, shortcut_category: CategorySpace):
     num_categories = 0
-    connection_open = False
 
     try:
         for category in DB.get_many_categories():
@@ -32,6 +38,8 @@ def get_db_information(widget: QWidget | None, shortcut_category: CategorySpace,
         update_category_buttons_pos(shortcut_category)
 
     except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+        DB.close_connection()
+
         UserManager.set_user('Guest', 'Offline')
 
         QMessageBox.warning(None, "Categories not found", "There was an issue with the network")
@@ -46,11 +54,7 @@ def get_db_information(widget: QWidget | None, shortcut_category: CategorySpace,
         create_category_in(shortcut_category, 'Fill', widget)
         update_category_buttons_pos(shortcut_category)
 
-        num_categories = 0
-
     else:
-        connection_open = True
-
         if num_categories <= 0:
             QMessageBox.warning(None, "There aren't any categories in the database", "The default categories will be created")
 
@@ -68,48 +72,45 @@ def get_db_information(widget: QWidget | None, shortcut_category: CategorySpace,
             create_category_in(shortcut_category, 'Fill', widget)
             update_category_buttons_pos(shortcut_category)
 
-    set_empty_category(shortcut_category)
+def get_db_stores(widget: QWidget | None, main_window: MainWindow):
+    try:
+        for store_index, store in enumerate(DB.get_many_stores()):
+            spaces = []
 
-    if connection_open:
-        try:
-            for store in DB.get_many_stores():
-                spaces = []
+            for index, shelf_id in enumerate(store['storeShelves']):
+                shelf = DB.get_one_shelf({ "_id": shelf_id })
+                mongo_spaces = DB.get_many_spaces({"_id": {"$in": shelf['spaces']}})
 
-                for index, shelf_id in enumerate(store['storeShelves']):
-                    shelf = DB.get_one_shelf({ "_id": shelf_id })
-                    mongo_spaces = DB.get_many_spaces({"_id": {"$in": shelf['spaces']}})
+                ShelfForm.create(widget, main_window)
 
-                    ShelfForm.create(widget, main_window)
+                SHELVES_FORMS[index].input_spaces.set_value(len(shelf['spaces']) / store['storeFloors'])
+                SHELVES_FORMS[index].input_shelf_floors.set_value(shelf['floors'])
+                SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
+                SHELVES_FORMS[index].hide()
 
-                    SHELVES_FORMS[index].input_spaces.set_value(shelf['spaces'].__len__() / store['storeFloors'])
-                    SHELVES_FORMS[index].input_shelf_floors.set_value(shelf['floors'])
-                    SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
-                    SHELVES_FORMS[index].hide()
+                spaces.append(mongo_spaces)
+            
+            save_shelves_info(SHELVES_FORMS)
+            
+            Store.create_store(store['name'], widget, store['image'], main_window)
 
-                    spaces.append(mongo_spaces)
-                
-                save_shelves_info(SHELVES_FORMS)
-                
-                Store.create_store(store['name'], widget, store['image'], main_window)
+            STORES[store_index].return_to_store_button.hide()
 
-                STORES[store_index].return_to_store_button.hide()
+            for shelf_i in range(len(store['storeShelves'])):
+                for index, mongo_space in enumerate(spaces[shelf_i]):
+                    SHELVES[store_index][shelf_i].spaces[index].mongo_id = mongo_space['mongo_id']
 
-                for shelf_i in range(store['storeShelves'].__len__()):
-                    for index, mongo_space in enumerate(spaces[shelf_i]):
-                        SHELVES[store_index][shelf_i].spaces[index].mongo_id = mongo_space['mongo_id']
+                    if Category.count() > 0:
+                        category = DB.get_one_category({ "_id": mongo_space['category'] })
 
-                        if num_categories > 0:
-                            category = DB.get_one_category({ "_id": mongo_space['category'] })
+                        if category != None:
+                            SHELVES[store_index][shelf_i].spaces[index].category_selector.setCurrentText(category['name'])
+                            SHELVES[store_index][shelf_i].spaces[index].category.name = category['name']
+                            SHELVES[store_index][shelf_i].spaces[index].category.color = category['color']
 
-                            if category != None:
-                                SHELVES[store_index][shelf_i].spaces[index].category_selector.setCurrentText(category['name'])
-                                SHELVES[store_index][shelf_i].spaces[index].category.name = category['name']
-                                SHELVES[store_index][shelf_i].spaces[index].category.color = category['color']
+                            if isinstance(SHELVES[store_index][shelf_i].spaces[index].product, Product):
+                                SHELVES[store_index][shelf_i].spaces[index].product.hide()
 
-                                if isinstance(SHELVES[store_index][shelf_i].spaces[index].product, Product):
-                                    SHELVES[store_index][shelf_i].spaces[index].product.hide()
-                
-                store_index =+ 1
-        except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
-            UserManager.set_user('Guest', 'Offline')
-            QMessageBox.warning(None, "Network error", "There was an issue with the network")
+    except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
+        UserManager.set_user('Guest', 'Offline')
+        QMessageBox.warning(None, "Network error", "There was an issue with the network")
