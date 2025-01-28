@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import QWidget, QMessageBox
 
 from constants import SHELVES_FORMS, STORES, SHELVES
 
+from utils.db import DB
 from utils.mongo_db import Mongo
 from utils.category import Category
 from utils.user_manager import UserManager
@@ -11,15 +12,17 @@ from utils.user_manager import UserManager
 from utils.functions.space_category_functions import create_category_in, update_category_buttons_pos, set_empty_category
 from utils.functions.shelf_functions import save_shelves_info
 
+from components.product import Product
 from components.shelf import ShelfForm
+from main import Store, MainWindow, CategorySpace
 
-def get_information(widget: QWidget | None, shortcut_category, main_window):
+def get_db_information(widget: QWidget | None, shortcut_category: CategorySpace, main_window: MainWindow):
     store_index = 0
     num_categories = 0
     connection_open = False
 
     try:
-        for category in Mongo.get_many_categories():
+        for category in DB.get_many_categories():
             Category.add_category(category['name'], category['color'])
             Category.change_can_hold_product(category['name'], category['hold'])
 
@@ -69,13 +72,13 @@ def get_information(widget: QWidget | None, shortcut_category, main_window):
 
     if connection_open:
         try:
-            for store in Mongo.get_many_stores():
-                spacesInfo = []
+            for store in DB.get_many_stores():
+                spaces = []
 
                 for index, shelf_id in enumerate(store['storeShelves']):
-                    shelf = Mongo.get_one_shelf({ "_id": shelf_id })
-                    mongoSpaces = Mongo.get_many_spaces({"_id": {"$in": shelf['spaces']}})
-                    
+                    shelf = DB.get_one_shelf({ "_id": shelf_id })
+                    mongo_spaces = DB.get_many_spaces({"_id": {"$in": shelf['spaces']}})
+
                     ShelfForm.create(widget, main_window)
 
                     SHELVES_FORMS[index].input_spaces.set_value(shelf['spaces'].__len__() / store['storeFloors'])
@@ -83,7 +86,7 @@ def get_information(widget: QWidget | None, shortcut_category, main_window):
                     SHELVES_FORMS[index].double_shelf_input.set_value(shelf['double_shelf'])
                     SHELVES_FORMS[index].hide()
 
-                    spacesInfo.append(mongoSpaces)
+                    spaces.append(mongo_spaces)
                 
                 save_shelves_info(SHELVES_FORMS)
                 
@@ -91,20 +94,20 @@ def get_information(widget: QWidget | None, shortcut_category, main_window):
 
                 STORES[store_index].return_to_store_button.hide()
 
-                for shelfIndex in range(store['storeShelves'].__len__()):
-                    for index, mongoSpace in enumerate(spacesInfo[shelfIndex]):
-                        SHELVES[store_index][shelfIndex].spaces[index].mongo_id = mongoSpace['mongo_id']
+                for shelf_i in range(store['storeShelves'].__len__()):
+                    for index, mongo_space in enumerate(spaces[shelf_i]):
+                        SHELVES[store_index][shelf_i].spaces[index].mongo_id = mongo_space['mongo_id']
 
                         if num_categories > 0:
-                            category = Mongo.get_one_category({ "_id": mongoSpace['category'] })
+                            category = DB.get_one_category({ "_id": mongo_space['category'] })
 
                             if category != None:
-                                SHELVES[store_index][shelfIndex].spaces[index].category_selector.setCurrentText(category['name'])
-                                SHELVES[store_index][shelfIndex].spaces[index].category.name = category['name']
-                                SHELVES[store_index][shelfIndex].spaces[index].category.color = category['color']
+                                SHELVES[store_index][shelf_i].spaces[index].category_selector.setCurrentText(category['name'])
+                                SHELVES[store_index][shelf_i].spaces[index].category.name = category['name']
+                                SHELVES[store_index][shelf_i].spaces[index].category.color = category['color']
 
-                                if isinstance(SHELVES[store_index][shelfIndex].spaces[index].product, Product):
-                                    SHELVES[store_index][shelfIndex].spaces[index].product.hide()
+                                if isinstance(SHELVES[store_index][shelf_i].spaces[index].product, Product):
+                                    SHELVES[store_index][shelf_i].spaces[index].product.hide()
                 
                 store_index =+ 1
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):

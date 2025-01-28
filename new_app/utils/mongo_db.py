@@ -220,7 +220,7 @@ class Mongo:
         if space_id != None:
             try:
                 if new_product != '':
-                    product_id = cls.get_product_by_name(new_product)
+                    product_id = cls.get_product_by_name(new_product.lower())
 
                     if product_id != None:
                         DB.update_one_space({ "mongo_id": space_id }, { "$set": { "product": product_id } })
@@ -238,7 +238,7 @@ class Mongo:
     @classmethod
     def update_product(cls, old_name: str, new_name: str, new_price: float):
         try:
-            product_id = cls.get_product_by_name(old_name)
+            product_id = cls.get_product_by_name(old_name.lower())
 
             if product_id != None:
                 DB.update_one_product({ "_id": product_id }, { "$set": { "name": new_name.lower(), "price": new_price } })
@@ -253,7 +253,7 @@ class Mongo:
     @classmethod
     def update_product_name(cls, old_name: str, new_name: str):
         try:
-            product_id = cls.get_product_by_name(old_name)
+            product_id = cls.get_product_by_name(old_name.lower())
 
             if product_id != None:
                 DB.update_one_product({ "_id": product_id }, { "$set": { "name": new_name.lower() } })
@@ -268,7 +268,7 @@ class Mongo:
     @classmethod
     def update_product_price(cls, old_name: str, new_price: float):
         try:
-            product_id = cls.get_product_by_name(old_name)
+            product_id = cls.get_product_by_name(old_name.lower())
 
             if product_id != None:
                 DB.update_one_product({ "_id": product_id }, { "$set": { "price": new_price } })

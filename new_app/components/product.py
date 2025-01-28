@@ -299,10 +299,10 @@ class Product(QLabel):
         # Update the information in the db and local
         ProductManager.update_product(index, self.edit_product_name.text(), self.edit_price.get_value())
 
-        Product.update_all_product_selector_name(self._name, self.edit_product_name.text())
-
         if UserManager.get_role() != 'Offline':
             Mongo.update_product(self._name, self.edit_product_name.text(), self.edit_price.get_value())
+
+        Product.update_all_product_selector_name(self._name, self.edit_product_name.text())
 
         # Update properties
         self._name = self.edit_product_name.text().capitalize()

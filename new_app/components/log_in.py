@@ -11,7 +11,7 @@ from utils.language import Language
 from utils.category import Category
 
 from utils.functions.space_category_functions import create_category_in, update_category_buttons_pos
-from utils.functions.mongo_functions import get_information
+from utils.functions.mongo_functions import get_db_information
 
 from components.language_changer import LanguageChanger
 from main import MainWindow
@@ -197,7 +197,7 @@ class LogInWindow(QMainWindow):
         self._main_app.language_selector.update()
 
         # Download db information
-        # get_information(self._main_app.widget, self._main_app.shortcut_category, self._main_app)
+        get_db_information(self._main_app.widget, self._main_app.shortcut_category, self._main_app)
 
         # Close log in window
         self.close()
