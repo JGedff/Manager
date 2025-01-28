@@ -2,11 +2,11 @@ from constants import WINDOW_HEIGHT, WINDOW_WIDTH
 
 from utils.language import Language
 
-def save_shelves_info(shelves):
+def save_shelves_info(shelves: list):
     for form in shelves:
         form.save_info()
 
-def update_shelves_pos(shelves):
+def update_shelves_pos(shelves: list):
     x = 400
     y = 300
 

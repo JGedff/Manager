@@ -1,7 +1,7 @@
 from utils.mongo_db import Mongo
 from utils.user_manager import UserManager
 
-from PyQt5.QtWidgets import QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox
+from PyQt5.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QComboBox, QMessageBox
 
 from utils.language import Language
 from utils.product_manager import ProductManager
@@ -15,7 +15,7 @@ from components.input_integer import InputInteger
 from components.input_float import InputFloat
 
 class Product(QLabel):
-    def __init__(self, pos_x: int, pos_y: int, space, parent = None):
+    def __init__(self, pos_x: int, pos_y: int, space, parent: QWidget | None = None):
         super().__init__(parent)
 
         self.init_variables(pos_x, pos_y, space)
@@ -69,7 +69,7 @@ class Product(QLabel):
         ProductManager.add('Jacket', 25)
         ProductManager.add('Sweater', 35)
 
-    def init_ui(self, parent):
+    def init_ui(self, parent: QWidget | None):
         ## INITIALIZE OBJECTS ##
         # Labels
         self.label_product = QLabel(Language.get('product'), parent)

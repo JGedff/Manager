@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QComboBox
+from PyQt5.QtWidgets import QLabel, QComboBox, QWidget
 
 from styles.style_sheets import COMBO_BOX
 from styles.fonts import FONT_SMALL_TEXT
@@ -10,7 +10,7 @@ from utils.language import Language
 from components.product import Product
 
 class LanguageChanger(QLabel):
-    def __init__(self, window, parent):
+    def __init__(self, window, parent: QWidget | None):
         super().__init__(parent)
 
         self.init_variables(window)
@@ -21,7 +21,7 @@ class LanguageChanger(QLabel):
         self._language = 'English'
         self._main_window = window
 
-    def init_ui(self, parent):
+    def init_ui(self, parent: QWidget | None):
         self.changer = QComboBox(parent)
         self.changer.addItem("English")
         self.changer.addItem("Español")

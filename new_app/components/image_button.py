@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton
+from PyQt5.QtWidgets import QLabel, QVBoxLayout, QPushButton, QWidget
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtCore import Qt
 
@@ -6,7 +6,7 @@ from styles.style_sheets import IMAGE_BUTTON
 from styles.fonts import FONT_SMALL_TEXT
 
 class ImageButton(QPushButton):
-    def __init__(self, text: str, icon_path: str, parent = None):
+    def __init__(self, text: str, icon_path: str, parent: QWidget | None = None):
         super().__init__(parent)
 
         self.init_ui(text, icon_path)

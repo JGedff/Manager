@@ -10,7 +10,7 @@ class UserManager:
     _role = ''
 
     @classmethod
-    def register(cls, username, password) -> str:
+    def register(cls, username: str, password: str) -> str:
         try:
             user = cls.is_duplicated(username)
 
@@ -32,7 +32,7 @@ class UserManager:
         return username
 
     @classmethod
-    def authenticate(cls, username, password) -> str | None:
+    def authenticate(cls, username: str, password: str) -> str | None:
         try:
             user = DB.get_one_user({ "username": username })
 
@@ -50,7 +50,7 @@ class UserManager:
             return None
 
     @classmethod
-    def delete(cls, username):
+    def delete(cls, username: str):
         try:
             DB.delete_one_user({ "username": username })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -59,7 +59,7 @@ class UserManager:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
     @classmethod
-    def is_duplicated(cls, username) -> bool:
+    def is_duplicated(cls, username: str) -> bool:
         try:
             user = DB.get_one_user({ "username": username })
 
@@ -72,7 +72,7 @@ class UserManager:
             return False
     
     @classmethod
-    def find_user_role(cls, username) -> str:
+    def find_user_role(cls, username: str) -> str:
         try:
             user = DB.get_one_user({ "username": username })
 
@@ -81,7 +81,7 @@ class UserManager:
             return 'Offline'
 
     @classmethod
-    def set_user(cls, username, role):
+    def set_user(cls, username: str, role: str):
         cls._username = username
         cls._role = role
 

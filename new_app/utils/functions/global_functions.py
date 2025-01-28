@@ -1,7 +1,7 @@
 def useless_function():
     pass
 
-def get_max_floor(shelves):
+def get_max_floor(shelves) -> int:
     max_floor = 1
 
     for form in shelves:

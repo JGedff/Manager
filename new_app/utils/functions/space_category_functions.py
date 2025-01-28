@@ -1,10 +1,12 @@
+from PyQt5.QtWidgets import QWidget
+
 from constants import CATEGORY_NAMES, CATEGORY_COLORS, WINDOW_HEIGHT
 
 from utils.category import Category
 
 from components.double_button import DoubleButton
 
-def create_category_in(space, category_name, parent):
+def create_category_in(space, category_name: str, parent: QWidget | None):
     space_category = space
 
     # Create a button to acces the config of the category
@@ -13,7 +15,7 @@ def create_category_in(space, category_name, parent):
 
     space_category.categories_buttons.append(new_double_buttons)
 
-def update_category_name(space, color, actual_name, new_name, shortcut = False):
+def update_category_name(space, color: str, actual_name: str, new_name: str, shortcut = False):
     space_category = space
 
     if not shortcut:
@@ -34,7 +36,7 @@ def update_category_name(space, color, actual_name, new_name, shortcut = False):
             button.set_first_button_text(new_name)
             break
 
-def delete_category_from(space, index_button_pressed, category_name, shortcut = False):
+def delete_category_from(space, index_button_pressed: int, category_name: str, shortcut = False):
     space_category = space
 
     if not shortcut:
@@ -93,12 +95,12 @@ def set_unreachable_category(category):
     category.name = CATEGORY_NAMES[1]
     category.color = CATEGORY_COLORS[1]
 
-def set_category_by_name(category, name):
+def set_category_by_name(category, name: str):
     category.name = name
     category.color = Category.get_color_by_name(name)
 
-def get_empty_category_name():
+def get_empty_category_name() -> str:
     return CATEGORY_NAMES[0]
 
-def get_unreachable_category_name():
+def get_unreachable_category_name() -> str:
     return CATEGORY_NAMES[1]

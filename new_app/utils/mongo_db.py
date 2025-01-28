@@ -38,7 +38,7 @@ class Mongo:
             QMessageBox.warning(None, "The shelves were not created", "There was an issue with the network")
 
     @classmethod
-    def get_last_spaces_created(cls, num) -> list:
+    def get_last_spaces_created(cls, num: int) -> list:
         spaces = []
 
         try:
@@ -53,7 +53,7 @@ class Mongo:
         return spaces
 
     @classmethod
-    def get_last_shelves_created(cls, num) -> list:
+    def get_last_shelves_created(cls, num: int) -> list:
         shelves = []
 
         try: 
@@ -68,7 +68,7 @@ class Mongo:
         return shelves
 
     @classmethod
-    def add_store(cls, shelves, name, image):
+    def add_store(cls, shelves, name: str, image: str):
         cls.add_shelves(shelves)
 
         id_shelves = cls.get_last_shelves_created(len(shelves))
@@ -86,7 +86,7 @@ class Mongo:
             QMessageBox.warning(None, "The store was not created", "There was an issue with the network")
 
     @classmethod
-    def get_category_by_name(cls, name) -> str:
+    def get_category_by_name(cls, name: str) -> str:
         try:
             file = DB.get_one_category({ "name": name })
 
@@ -98,7 +98,7 @@ class Mongo:
             return name
 
     @classmethod
-    def update_category_space(cls, space_id, category_name):
+    def update_category_space(cls, space_id, category_name: int):
         if space_id != None:
             category_id = cls.get_category_by_name(category_name)
 
@@ -111,7 +111,7 @@ class Mongo:
                 QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
 
     @classmethod
-    def update_category_name(cls, old_name, new_name):
+    def update_category_name(cls, old_name: str, new_name: str):
         try:
             DB.update_one_category({ "name": old_name }, { "$set": { "name": new_name } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -121,7 +121,7 @@ class Mongo:
             QMessageBox.warning(None, "The category was not updated", f"Operation failed: {e.details}")
 
     @classmethod
-    def update_category_color(cls, name, color):
+    def update_category_color(cls, name: str, color: str):
         try:
             DB.update_one_category({ "name": name }, { "$set": { "color": color } })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -131,7 +131,7 @@ class Mongo:
             QMessageBox.warning(None, "The category was not updated", f"Operation failed: {e.details}")
 
     @classmethod
-    def delete_by_name(cls, name):
+    def delete_by_name(cls, name: str):
         try:
             DB.delete_one_category({ "name": name })
         except (ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout):
@@ -141,7 +141,7 @@ class Mongo:
             QMessageBox.warning(None, "There was an issue deleting the user", f"Write error: {e.details}")
 
     @classmethod
-    def add_category(cls, name, color, can_hold_product):
+    def add_category(cls, name: str, color: str, can_hold_product: bool):
         try:
             DB.insert_one_category({
                 "name": name,
@@ -153,7 +153,7 @@ class Mongo:
             QMessageBox.warning(None, "The category was not created", "There was an issue with the network")
 
     @classmethod
-    def update_category_holds_product(cls, category_name, holds_product):
+    def update_category_holds_product(cls, category_name: str, holds_product: bool):
         category_id = cls.get_category_by_name(category_name)
 
         try:
@@ -216,7 +216,7 @@ class Mongo:
             return None
 
     @classmethod
-    def update_space_product(cls, space_id, new_product):
+    def update_space_product(cls, space_id, new_product: str):
         if space_id != None:
             try:
                 if new_product != '':
@@ -236,7 +236,7 @@ class Mongo:
                 QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
 
     @classmethod
-    def update_product(cls, old_name, new_name: str, new_price: float):
+    def update_product(cls, old_name: str, new_name: str, new_price: float):
         try:
             product_id = cls.get_product_by_name(old_name)
 
@@ -251,7 +251,7 @@ class Mongo:
             QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
 
     @classmethod
-    def update_product_name(cls, old_name, new_name: str):
+    def update_product_name(cls, old_name: str, new_name: str):
         try:
             product_id = cls.get_product_by_name(old_name)
 
@@ -266,7 +266,7 @@ class Mongo:
             QMessageBox.warning(None, "The space was not updated", f"Operation failed: {e.details}")
 
     @classmethod
-    def update_product_price(cls, old_name, new_price: float):
+    def update_product_price(cls, old_name: str, new_price: float):
         try:
             product_id = cls.get_product_by_name(old_name)
 

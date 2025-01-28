@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QLabel, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel, QPushButton
 
 from styles.style_sheets import REST_BUTTON, BACKGROUND_BLACK
 from styles.fonts import FONT_TEXT, FONT_SMALL_TEXT, FONT_SMALLEST_CHAR
@@ -14,7 +14,7 @@ from components.input_integer import InputInteger
 
 class ShelfForm(QLabel):
     @staticmethod
-    def create(parent, main_window):
+    def create(parent: QWidget | None, main_window):
         length = len(SHELVES_FORMS)
         new_form = None
 
@@ -37,7 +37,7 @@ class ShelfForm(QLabel):
         for shelf in array_forms:
             shelf.show()
 
-    def __init__(self, name, posx, posy, main_window, parent = None):
+    def __init__(self, name: str, posx: int, posy: int, main_window, parent: QWidget | None = None):
         super().__init__(parent)
         
         self.setGeometry(posx, posy, WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -52,7 +52,7 @@ class ShelfForm(QLabel):
         self._spaces = 1
         self._floors = 1
 
-    def init_ui(self, store_name):
+    def init_ui(self, store_name: str):
         ## INITIALIZE OBJECTS ##
         # Labels
         self.shelf_label = QLabel(store_name, self)

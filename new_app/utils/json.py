@@ -2,7 +2,7 @@ import json
 
 class JsonManager():
     @staticmethod
-    def get_json(path):
+    def get_json(path: str) -> str:
         with open(path, 'r', encoding="utf-8") as file:
             return json.load(file)
 

@@ -1,6 +1,6 @@
 from pymongo.errors import ConnectionFailure, ServerSelectionTimeoutError, NetworkTimeout
 
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QWidget, QMessageBox
 
 from constants import SHELVES_FORMS, STORES, SHELVES
 
@@ -13,7 +13,7 @@ from utils.functions.shelf_functions import save_shelves_info
 
 from components.shelf import ShelfForm
 
-def get_information(widget, shortcut_category, main_window):
+def get_information(widget: QWidget | None, shortcut_category, main_window):
     store_index = 0
     num_categories = 0
     connection_open = False

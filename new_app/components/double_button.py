@@ -5,13 +5,13 @@ from styles.style_sheets import DEFAULT_BUTTON, REST_BUTTON
 from styles.fonts import FONT_SMALL_TEXT
 
 class DoubleButton(QLabel):
-    def __init__(self, text_first_button: str, text_second_button: str, function_first_button, funciton_second_button, parent = None):
+    def __init__(self, text_first_button: str, text_second_button: str, function_first_button: function, funciton_second_button: function, parent: QWidget | None = None):
         super().__init__(parent)
 
         self.init_ui(text_first_button, text_second_button, parent)
         self.init_events(function_first_button, funciton_second_button)
 
-    def init_ui(self, text_first_button: str, text_second_button: str, parent):
+    def init_ui(self, text_first_button: str, text_second_button: str, parent: QWidget | None):
         ## LAYOUT ##
         self.widget = QWidget(parent)
 
@@ -31,7 +31,7 @@ class DoubleButton(QLabel):
         self._first_button.setStyleSheet(DEFAULT_BUTTON)
         self._second_button.setStyleSheet(REST_BUTTON)
 
-    def init_events(self, function_first_button, funciton_second_button):
+    def init_events(self, function_first_button: function, funciton_second_button: function):
         self._first_button.clicked.connect(function_first_button)
         self._second_button.clicked.connect(funciton_second_button)
     

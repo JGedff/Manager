@@ -9,15 +9,15 @@ from styles.fonts import FONT_BIG_TEXT, FONT_TEXT, FONT_SMALL_TEXT, FONT_BOLD_TI
 from utils.user_manager import UserManager
 from utils.language import Language
 from utils.category import Category
-from utils.mongo_db import Mongo
 
 from utils.functions.space_category_functions import create_category_in, update_category_buttons_pos
 from utils.functions.mongo_functions import get_information
 
 from components.language_changer import LanguageChanger
+from main import MainWindow
 
 class LogInWindow(QMainWindow):
-    def __init__(self, main_app):
+    def __init__(self, main_app: MainWindow):
         super().__init__()
 
         self.init_variables(main_app)
@@ -26,7 +26,7 @@ class LogInWindow(QMainWindow):
 
         self.setCentralWidget(self.scroll)
 
-    def init_variables(self, main_app):
+    def init_variables(self, main_app: MainWindow):
         # Properties
         self._log_in = True
         self._main_app = main_app
@@ -41,7 +41,7 @@ class LogInWindow(QMainWindow):
         self.widget.resize(390, 600)
         self.scroll.setWidget(self.widget)
     
-    def init_ui(self, parent):
+    def init_ui(self, parent: QWidget | None):
         ## INITIALIZE OBJECTS ##
         # Titles
         self.log_in_title = QLabel(Language.get("log_in"), parent)
@@ -177,7 +177,7 @@ class LogInWindow(QMainWindow):
         self._main_app.reopen_home()
         self._main_app.show()
 
-    def logged_successful(self, username):
+    def logged_successful(self, username: str):
         # Manage user and role
         role = UserManager.find_user_role(username)
         UserManager.set_user(username, role)
